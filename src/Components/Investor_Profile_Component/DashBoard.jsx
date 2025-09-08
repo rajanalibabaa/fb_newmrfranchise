@@ -34,7 +34,7 @@ const Dashboard = () => {
   const shortListState = useSelector(state => state.shortList);
   const likedBrandsState = useSelector(state => state.likedBrands);
   const viewBrandsState = useSelector(state => state.viewBrands);
-
+console.log("shortListState :",shortListState)
   const { brands: viewedBrands, pagination: viewPagination } = viewBrandsState;
   const shortlistedBrands = Array.isArray(shortListState.brands) ? shortListState.brands : [];
   const likedBrands = Array.isArray(likedBrandsState.brands) ? likedBrandsState.brands : [];
@@ -44,10 +44,12 @@ const Dashboard = () => {
 
   const stats = useMemo(() => ({
     totalViews: viewPagination?.totalItems || viewedBrands?.length || 0,
-    totalLikes: likedBrands.length,
+    totalLikes: likedBrandsState.pagination.total,
     totalApplications: appliedBrands.length,
-    totalShortlisted: shortListState?.pagination?.total || shortlistedBrands.length
+    totalShortlisted: shortListState?.pagination?.total
   }), [viewedBrands, viewPagination, likedBrands, appliedBrands, shortlistedBrands, shortListState]);
+
+  
 
   const fetchBrandDetails = async (brandId, config) => {
     try {
@@ -77,7 +79,7 @@ const Dashboard = () => {
         }
       };
 
-      const [likedRes, shortlistRes, viewRes, appliedRes, userRes] = await Promise.all([
+      const [appliedRes, userRes] = await Promise.all([
         dispatch(fetchLikedBrandsById({ userId: investorUUID })),
         dispatch(fetchShortListedById({ 
           investorUUID, 
@@ -336,7 +338,7 @@ const handleViewDetails = useCallback((brand) => {
           <ShortlistedTab
             items={shortlistedBrands}
             currentPage={currentPage}
-            totalPages={Math.max(1, Math.ceil((shortListState?.pagination?.total || 0) / itemsPerPage))}
+            totalPages={shortListState?.pagination?.totalPages}
             handlePageChange={handlePageChange}
             likedStates={likedStates}
             shortlistedStates={shortlistedStates}

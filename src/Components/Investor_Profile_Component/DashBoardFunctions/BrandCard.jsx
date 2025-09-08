@@ -16,6 +16,9 @@ import { RiBookmark3Fill } from "react-icons/ri";
 import img from "../../../assets/Images/logo.png";
 import { openBrandDialog } from "../../../Redux/Slices/OpenBrandNewPageSlice.jsx";
 import { useDispatch } from "react-redux";
+import { removeLikedBrand } from "../../../Redux/Slices/likeSlice.jsx";
+import { likeApiFunction } from "../../../Api/likeApi.jsx";
+import { removeSortList } from "../../../Redux/Slices/shortlistslice.jsx";
 
 const BrandCard = memo(({ 
   item, 
@@ -29,9 +32,9 @@ const BrandCard = memo(({
   franchiseModel,
   brandCategoryChild,
   onViewDetails, 
-  onToggleLike, 
+  // onToggleLike, 
   brandIdData,
-  onToggleShortlist, 
+  // onToggleShortlist, 
   onToggleViewClose 
 }) => {
   const theme = useTheme();
@@ -84,6 +87,20 @@ const dispatch = useDispatch();
     item?.image || brandLogoData ||
     img;
 
+
+    const onToggleLike = async(brandId) => {
+
+      console.log("brand id",brandId)
+      dispatch(removeLikedBrand(brandId))
+       await likeApiFunction(brandId);
+    }
+
+    const onToggleShortlist = (brandId) => {
+        console.log("brand id",brandId)
+        dispatch(removeSortList(brandId))
+    }
+
+
   return (
     <motion.div whileHover={{ y: -5 }} transition={{ duration: 0.2 }} style={{ minWidth: 0 }}>
       <Card
@@ -123,10 +140,7 @@ const dispatch = useDispatch();
                   color: isShortlisted ? "#689f38" : "rgba(0,0,0,0.2)",
                   "&:hover": { color: "#689f38" },
                 }}
-                onClick={async (e) => {
-                  e.stopPropagation();
-                  await onToggleShortlist(brandId);
-                }}
+                onClick={()=>onToggleShortlist(brandId)}
               >
                 <Tooltip title={isShortlisted ? "Remove from shortlist" : "Add to shortlist"}>
                   <RiBookmark3Fill size={21} />
@@ -155,9 +169,7 @@ const dispatch = useDispatch();
                   color: "#689f38",
                   "&:hover": { color: "#689f38" },
                 }}
-                onClick={async () => {
-                  await onToggleShortlist(brandId);
-                }}
+                onClick={()=>onToggleShortlist(brandId)}
               >
                 <Tooltip title="Remove from shortlist">
                   <RiBookmark3Fill size={21} />

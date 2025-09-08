@@ -2,9 +2,12 @@ import React, { useState, useMemo } from "react";
 import { Grid, Box, Typography, LinearProgress, CircularProgress, Pagination } from "@mui/material";
 import { Bookmark } from "@mui/icons-material";
 import BrandCard from "../DashBoardFunctions/BrandCard";
+import { useDispatch } from "react-redux";
 
 const ShortlistedTab = ({ 
   items = [], 
+  currentPage,
+  totalPages,
   isLoading, 
   errorMessage,
   likedStates = {},
@@ -15,15 +18,15 @@ const ShortlistedTab = ({
   isPaginating
 }) => {
   const [page, setPage] = useState(1);
-  const itemsPerPage = 20;
+  const itemsPerPage = 10;
+  
+const dispatch = useDispatch()
 
   // Calculate paginated data
   const paginatedItems = useMemo(() => {
-    const start = (page - 1) * itemsPerPage;
-    return items.slice(start, start + itemsPerPage);
-  }, [page, items]);
-
-  const totalPages = Math.ceil(items.length / itemsPerPage);
+    // dispatch(fetchShortListedById({page}))
+    console.log("Initial page:", page);
+  }, [page]);
 
   if (isLoading) {
     return (
@@ -47,7 +50,7 @@ const ShortlistedTab = ({
       {items.length > 0 ? (
         <>
           <Grid container spacing={3} justifyContent="center">
-            {paginatedItems.map((item) => (
+            {items.map((item) => (
               <Grid item xs={12} sm={6} md={4} lg={2.5} key={item?.uuid || Math.random()}>
                 <BrandCard 
                   item={item} 
@@ -68,6 +71,7 @@ const ShortlistedTab = ({
               <Pagination 
                 count={totalPages} 
                 page={page} 
+                onClick={paginatedItems}
                 onChange={(e, value) => setPage(value)} 
                 color="primary"
               />

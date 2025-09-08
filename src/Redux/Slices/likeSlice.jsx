@@ -54,13 +54,18 @@ export const fetchLikedBrandsById = createAsyncThunk(
 
     
 
-      const query = { page, limit };
-      const baseUrl =  "http://localhost:5000/api/v1/like";
-      const url = `${baseUrl}/get-favbrands/${userId}`;
+      const query = { page, limit, main: "Food & Beverages" };
+      const baseUrl = "http://localhost:5000/api/v1/like";
 
-      const response = await getApi(url, query, token);
+      const queryString = new URLSearchParams(query).toString();
 
-      // console.log("...", response.data?.data)
+      const url = `${baseUrl}/get-favbrands/${userId}?${queryString}`;
+
+      // console.log(url);
+
+      const response = await getApi(url, token);
+
+      console.log("...", response.data?.data)
 
       const responseData = response.data?.data;
       if (!responseData) throw new Error("No data received");
@@ -70,7 +75,7 @@ export const fetchLikedBrandsById = createAsyncThunk(
         pagination: responseData.pagination || {
           currentPage: page,
           totalPages: 1,
-          totalItems: 0,
+          total: 0,
           limit,
           hasNext: false,
         },
@@ -85,7 +90,7 @@ export const fetchLikedBrandsById = createAsyncThunk(
 const initialState = {
   brands: [],
   pagination: {
-    totalItems: 0,
+    total: 0,
     currentPage: 1,
     totalPages: 1,
     limit: 10,
@@ -107,13 +112,13 @@ const likedBrandsSlice = createSlice({
       state.brands = state.brands.filter(
         (brand) => brand.uuid !== action.payload
       );
-      state.pagination.totalItems = state.brands.length;
+      state.pagination.total -= 1;
     },
 
     addLikedBrand: (state, action) => {
       const brand = { ...action.payload, isLiked: true };
       state.brands.unshift(brand);
-      state.pagination.totalItems = state.brands.length;
+      state.pagination.total = state.pagination.total + 1;
     },
 
     toggleLikedBrand: (state, action) => {
@@ -147,7 +152,7 @@ const likedBrandsSlice = createSlice({
         state.pagination = {
           ...state.pagination,
           ...action.payload.pagination,
-          totalItems: action.payload.brands.length,
+          total: action.payload.pagination.total,
         };
       })
 
@@ -160,7 +165,7 @@ const likedBrandsSlice = createSlice({
         state.brands = state.brands.filter(
           (brand) => brand.uuid !== action.payload
         );
-        state.pagination.totalItems = state.brands.length;
+        state.pagination.total -=1;
       })
 
       .addCase(removeFromLikedBrands.rejected, (state, action) => {

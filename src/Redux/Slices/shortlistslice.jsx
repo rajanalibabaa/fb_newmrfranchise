@@ -53,15 +53,15 @@ export const fetchShortListedById = createAsyncThunk(
       const responseData = response.data?.data;
       if (!responseData) throw new Error("No data received");
  
-// console.log("Total Shortlisted Brands:", responseData?.pagination?.totalItems || 0);
-      // console.log("All Shortlisted Data:", responseData);
+console.log("Total Shortlisted Brands:", responseData?.pagination?.total || 0);
+      console.log("All Shortlisted Data:", responseData);
       
       return {
         brands: responseData.brands || [],
         pagination: responseData.pagination || {
           currentPage: page,
           totalPages: 1,
-          totalItems: 0,
+          total: 0,
           limit,
           hasNext: false,
         },
@@ -76,7 +76,7 @@ export const fetchShortListedById = createAsyncThunk(
 const initialState = {
   brands: [],
   pagination: {
-    totalItems: 0,
+    total: 0,
     currentPage: 1,
     totalPages: 1,
     limit: 10,
@@ -98,13 +98,13 @@ const shortListSlice = createSlice({
       state.brands = state.brands.filter(
         (brand) => brand.uuid !== action.payload
       );
-      state.pagination.totalItems = state.brands.length;
+      state.pagination.total -= 1;
     },
  
     addSortlist: (state, action) => {
       const brand = { ...action.payload, isShortListed: true };
       state.brands.unshift(brand);
-      state.pagination.totalItems = state.brands.length;
+      state.pagination.total += 1;
     },
  
     toggleSortlistBrandLike: (state, action) => {
@@ -131,7 +131,7 @@ const shortListSlice = createSlice({
         state.pagination = {
           ...state.pagination,
           ...action.payload.pagination,
-          totalItems: action.payload.brands.length,
+          total: action.payload.pagination.total,
         };
       })
  
@@ -144,7 +144,7 @@ const shortListSlice = createSlice({
         state.brands = state.brands.filter(
           (brand) => brand.uuid !== action.payload
         );
-        state.pagination.totalItems = state.brands.length;
+        state.pagination.total -= 1;
       })
  
       .addCase(removeFromShortlist.rejected, (state, action) => {
