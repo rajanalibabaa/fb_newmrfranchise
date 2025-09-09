@@ -6,7 +6,7 @@ import { getApi } from "../../Api/DefaultApi";
 
 // Utility for handling API errors
 const handleApiError = (error) => {
-  console.error("API Error:", error.response?.data || error.message);
+  // console.error("API Error:", error.response?.data || error.message);
   return (
     error.response?.data?.message ||
     error.message ||
@@ -41,7 +41,7 @@ export const fetchShortListedById = createAsyncThunk(
   "shortList/fetchById",
   async ({ investorUUID, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      if (!investorUUID) throw new Error("User ID is required");
+      if (!userId) throw new Error("User ID is required");
 
       const query = { page, limit ,main: "Food & Beverages" };
 const baseUrl =
@@ -49,12 +49,13 @@ const baseUrl =
 
 const queryString = new URLSearchParams(query).toString();
 
-const url = `${baseUrl}/getShortListedById/${investorUUID}?${queryString}`;
+const url = `${baseUrl}/getShortListedById/${userId}?${queryString}`;
 
 
       const response = await getApi(url, query, token);
-
+console.log("xnxx :",response.data?.data)
       const responseData = response.data?.data;
+      
       if (!responseData) throw new Error("No data received");
 
       console.log("Total Shortlisted Brands:", responseData?.pagination?.total || 0);
