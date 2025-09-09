@@ -5,24 +5,19 @@ import BrandCard from "./BrandCard";
 
 const ViewedBrands = ({ 
   brands = [],         
-  currentPage = 1,       
-  itemsPerPage = 20,    // Added itemsPerPage prop with default value
-  handlePageChange = () => {}, 
-  handleViewDetails = () => {}, 
+  currentPage = 1,
+  totalPages,       
   likedStates = {},      
   shortlistedStates = {}, 
-  toggleLike = () => {},
-  toggleShortlist = () => {},
   isLoading = false,
-  errorMessage = null
+  errorMessage = null,
+  handlePageChange,
+  onPageChange = () => {}   // ✅ callback from parent
 }) => {
   // Safe array access and pagination
   const safeBrands = Array.isArray(brands) ? brands : [];
-  const totalPages = Math.ceil(safeBrands.length / itemsPerPage);
-  const paginatedBrands = safeBrands.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+ 
+ 
 
   if (isLoading) {
     return (
@@ -45,7 +40,7 @@ const ViewedBrands = ({
       {safeBrands.length > 0 ? (
         <>
           <Grid container spacing={3} justifyContent="center">
-            {paginatedBrands.map((item) => {
+            {brands.map((item) => {
               if (!item) return null;
               return (
                 <Grid item xs={12} sm={6} md={4} lg={2.5} key={item.uuid || Math.random()}>
@@ -54,9 +49,6 @@ const ViewedBrands = ({
                     type="viewed"
                     likedStates={likedStates}
                     shortlistedStates={shortlistedStates}
-                    onViewDetails={handleViewDetails}
-                    onToggleLike={toggleLike}
-                    onToggleShortlist={toggleShortlist}
                   />
                 </Grid>
               );

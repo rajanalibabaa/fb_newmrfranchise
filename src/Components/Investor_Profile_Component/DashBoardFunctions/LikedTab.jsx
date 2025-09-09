@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Box, Typography, LinearProgress, CircularProgress, Pagination } from "@mui/material";
+import { Grid, Box, Typography, LinearProgress, Pagination } from "@mui/material";
 import { Favorite } from "@mui/icons-material";
 import BrandCard from "../DashBoardFunctions/BrandCard";
 
@@ -8,23 +8,15 @@ const LikedTab = ({
   isLoading, 
   errorMessage, 
   currentPage = 1, 
-  itemsPerPage = 20,  // Added itemsPerPage with default value
+  totalPages = 1,
   handlePageChange,
   likedStates = {},
   shortlistedStates = {},
-  handleViewDetails,
-  toggleLike,
-  toggleShortlist,
+  onViewDetails,
+  onToggleLike,
+  onToggleShortlist,
   isPaginating
 }) => {
-  // Calculate paginated items
-  const safeItems = Array.isArray(items) ? items : [];
-  const paginatedItems = safeItems.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const totalPages = Math.ceil(safeItems.length / itemsPerPage);
-
   if (isLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
@@ -44,19 +36,19 @@ const LikedTab = ({
   return (
     <>
       {isPaginating && <LinearProgress sx={{ width: '100%', mb: 2 }} />}
-      {safeItems.length > 0 ? (
+      {items.length > 0 ? (
         <>
           <Grid container spacing={3} justifyContent="center">
-            {paginatedItems.map((item) => (
+            {items.map((item) => (
               <Grid item xs={12} sm={6} md={4} lg={2.5} key={item?.uuid || Math.random()}>
                 <BrandCard 
                   item={item} 
                   type="liked"
                   likedStates={likedStates}
                   shortlistedStates={shortlistedStates}
-                  onViewDetails={handleViewDetails}
-                  onToggleLike={toggleLike}
-                  onToggleShortlist={toggleShortlist}
+                  onViewDetails={onViewDetails}
+                  onToggleLike={onToggleLike}
+                  onToggleShortlist={onToggleShortlist}
                 />
               </Grid>
             ))}
@@ -66,18 +58,10 @@ const LikedTab = ({
             <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 2 }}>
               <Pagination
                 count={totalPages}
-                page={Math.min(currentPage, totalPages)}  // Ensure page doesn't exceed total
+                page={currentPage}
                 onChange={handlePageChange}
                 color="primary"
                 size="large"
-                sx={{
-                  '& .MuiPaginationItem-root': {
-                    fontSize: '1rem',
-                    '&.Mui-selected': {
-                      fontWeight: 'bold',
-                    },
-                  },
-                }}
               />
             </Box>
           )}

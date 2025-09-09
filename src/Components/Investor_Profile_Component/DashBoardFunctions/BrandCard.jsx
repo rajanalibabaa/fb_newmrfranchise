@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import { removeLikedBrand } from "../../../Redux/Slices/likeSlice.jsx";
 import { likeApiFunction } from "../../../Api/likeApi.jsx";
 import { removeSortList } from "../../../Redux/Slices/shortlistslice.jsx";
+import { handleShortList } from "../../../Api/shortListApi.jsx";
 
 const BrandCard = memo(({ 
   item, 
@@ -95,9 +96,10 @@ const dispatch = useDispatch();
        await likeApiFunction(brandId);
     }
 
-    const onToggleShortlist = (brandId) => {
+    const onToggleShortlist = async(brandId) => {
         console.log("brand id",brandId)
         dispatch(removeSortList(brandId))
+        await handleShortList(brandId)
     }
 
 
