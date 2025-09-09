@@ -53,7 +53,6 @@ const url = `${baseUrl}/getShortListedById/${userId}?${queryString}`;
 
 
       const response = await getApi(url, query, token);
-console.log("xnxx :",response.data?.data)
       const responseData = response.data?.data;
       
       if (!responseData) throw new Error("No data received");
