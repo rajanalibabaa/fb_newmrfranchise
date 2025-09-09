@@ -29,7 +29,7 @@ export const fetchFilteredBrands = createAsyncThunk(
       params.append('page', page);
       params.append('limit', limit);
       if (id) params.append('id', id);
-      if (maincat) params.append('maincat', maincat);
+      params.append('maincat', 'Food & Beverages');
       if (subcat) params.append('subcat', subcat);
       if (childcat) params.append('childcat', childcat);
       if (serchterm) params.append('serchterm', serchterm);

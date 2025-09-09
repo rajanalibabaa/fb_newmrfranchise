@@ -236,7 +236,7 @@ useEffect(() => {
               },
             }}
           >
-            Top Fashion & Lifestyle 
+            Top Truck & Kiosks Brands
           </Typography>
 
           <Button
