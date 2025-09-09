@@ -28,12 +28,12 @@ export default brandSlice.reducer;
 
 // Thunk for side effects
 export const openBrandDialog = (brand) => async (dispatch) => {
-  if (!brand || !brand.uuid) {
-    console.error("❌ No UUID in brand payload");
-    return;
-  }
+  // if (!brand || !brand.uuid) {
+  //   console.error("❌ No UUID in brand payload");
+  //   return;
+  // }
 
-  const brandId = brand.uuid;
+  const brandId = brand.uuid || brand;
 
   // Record "view" in another slice + backend (fire-and-forget)
   if (userId) {
