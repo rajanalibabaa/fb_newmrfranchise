@@ -3,20 +3,27 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api/v1/';
 
-// Async thunk for fetching all filter options
+// --- Async thunk for fetching filter options ---
 export const fetchFilterOptions = createAsyncThunk(
   'filterDropdown/fetchFilterOptions',
   async (params = {}, { rejectWithValue }) => {
     try {
-      const { sub, state, district, main } = params;
+      // ✅ Include areaRequired in destructuring
+      const { sub, state, district, main, areaRequired } = params;
+
       const queryParams = new URLSearchParams();
 
       if (sub) queryParams.append('sub', sub);
       if (state) queryParams.append('state', state);
       if (district) queryParams.append('district', district);
-   queryParams.append('main', 'Food & Beverages');
+      if (areaRequired) queryParams.append('areaRequired', areaRequired);
+      if (main) queryParams.append('main', main);
+      else queryParams.append('main', 'Food & Beverages'); // default fallback
 
-      const response = await axios.post(`${API_BASE_URL}filter/getAllBrandFiltersdata?${queryParams.toString()}`);
+      const response = await axios.post(
+        `${API_BASE_URL}filter/getAllBrandFiltersdata?${queryParams.toString()}`
+      );
+
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
@@ -24,13 +31,14 @@ export const fetchFilterOptions = createAsyncThunk(
   }
 );
 
+// --- Initial State ---
 const initialState = {
-  // Main filter options
   mainCategories: [],
   subCategories: [],
   childCategories: [],
   investmentRanges: [],
   franchiseModels: [],
+  areaRequired: [], // ✅ already exists in your state
   states: [],
   districts: [],
   cities: [],
@@ -48,6 +56,7 @@ const initialState = {
   citiesError: null,
 };
 
+// --- Slice ---
 const filterDropdownSlice = createSlice({
   name: 'filterDropdown',
   initialState,
@@ -66,65 +75,65 @@ const filterDropdownSlice = createSlice({
       state.childCategoriesError = null;
       state.districtsError = null;
       state.citiesError = null;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Handle pending states for all cases
+      // --- Pending ---
       .addCase(fetchFilterOptions.pending, (state, action) => {
         const params = action.meta.arg || {};
-        if (params.main) {
-          state.loading = true;
-        }
-        if (params.sub) {
-          state.loadingChildCategories = true;
-        }
-        if (params.state) {
-          state.loadingDistricts = true;
-        }
-        if (params.district) {
-          state.loadingCities = true;
-        }
-        if (!action.meta.arg) {
-          state.loading = true;
-        }
+
+        if (params.main) state.loading = true;
+        if (params.sub) state.loadingChildCategories = true;
+        if (params.state) state.loadingDistricts = true;
+        if (params.areaRequired) state.loading = true;
+        if (params.district) state.loadingCities = true;
+        if (!action.meta.arg) state.loading = true;
       })
+
+      // --- Fulfilled ---
       .addCase(fetchFilterOptions.fulfilled, (state, action) => {
         const params = action.meta.arg || {};
 
         if (params.sub) {
-          // Child categories response
+          // Child categories
           state.childCategories = action.payload;
           state.loadingChildCategories = false;
         } else if (params.state) {
-          // Districts response
+          // Districts
           state.districts = action.payload;
           state.loadingDistricts = false;
         } else if (params.district) {
-          // Cities response
+          // Cities
           state.cities = action.payload;
           state.loadingCities = false;
+        } else if (params.areaRequired) {
+          // ✅ Area required filter results — keep separately
+          state.areaRequired =
+            action.payload.areaRequired || action.payload || [];
+          state.loading = false;
         } else if (params.main) {
-          // Subcategories and other filtered options for selected main category
+          // ✅ Main filter-specific updates
           state.subCategories = action.payload.subcat || [];
           state.investmentRanges = action.payload.investmentRange || [];
           state.franchiseModels = action.payload.franchiseModel || [];
           state.states = action.payload.states || [];
-          // Optionally set childCategories if you want all children under main (but UI fetches per sub)
-          // state.childCategories = action.payload.childcat || [];
+          state.areaRequired = action.payload.areaRequired || []; // ✅ Added this
           state.loading = false;
         } else {
-          // Initial full filters response
+          // Full list (default initial load)
           state.mainCategories = action.payload.maincat || [];
           state.subCategories = action.payload.subcat || [];
           state.investmentRanges = action.payload.investmentRange || [];
           state.franchiseModels = action.payload.franchiseModel || [];
           state.states = action.payload.states || [];
+          state.areaRequired = action.payload.areaRequired || []; // ✅ Added this
           state.loading = false;
 
-          console.log("Fetched all filter options:", action.payload);
         }
       })
+
+      // --- Rejected ---
       .addCase(fetchFilterOptions.rejected, (state, action) => {
         const params = action.meta.arg || {};
 
@@ -137,6 +146,9 @@ const filterDropdownSlice = createSlice({
         } else if (params.district) {
           state.citiesError = action.payload;
           state.loadingCities = false;
+        } else if (params.areaRequired) {
+          state.error = action.payload;
+          state.loading = false;
         } else if (params.main) {
           state.error = action.payload;
           state.loading = false;
@@ -145,14 +157,15 @@ const filterDropdownSlice = createSlice({
           state.loading = false;
         }
       });
-  }
+  },
 });
 
 export const {
   resetChildCategories,
   resetDistricts,
   resetCities,
-  clearErrors
+  clearErrors,
 } = filterDropdownSlice.actions;
 
 export default filterDropdownSlice.reducer;
+ 

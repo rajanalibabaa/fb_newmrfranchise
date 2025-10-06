@@ -179,29 +179,36 @@ const handleFindBrands = useCallback(() => {
         boxShadow: 1,
       }}
     >
-      {/* Category Filter */}
-      <FormControl fullWidth sx={{ minWidth: 180 }}>
-        <InputLabel>Category</InputLabel>
-        <Select
-          value={filters.selectedSubCategory}
-          onChange={(e) =>
-            handleFilterChange("selectedSubCategory", e.target.value)
-          }
-          label="Category"
-          MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
-          sx={{
-            backgroundColor: "white",
-            borderRadius: 1,
-          }}
-        >
-          <MenuItem value="">All Categories</MenuItem>
-          {subCategories.map((category) => (
-            <MenuItem key={category} value={category}>
-              {category}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+    {/* Category Filter */}
+<FormControl fullWidth sx={{ minWidth: 180 }}>
+  <InputLabel>Category</InputLabel>
+  <Select
+    value={filters.selectedSubCategory}
+    onChange={(e) =>
+      handleFilterChange("selectedSubCategory", e.target.value)
+    }
+    label="Category"
+    MenuProps={{ PaperProps: { style: { maxHeight: 300 } } }}
+    sx={{
+      backgroundColor: "white",
+      borderRadius: 1,
+    }}
+  >
+    <MenuItem value="">All Categories</MenuItem>
+
+    {/* 🔠 Sort the subCategories first */}
+    {[...subCategories]
+      .sort((a, b) =>
+        (a || "").localeCompare(b || "", undefined, { sensitivity: "base" })
+      )
+      .map((category) => (
+        <MenuItem key={category} value={category}>
+          {category}
+        </MenuItem>
+      ))}
+  </Select>
+</FormControl>
+
 
       {/* Investment Range Filter */}
       <FormControl fullWidth sx={{ minWidth: 180 }}>

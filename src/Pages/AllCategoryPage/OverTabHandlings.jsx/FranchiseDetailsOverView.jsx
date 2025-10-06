@@ -106,9 +106,11 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
     "&:active": { cursor: "grabbing" },
     "&::-webkit-scrollbar": {
       height: "8px",
+      backgroundColor: "#f1f1f1",
     },
     "&::-webkit-scrollbar-thumb": {
       backgroundColor: "#7ad03a",
+
       borderRadius: "4px",
     },
   }}
