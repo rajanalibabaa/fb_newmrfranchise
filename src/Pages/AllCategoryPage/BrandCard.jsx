@@ -386,8 +386,9 @@ const BrandCard = memo(
             />
           </Box>
 
-          <Button
-        
+          <Box mb={1}>
+            <Button
+            fullWidth
             variant="contained"
             onClick={handleOpenBrand}
             startIcon={<Description />}
@@ -395,6 +396,7 @@ const BrandCard = memo(
           >
             View Details
           </Button>
+          </Box>
         </Box>
 
         {showLogin && (
