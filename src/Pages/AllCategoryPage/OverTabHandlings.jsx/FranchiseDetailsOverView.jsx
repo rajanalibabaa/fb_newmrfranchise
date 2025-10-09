@@ -50,7 +50,7 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
             sx={{
               borderBottom: "1px solid rgba(0,0,0,0.05)",
               padding: "16px",
-              minWidth: j === 0 ? "180px" : "120px", // Adjust minimum widths as needed
+              minWidth: j === 0 ? "180px" : "170px", // Adjust minimum widths as needed
               maxWidth: "200px",
               whiteSpace: "normal",
               wordBreak: "break-word",
