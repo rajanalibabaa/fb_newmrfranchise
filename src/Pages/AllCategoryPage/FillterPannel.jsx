@@ -23,7 +23,12 @@ import {
   Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
 } from "@mui/icons-material";
-import { fetchFilterOptions, resetChildCategories, resetDistricts, resetCities } from "../../Redux/Slices/filterDropdownData";
+import {
+  fetchFilterOptions,
+  resetChildCategories,
+  resetDistricts,
+  resetCities,
+} from "../../Redux/Slices/filterDropdownData";
 
 const FilterPanel = React.memo(
   ({
@@ -158,7 +163,9 @@ const areaRequired = params.get("areaRequired");
 
     const filteredModelTypes = useMemo(() => {
       const term = searchTerms.modelType.toLowerCase().trim();
-      return franchiseModels.filter((type) => type?.toLowerCase().includes(term));
+      return franchiseModels.filter((type) =>
+        type?.toLowerCase().includes(term)
+      );
     }, [franchiseModels, searchTerms.modelType]);
 
     const filteredInvestmentRanges = useMemo(() => {
@@ -207,7 +214,12 @@ const scrollToSection = (ref) => {
     };
     return (
       <Box sx={{ pr: 2, height: "calc(100vh - 120px)", overflowY: "auto" }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={2}
+        >
           <Typography variant="h6">Filters</Typography>
           <Button
             size="small"
@@ -439,7 +451,7 @@ const scrollToSection = (ref) => {
                     >
                       <AccordionSummary
                         sx={{
-                          minHeight: "36px",
+                          minHeight: "10px",
                           px: 1,
                           "& .MuiAccordionSummary-content": { my: "2px" },
                         }}
@@ -602,7 +614,12 @@ const scrollToSection = (ref) => {
                 onChange={handleSearchTermChange("investmentRange")}
                 sx={{ mb: 1 }}
                 InputProps={{
-                  startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: "#ff9800" }} />,
+                  startAdornment: (
+                    <SearchIcon
+                      fontSize="small"
+                      sx={{ mr: 1, color: "#ff9800" }}
+                    />
+                  ),
                 }}
               /> */}
               <RadioGroup
@@ -1053,7 +1070,10 @@ const scrollToSection = (ref) => {
 
 
         <Divider sx={{ my: 2 }} />
-        <Typography variant="body2" sx={{ color: "#4caf50", textAlign: "center" }}>
+        <Typography
+          variant="body2"
+          sx={{ color: "#4caf50", textAlign: "center" }}
+        >
           Showing {resultStats.showing || 0} of {resultStats.total || 0} brands
         </Typography>
       </Box>
