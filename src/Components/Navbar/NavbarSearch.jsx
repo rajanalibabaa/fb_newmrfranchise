@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -51,9 +50,10 @@ const NavbarSearch = ({ open, handleClose }) => {
   const [openSuggestions, setOpenSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   // Get filter options from Redux store
-  const {
+ const {
     mainCategories = [],
     subCategories = [],
     childCategories = [],
@@ -63,6 +63,9 @@ const NavbarSearch = ({ open, handleClose }) => {
     cities = [],
     loading: dropdownLoading
   } = useSelector(state => state.filterDropdown);
+
+
+  console.log("===mainCategories=== ",subCategories)
 
   // Selected filters state
   const [selectedMainCategory, setSelectedMainCategory] = useState('');
@@ -83,6 +86,16 @@ const NavbarSearch = ({ open, handleClose }) => {
     city: '',
     investment: ''
   });
+
+  // Mobile detection
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Fetch initial filter options when component mounts
   useEffect(() => {
@@ -435,9 +448,33 @@ const NavbarSearch = ({ open, handleClose }) => {
     selectedInvestmentRange
   ]);
 
+  const CustomListbox = React.forwardRef(function CustomListbox(props, ref) {
+    const { children, ...other } = props;
+
+    return (
+      <ul
+        ref={ref}
+        {...other}
+        style={{
+          listStyle: 'none',
+          margin: 0,
+          padding: 8,
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)',
+          gap: 1,
+          backgroundColor: '#e0e0e0',
+          maxHeight: 200,
+          overflow: 'auto',
+        }}
+      >
+        {children}
+      </ul>
+    );
+  });
+
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-      <DialogContent sx={{  p: 3 ,background:'#d5e7ddac'}}>
+    <Dialog  open={open} onClose={handleClose} fullWidth maxWidth="md">
+      <DialogContent sx={{  p: 3 ,background:'#d5e7ddac',}}>
         {/* Close Button */}
         <IconButton
           onClick={handleClose}
@@ -447,7 +484,7 @@ const NavbarSearch = ({ open, handleClose }) => {
         </IconButton>
 
         {/* Search Input with Suggestions */}
-        <Box display="flex" justifyContent="center" mb={2} position="relative">
+        <Box display="flex"  justifyContent="center" mb={2} position="relative">
           <TextField
             placeholder="Search for brands by name, category, or location"
             fullWidth
@@ -604,24 +641,33 @@ const NavbarSearch = ({ open, handleClose }) => {
         </Typography>
 
         {/* Tabs */}
-        <Tabs
-          value={tab}
-          onChange={handleTabChange}
-          centered
-          textColor="error"
-          indicatorColor="error"
-          sx={{ mb: 2 }}
-        >
-          <Tab label="Categories" />
-          <Tab label="Location" />
-          <Tab label="Investment" />
-        </Tabs>
+     <Tabs
+  value={tab}
+  onChange={handleTabChange}
+  centered
+  textColor="error"
+
+  sx={{
+    mb: 2,
+    gap: { xs: "1px", md: "5px" }, // ✅ gap 2px on mobile, 1px on desktop
+    "& .MuiTab-root": {
+      minWidth: "auto", // ✅ prevents large default widths
+      px: { xs: 0.8, md: 5,sm:5}, // ✅ small padding on mobile
+       fontSize: { xs: "0.75rem",md :"1rem",sm:"0.9rem"},
+    },
+  }}
+>
+  <Tab label="Categories" />
+  <Tab label="Location" />
+  <Tab label="Investment" />
+</Tabs>
+
 
         {/* Tab Content */}
         {tab === 0 && (
           <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" mb={3}>
             {/* Main Category Filter */}
-            <FormControl sx={{ minWidth: 200 }}>
+            {/* <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
               <Autocomplete
                 options={filteredMainCategories}
                 value={selectedMainCategory}
@@ -634,6 +680,7 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('mainCategory', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
@@ -655,12 +702,12 @@ const NavbarSearch = ({ open, handleClose }) => {
                 loading={dropdownLoading}
                 disabled={dropdownLoading}
               />
-            </FormControl>
+            </FormControl> */}
 
             {/* Sub Category Filter - dependent on selected main category */}
-            <FormControl sx={{ minWidth: 200 }}>
+            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
               <Autocomplete
-                options={filteredSubCategories}
+                options={subCategories}
                 value={selectedSubCategory}
                 onChange={(_, newValue) => {
                   setSelectedSubCategory(newValue);
@@ -670,12 +717,13 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('subCategory', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
-                    label="Main Category" 
+                    label="Category" 
                     variant="outlined"
-                    disabled={!selectedMainCategory || dropdownLoading}
+                    // disabled={!selectedMainCategory || dropdownLoading}
                     InputProps={{
                       ...params.InputProps,
                       endAdornment: (
@@ -690,12 +738,12 @@ const NavbarSearch = ({ open, handleClose }) => {
                   />
                 )}
                 loading={dropdownLoading}
-                disabled={!selectedMainCategory || dropdownLoading}
+                // disabled={!selectedMainCategory || dropdownLoading}
               />
             </FormControl>
 
             {/* Child Category Filter - dependent on selected sub category */}
-            <FormControl sx={{ minWidth: 200 }}>
+            {/* <FormControl sx={{ minWidth: { xs: 200, md: 600 } }}>
               <Autocomplete
                 options={filteredChildCategories}
                 value={selectedChildCategory}
@@ -706,6 +754,7 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('childCategory', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
@@ -728,14 +777,14 @@ const NavbarSearch = ({ open, handleClose }) => {
                 loading={dropdownLoading}
                 disabled={!selectedSubCategory || dropdownLoading}
               />
-            </FormControl>
+            </FormControl> */}
           </Box>
         )}
 
         {tab === 1 && (
           <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" mb={3}>
             {/* State Filter */}
-            <FormControl sx={{ minWidth: 300 }}>
+            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
               <Autocomplete
                 options={filteredStates}
                 value={selectedState}
@@ -748,6 +797,7 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('state', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
@@ -772,7 +822,7 @@ const NavbarSearch = ({ open, handleClose }) => {
             </FormControl>
 
             {/* District Filter - dependent on selected state */}
-            <FormControl sx={{ minWidth: 300 }}>
+            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
               <Autocomplete
                 options={filteredDistricts}
                 value={selectedDistrict}
@@ -784,10 +834,11 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('district', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
-                    label="Cities" 
+                    label="District" 
                     variant="outlined"
                     disabled={!selectedState || dropdownLoading}
                     InputProps={{
@@ -809,7 +860,7 @@ const NavbarSearch = ({ open, handleClose }) => {
             </FormControl>
 
             {/* City Filter - dependent on selected district */}
-            {/* <FormControl sx={{ minWidth: 200 }}>
+            {/* <FormControl sx={{ minWidth: { xs: 200, md: 600 } }}>
               <Autocomplete
                 options={filteredCities}
                 value={selectedCity}
@@ -820,6 +871,7 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('city', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
@@ -848,7 +900,7 @@ const NavbarSearch = ({ open, handleClose }) => {
 
         {tab === 2 && (
           <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center" mb={3}>
-            <FormControl sx={{ minWidth: 300 }}>
+            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
               <Autocomplete
                 options={filteredInvestmentRanges}
                 value={selectedInvestmentRange}
@@ -859,6 +911,7 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, newInputValue) => {
                   handleSearchChange('investment', newInputValue);
                 }}
+                ListboxComponent={CustomListbox}
                 renderInput={(params) => (
                   <TextField 
                     {...params} 
