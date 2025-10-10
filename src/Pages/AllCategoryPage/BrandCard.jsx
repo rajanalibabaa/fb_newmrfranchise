@@ -50,7 +50,7 @@ const cardStyles = {
   position: "relative",
   overflow: "hidden",
   border: '1px solid #ff9800',
-  borderRadius: '2px',
+  borderRadius: '6px',
   "&:hover": {
     transform: "translateY(-5px)",
     boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
@@ -72,7 +72,9 @@ const titleStyles = {
 };
 
 const viewButtonStyles = {
-  py: 0.5,
+  // py: 0.5,
+  mx:1,
+  mb:1,
   bgcolor: "#4caf50",
   borderRadius: 1,
   fontWeight: 500,
@@ -384,7 +386,8 @@ const BrandCard = memo(
             />
           </Box>
 
-          <Button
+          <Box mb={1}>
+            <Button
             fullWidth
             variant="contained"
             onClick={handleOpenBrand}
@@ -393,6 +396,7 @@ const BrandCard = memo(
           >
             View Details
           </Button>
+          </Box>
         </Box>
 
         {showLogin && (

@@ -6,7 +6,7 @@ import { getApi } from "../../Api/DefaultApi";
 
 // Utility for handling API errors
 const handleApiError = (error) => {
-  console.error("API Error:", error.response?.data || error.message);
+  // console.error("API Error:", error.response?.data || error.message);
   return (
     error.response?.data?.message ||
     error.message ||
@@ -22,7 +22,7 @@ export const removeFromShortlist = createAsyncThunk(
       if (!userId || !brandId) throw new Error("Missing user ID or brand ID");
 
       const baseUrl =
-        api.shortListApi.base || "http://localhost:5000/api/v1/shortList";
+        api.shortListApi.base || "https://mrfranchisebackend.mrfranchise.in/api/v1/shortList";
       const url = `${baseUrl}/removeFromShortlist/${userId}/${brandId}`;
 
       await axios.delete(url, {
@@ -41,20 +41,20 @@ export const fetchShortListedById = createAsyncThunk(
   "shortList/fetchById",
   async ({ investorUUID, page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-      if (!investorUUID) throw new Error("User ID is required");
+      if (!userId) throw new Error("User ID is required");
 
       const query = { page, limit ,main: "Food & Beverages" };
 const baseUrl =
-  api.shortListApi.base || "http://localhost:5000/api/v1/shortList";
+  api.shortListApi.base || "https://mrfranchisebackend.mrfranchise.in/api/v1/shortList";
 
 const queryString = new URLSearchParams(query).toString();
 
-const url = `${baseUrl}/getShortListedById/${investorUUID}?${queryString}`;
+const url = `${baseUrl}/getShortListedById/${userId}?${queryString}`;
 
 
       const response = await getApi(url, query, token);
-
       const responseData = response.data?.data;
+      
       if (!responseData) throw new Error("No data received");
 
       console.log("Total Shortlisted Brands:", responseData?.pagination?.total || 0);

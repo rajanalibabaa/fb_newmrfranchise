@@ -238,7 +238,7 @@ const {
             },
           }}
         >
-          Top Automotive 
+          Top Food Franchises
         </Typography>
 
        <Button

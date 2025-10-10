@@ -265,7 +265,7 @@ const {
               },
             }}
           >
-            Top Beauty & Health 
+             Top Beverage Brands
           </Typography>
 
          <Button

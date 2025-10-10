@@ -50,7 +50,7 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
             sx={{
               borderBottom: "1px solid rgba(0,0,0,0.05)",
               padding: "16px",
-              minWidth: j === 0 ? "180px" : "120px", // Adjust minimum widths as needed
+              minWidth: j === 0 ? "180px" : "170px", // Adjust minimum widths as needed
               maxWidth: "200px",
               whiteSpace: "normal",
               wordBreak: "break-word",
@@ -106,9 +106,11 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
     "&:active": { cursor: "grabbing" },
     "&::-webkit-scrollbar": {
       height: "8px",
+      backgroundColor: "#f1f1f1",
     },
     "&::-webkit-scrollbar-thumb": {
       backgroundColor: "#7ad03a",
+
       borderRadius: "4px",
     },
   }}

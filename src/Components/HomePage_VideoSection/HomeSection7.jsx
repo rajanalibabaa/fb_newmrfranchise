@@ -232,7 +232,7 @@ useEffect(() => {
               },
             }}
           >
-            Top HomeBased Business Services 
+           Top Truck And Kiosks Franchises
           </Typography>
 
           <Button

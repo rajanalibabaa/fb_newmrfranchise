@@ -232,7 +232,7 @@ useEffect(() => {
               },
             }}
           >
-            Top Education & Training 
+             Top Dessert & Bakery Brands 
           </Typography>
 
           <Button
