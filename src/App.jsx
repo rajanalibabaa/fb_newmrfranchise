@@ -13,6 +13,7 @@ import LoadingFallback from '../src/services/SupportingComponents/LoadingFallbac
 import HomeBannerSec from "./Pages/HomePages/HomeBannerSec"
 import BrandDetailsPage from './Pages/AllCategoryPage/BrandDetailsPage'
 import BrandCategroyViewPage from './Pages/AllCategoryPage/BrandCategroyViewPage'
+import { autoLogOut } from './Api/autologout.jsx';
 // Lazy-loaded components with prefetching
 // const  = lazy(() => import(/* webpackPrefetch: true */ ));
 // const  = lazy(() => import(/* webpackPrefetch: true */ ''));
@@ -92,14 +93,24 @@ const App = () => {
 
   // Auto logout functionality
   useEffect(() => {
-    const checkAutoLogout = () => {
+    
+    const checkAutoLogout = async() => {
       const logoutTimestamp = localStorage.getItem('logoutTimestamp');
       if (!logoutTimestamp ) return;
       
       if (Date.now() >= parseInt(logoutTimestamp, 10)) {
         dispatch(logout());
+        //  await postApi(`${api.logout.post.logout}/${id}`)
         window.location.href = '/loginpage';
       }
+      // const autoLogOut = await postApi(`${api.logout.post.autoLogout}/${id}`)
+      
+      // if (autoLogOut.data.statuscode === 409 || autoLogOut.data.statuscode === 401) {
+      //   console.log("autoLogOut",autoLogOut.data)
+      //   dispatch(logout())
+      //   window.location.href = '/';
+      // }
+      autoLogOut(dispatch)
     };
     
     checkAutoLogout();

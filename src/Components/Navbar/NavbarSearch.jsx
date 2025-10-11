@@ -65,7 +65,7 @@ const NavbarSearch = ({ open, handleClose }) => {
   } = useSelector(state => state.filterDropdown);
 
 
-  console.log("===mainCategories=== ",subCategories)
+  // console.log("===mainCategories=== ",subCategories)
 
   // Selected filters state
   const [selectedMainCategory, setSelectedMainCategory] = useState('');

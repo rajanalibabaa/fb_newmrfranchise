@@ -46,5 +46,11 @@ export const api = {
       get : `${API_BASE_URL}/shortList/getShortListedById`,
       getDataForBrandOwner : `${API_BASE_URL}/shortList/getShortListedDataForOwner`,
    
+  },
+  logout : {
+    post : {
+      autoLogout : `${API_BASE_URL}/autoLogOut`,
+      logout : `${API_BASE_URL}/logout`,
+    }
   }
 };
