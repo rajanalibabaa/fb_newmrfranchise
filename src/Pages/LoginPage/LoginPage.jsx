@@ -28,7 +28,6 @@ function LoginPage({ open, onClose }) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
   const token = useSelector((state) => state.auth.token);
 
   const [formData, setFormData] = useState({ username: "", otp: "" });
@@ -43,6 +42,9 @@ function LoginPage({ open, onClose }) {
     severity: "success",
   });
 
+  const [confirmationDialogOpen, setConfirmationDialogOpen] = useState(false);
+  const [pendingOtpPayload, setPendingOtpPayload] = useState(null);
+
   const isEmail = useMemo(() => formData.username.includes("@"), [formData.username]);
 
   const otpRequestPayload = useMemo(() => {
@@ -55,10 +57,10 @@ function LoginPage({ open, onClose }) {
     return {
       verifyOtp: formData.otp,
       [isEmail ? "email" : "phone"]: isEmail ? trimmed : `+91${trimmed}`,
+      platform : "https://fb.mrfranchise.in/"
     };
   }, [formData.otp, formData.username, isEmail]);
 
-  // Countdown for resend OTP
   useEffect(() => {
     if (resendDisabled && timer > 0) {
       const interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
@@ -69,7 +71,6 @@ function LoginPage({ open, onClose }) {
     }
   }, [resendDisabled, timer]);
 
-  // 🔥 Auto logout checker
   useEffect(() => {
     const logoutTimestamp = localStorage.getItem("logoutTimestamp");
     if (!logoutTimestamp) return;
@@ -112,33 +113,53 @@ function LoginPage({ open, onClose }) {
     return Object.keys(newErrors).length === 0;
   }, [formData.username]);
 
-  const handleOtpRequest = useCallback(async () => {
-    if (!validateForm()) return;
-    setIsLoading(true);
-    try {
-      const response = await axios.post(
-        `https://mrfranchisebackend.mrfranchise.in/api/v1/login/generateOTPforLogin`,
-        otpRequestPayload,
-        { headers: { "Content-Type": "application/json" } }
-      );
+  const handleOtpRequest = useCallback(
+    async (force = false) => {
+      if (!validateForm()) return;
+      setIsLoading(true);
+      try {
+        const payload = force
+          ? { ...otpRequestPayload, logingAnyway: true }
+          : otpRequestPayload;
 
-      if (response.data.success) {
-        setSnackbar({
-          open: true,
-          message: "OTP sent successfully!",
-          severity: "success",
-        });
-        setIsOtpSent(true);
-        setResendDisabled(true);
-      } else {
-        throw new Error(response.data.message || "Failed to send OTP");
+        const response = await axios.post(
+          `https://mrfranchisebackend.mrfranchise.in/api/v1/login/generateOTPforLogin`,
+          payload,
+          { headers: { "Content-Type": "application/json" } }
+        );
+
+        const { statuscode, success, message } = response.data;
+
+        if (statuscode === 309 && success) {
+          setPendingOtpPayload(payload);
+          // setSnackbar({
+          //   open: true,
+          //   message: message || "You're already logged in elsewhere.",
+          //   severity: "info",
+          // });
+          setConfirmationDialogOpen(true);
+          return;
+        }
+
+        if (success && (statuscode === 200 || statuscode === 308)) {
+          setSnackbar({
+            open: true,
+            message: message || "OTP sent successfully!",
+            severity: "success",
+          });
+          setIsOtpSent(true);
+          setResendDisabled(true);
+        } else {
+          throw new Error(message || "Failed to send OTP");
+        }
+      } catch (err) {
+        setSnackbar({ open: true, message: err.message, severity: "error" });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      setSnackbar({ open: true, message: err.message, severity: "error" });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [otpRequestPayload, validateForm]);
+    },
+    [otpRequestPayload, validateForm]
+  );
 
   const handleVerifyOtp = useCallback(async () => {
     if (!formData.otp) {
@@ -180,7 +201,7 @@ function LoginPage({ open, onClose }) {
           setTimer(30);
           setErrors({});
           navigate("/");
-          window.location.reload(); // Full refresh
+          window.location.reload();
         }, 1000);
       } else {
         throw new Error(response.data.message || "Invalid OTP");
@@ -217,9 +238,7 @@ function LoginPage({ open, onClose }) {
             py: 2,
           }}
         >
-          <Typography variant="h5" component={"span"}>
-            Login
-          </Typography>
+          <Typography variant="h5">Login</Typography>
           <IconButton onClick={onClose}>
             <CloseIcon sx={{ color: "red", fontSize: 30 }} />
           </IconButton>
@@ -295,7 +314,7 @@ function LoginPage({ open, onClose }) {
                 {isOtpSent && (
                   <Typography variant="body2" textAlign="center" mb={2}>
                     Didn’t receive OTP?{" "}
-                    <Link component="button" onClick={handleOtpRequest} disabled={resendDisabled}>
+                    <Link component="button" onClick={() => handleOtpRequest()} disabled={resendDisabled}>
                       {resendDisabled ? `Resend in ${timer}s` : "Resend OTP"}
                     </Link>
                   </Typography>
@@ -321,6 +340,37 @@ function LoginPage({ open, onClose }) {
               </Box>
             </Grid>
           </Grid>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog for 309 */}
+      <Dialog open={confirmationDialogOpen} onClose={() => setConfirmationDialogOpen(false)}>
+        {/* <DialogTitle>You're already logged in</DialogTitle> */}
+        <DialogContent>
+          <Typography mb={2}>
+            It looks like you're already logged in on another device or browser. Do you want to proceed anyway?
+          </Typography>
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button
+              onClick={() => {
+                setConfirmationDialogOpen(false);
+                setPendingOtpPayload(null);
+              }}
+              color="inherit"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                setConfirmationDialogOpen(false);
+                handleOtpRequest(true); // Retry with force
+              }}
+              variant="contained"
+              color="primary"
+            >
+              Proceed Anyway
+            </Button>
+          </Box>
         </DialogContent>
       </Dialog>
 
