@@ -223,6 +223,7 @@ const scrollToSection = (ref) => {
           <Typography variant="h6">Filters</Typography>
           <Button
             size="small"
+            variant="outlined"
             onClick={onClearFilters}
             disabled={activeFilterCount === 0}
             startIcon={<ClearIcon />}

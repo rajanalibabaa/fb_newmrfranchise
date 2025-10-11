@@ -706,41 +706,40 @@ const NavbarSearch = ({ open, handleClose }) => {
 
             {/* Sub Category Filter - dependent on selected main category */}
             <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
-              <Autocomplete
-                options={subCategories}
-                value={selectedSubCategory}
-                onChange={(_, newValue) => {
-                  setSelectedSubCategory(newValue);
-                  setSelectedChildCategory('');
-                }}
-                inputValue={searchTerms.subCategory}
-                onInputChange={(_, newInputValue) => {
-                  handleSearchChange('subCategory', newInputValue);
-                }}
-                ListboxComponent={CustomListbox}
-                renderInput={(params) => (
-                  <TextField 
-                    {...params} 
-                    label="Category" 
-                    variant="outlined"
-                    // disabled={!selectedMainCategory || dropdownLoading}
-                    InputProps={{
-                      ...params.InputProps,
-                      endAdornment: (
-                        <>
-                          {dropdownLoading && selectedSubCategory && (
-                            <CircularProgress color="inherit" size={20} />
-                          )}
-                          {params.InputProps.endAdornment}
-                        </>
-                      )
-                    }}
-                  />
-                )}
-                loading={dropdownLoading}
-                // disabled={!selectedMainCategory || dropdownLoading}
-              />
-            </FormControl>
+  <Autocomplete
+    options={[...subCategories].sort((a, b) => a.localeCompare(b))}
+    value={selectedSubCategory}
+    onChange={(_, newValue) => {
+      setSelectedSubCategory(newValue);
+      setSelectedChildCategory('');
+    }}
+    inputValue={searchTerms.subCategory}
+    onInputChange={(_, newInputValue) => {
+      handleSearchChange('subCategory', newInputValue);
+    }}
+    ListboxComponent={CustomListbox}
+    renderInput={(params) => (
+      <TextField 
+        {...params} 
+        label="Category" 
+        variant="outlined"
+        InputProps={{
+          ...params.InputProps,
+          endAdornment: (
+            <>
+              {dropdownLoading && selectedSubCategory && (
+                <CircularProgress color="inherit" size={20} />
+              )}
+              {params.InputProps.endAdornment}
+            </>
+          )
+        }}
+      />
+    )}
+    loading={dropdownLoading}
+  />
+</FormControl>
+
 
             {/* Child Category Filter - dependent on selected sub category */}
             {/* <FormControl sx={{ minWidth: { xs: 200, md: 600 } }}>
