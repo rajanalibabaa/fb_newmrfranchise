@@ -38,7 +38,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { Info, InfoOutlined, InfoOutlineRounded } from "@mui/icons-material";
 const FranchiseDetails = ({ data = {}, errors = {}, onChange = () => {} }) => {
 
-  console.log("franchiseDetails",data);
   
   // Define fee unit options
   const royaltyFeeUnits = [

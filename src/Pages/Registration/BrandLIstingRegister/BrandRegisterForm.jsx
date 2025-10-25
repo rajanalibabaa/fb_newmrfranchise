@@ -31,7 +31,6 @@ import {
 import { useTheme, useMediaQuery } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import BrandDetails from "./BrandDetails";
-import FranchiseDetails from "./FranchiseDetails";
 import Uploads from "../BrandLIstingRegister/BrandRegisterUploads";
 import {
   validateBrandDetails,
@@ -45,6 +44,8 @@ import BrandExpansionLocationDetails from "./BrandExpansionLocationDetails";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { useDispatch } from "react-redux";
 import { showLoading } from "../../../Redux/Slices/loadingSlice";
+import FranchiseDetails from "./FranchiseDetails";
+
 
 const FORM_DATA_KEY = "brandRegistrationFormData";
 const FORM_STEP_KEY = "brandRegistrationActiveStep";
@@ -171,6 +172,19 @@ const initialFormData = {
     consultationOrAssistance: "",
     trainingSupport: "",
     uniqueSellingPoints: [],
+    franchiseTags:{
+      PrimaryClassifications: [],
+      productServiceTypes: [],
+      TargetAudience: [],
+      ServiceModel: [],
+      PricingValue: [],
+      AmbienceExperience: [],
+      FeaturesAmenities: [],
+      TechnologyIntegration: [],
+      SustainabilityEthics: [],
+      BusinessOperations: [],
+    },
+
   },
 
   expansionLocationData: {
@@ -330,6 +344,9 @@ const BrandRegisterForm = () => {
         setSubmitSuccess(false);
 
         const formDataSend = new FormData();
+
+        console.log("sending form data",formDataSend);
+        
         // Append brand details
         formDataSend.append(
           "brandDetails",
@@ -383,6 +400,7 @@ const BrandRegisterForm = () => {
               formData.franchiseDetails.consultationOrAssistance,
             trainingSupport: formData.franchiseDetails.trainingSupport,
             uniqueSellingPoints: formData.franchiseDetails.uniqueSellingPoints,
+            franchiseTags: formData.franchiseDetails.franchiseTags,
           })
         );
 
@@ -420,7 +438,7 @@ const BrandRegisterForm = () => {
         });
 console.log("Form data prepared for submission:", formDataSend);
         const response = await axios.post(
-          "https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/createBrandListing",
+          "http://localhost:5000/api/v1/brandlisting/createBrandListing",
           formDataSend,
           {
             headers: {
@@ -429,7 +447,7 @@ console.log("Form data prepared for submission:", formDataSend);
           }
         );
 
-        if (response.status === 200) {
+        if (response.status === 200 && response.data) {
           setSubmitSuccess(true);
           setSnackbar({
             open: true,
@@ -441,12 +459,16 @@ console.log("Form data prepared for submission:", formDataSend);
           localStorage.removeItem(FORM_STEP_KEY);
           setFormData(initialFormData);
           setActiveStep(0);
+          setOpenPreview(false);
           setTimeout(() => {
             navigate("/advertisewithus");
           }, 1500);
+        }else{
+          throw new Error("Submission failed. Please try again.");
         }
       } catch (error) {
         console.error("Submission error:", error);
+        setSubmitSuccess(false);
         setSnackbar({
           open: true,
           message:
@@ -572,7 +594,7 @@ console.log("Form data prepared for submission:", formDataSend);
             data={formData.franchiseDetails}
             errors={validationErrors.franchiseDetails}
             onChange={handleFranchiseDetailsChange}
-          />
+          />          
         );
       case 2:
         return (
@@ -1540,22 +1562,48 @@ console.log("Form data prepared for submission:", formDataSend);
             {renderPreviewContent()}
           </DialogContent>
           <DialogActions
-            sx={{
-              borderTop: "1px solid #e0e0e0",
-              position: "sticky",
-              bottom: 0,
-              backgroundColor: "background.paper",
-              zIndex: 1,
-            }}
-          >
-            <Button
-              onClick={handlePreviewClose}
-              variant="contained"
-              color="error"
-            >
-              Close
-            </Button>
-          </DialogActions>
+  sx={{
+    borderTop: "1px solid #e0e0e0",
+    position: "sticky",
+    bottom: 0,
+    backgroundColor: "background.paper",
+    zIndex: 1,
+  }}
+>
+  {activeStep === steps.length - 1 && (
+    <Button
+      variant="contained"
+      onClick={handleSubmit}
+      disabled={isSubmitting}
+      startIcon={
+        isSubmitting ? (
+          <CircularProgress size={20} color="inherit" />
+        ) : submitSuccess ? (
+          <CheckCircleIcon />
+        ) : null
+      }
+      sx={{
+        background: "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
+        mr: 1
+      }}
+    >
+      {isSubmitting
+        ? "Submitting..."
+        : submitSuccess
+        ? "Submitted!"
+        : "Submit from Preview"}
+    </Button>
+  )}
+  <Button
+    onClick={handlePreviewClose}
+    variant="contained"
+    color="error"
+    disabled={isSubmitting} // Disable close button during submission
+  >
+    Close
+  </Button>
+</DialogActions>
+
         </Dialog>
 
         {/* Snackbar for notifications */}

@@ -48,8 +48,8 @@ import BookmarkIcon from "@mui/icons-material/Bookmark";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 
-// const API_BASE_URL = 'https://mrfranchisebackend.mrfranchise.in';
-const API_BASE_URL = "https://mrfranchisebackend.mrfranchise.in/api/v1";
+// const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "http://localhost:5000/api/v1";
 const colors = {
   primary: "#2c3e50",
   secondary: "#34495e",
