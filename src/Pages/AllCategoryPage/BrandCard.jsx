@@ -61,6 +61,7 @@ const titleStyles = {
   fontWeight: 600,
   color: "text.primary",
   pr: 1,
+  ml:1,
   overflow: "hidden",
   textOverflow: "ellipsis",
   display: "-webkit-box",
@@ -304,8 +305,40 @@ const BrandCard = memo(
             justifyContent="space-between"
             alignItems="center"
           >
-            <Typography variant="body2" component="div" sx={titleStyles}>
-              {brandname}
+            <Typography >
+             
+              {brandCategories?.sub ? (
+  <Tooltip title={brandCategories?.sub} arrow>
+    <Chip
+      label={
+        brandCategories.sub.length > 25
+          ? `${brandCategories.sub.slice(0, 25)}...`
+          : brandCategories.sub
+      }
+      size="small"
+      sx={{
+        bgcolor: "rgba(255, 152, 0, 0.1)",
+        color: "orange.dark",
+        fontWeight: 150,
+        ml:0.5,
+        maxWidth: 175, 
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+        ".MuiChip-label": {
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        },
+      }}
+    />
+  </Tooltip>
+) : (
+  <Typography variant="body2" color="text.secondary">
+    N/A
+  </Typography>
+)}
+
             </Typography>
             <Box>
               <IconButton
@@ -350,10 +383,14 @@ const BrandCard = memo(
               justifyContent: "space-between",
               alignItems: "center",
             }}
-          >
-            {brandCategories?.child ? (
+          >            
+                        <Typography variant="body2" component="div" sx={titleStyles}>
+              {brandname}
+            </Typography>
+
+            {/* {brandCategories?.main ? (
               <Chip
-                label={brandCategories.child}
+                label={brandCategories?.main}
                 size="small"
                 sx={{
                   bgcolor: "rgba(255, 152, 0, 0.1)",
@@ -365,7 +402,7 @@ const BrandCard = memo(
               <Typography variant="body2" color="text.secondary">
                 N/A
               </Typography>
-            )}
+            )} */}
           </Box>
 
           <Box sx={{ mb: 2,ml:1, flexGrow: 1, "& > *:not(:last-child)": { mb: 1 ,} }}>
@@ -386,17 +423,30 @@ const BrandCard = memo(
             />
           </Box>
 
-          <Box mb={1}>
-            <Button
-            fullWidth
-            variant="contained"
-            onClick={handleOpenBrand}
-            startIcon={<Description />}
-            sx={viewButtonStyles}
-          >
-            View Details
-          </Button>
-          </Box>
+         <Box
+  sx={{
+    mt: "auto", 
+    px: 1,      
+    pb: 1,      
+    display: "flex",
+    justifyContent: "center",
+  }}
+>
+  <Button
+    variant="contained"
+    onClick={handleOpenBrand}
+    startIcon={<Description />}
+    sx={{
+      ...viewButtonStyles,
+      width: "100%", 
+      maxWidth: 220, 
+      textAlign: "center",
+    }}
+  >
+    View Details
+  </Button>
+</Box>
+
         </Box>
 
         {showLogin && (
