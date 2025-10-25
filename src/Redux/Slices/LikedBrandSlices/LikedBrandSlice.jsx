@@ -5,6 +5,7 @@ export const toggleLikeBrand = createAsyncThunk(
   "likedBrands/toggleLike",
   async (brandId) => {
     const res = await axios.post("/api/investor/toggle-like", { brandId });
+    console.log(res.data);
     return res.data.likedBrandIds;
   }
 );
