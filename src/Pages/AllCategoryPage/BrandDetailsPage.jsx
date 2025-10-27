@@ -77,6 +77,8 @@ function BrandDetailsPage() {
           { params: { userId } }
         );
         let brand = res.data?.data;
+        console.log("brand coming data ",brand);
+        
         // Guarantee always array for BrandDetails
         setBrandData(Array.isArray(brand) ? brand : [brand]);
         sessionStorage.setItem(brandCacheKey, JSON.stringify(Array.isArray(brand) ? brand : [brand]));

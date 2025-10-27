@@ -435,7 +435,7 @@ const investmentRanges = [
     child: data.brandCategories?.child
       ? (Array.isArray(data.brandCategories.child)
           ? data.brandCategories.child
-          : data.brandCategories.child.split(" - ").filter(Boolean))
+          : data.brandCategories.child.split(" | ").filter(Boolean))
       : [],
   });
   const handleMainCategoryChange = (e) => {

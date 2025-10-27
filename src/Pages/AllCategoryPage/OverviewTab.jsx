@@ -17,6 +17,7 @@ import { useTheme } from "@mui/material/styles";
 import FranchiseDetailsTable from "./OverTabHandlings.jsx/FranchiseDetailsOverView.jsx";
 import BrandDescription from "./OverTabHandlings.jsx/BrandDescriptionsOverView.jsx";
 import SupportProvided from "./OverTabHandlings.jsx/SupportProvidedOverView.jsx";
+import FranchiseTagsOverView from "./OverTabHandlings.jsx/FranchiseTagsOverView.jsx";
 
 // Lazy loading heavy/offscreen/large sections
 const ExpansionLocationGrid = React.lazy(() => import("./OverTabHandlings.jsx/BrandOverViewExpansionLocationDomestic.jsx"));
@@ -77,9 +78,17 @@ const OverviewTab = ({ brand }) => {
   const franchiseDetails = brand?.[0]?.brandfranchisedetails?.franchiseDetails || {};
   const expansionLocationData = brand?.[0]?.brandexpansionlocationdatas || {};
   const uploads = brand?.[0]?.uploads || {};
+const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchiseTags || {};
 
   return (
     <Box ref={overviewRef}>
+      {/* Franchise Tags: Render instantly */
+      }
+      {hasData(FranchiseTags) && (
+        <FranchiseTagsOverView 
+        franchiseTagsDetails={FranchiseTags}
+        />
+      )}
       {/* Franchise Details: Render instantly */}
       {hasData(franchiseDetails.fico) && (
         <FranchiseDetailsTable
