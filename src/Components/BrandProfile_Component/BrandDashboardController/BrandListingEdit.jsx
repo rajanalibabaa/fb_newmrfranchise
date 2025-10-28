@@ -33,8 +33,8 @@ const flattenBrandData = (brandDoc) => {
     const franchiseTagsFromAPI = brandDoc.franchiseDetails?.franchiseTags || {};
 console.log("=== FLATTEN DEBUG ===");
   console.log("Original franchiseTags:", franchiseTagsFromAPI);
-  console.log("Type:", typeof franchiseTagsFromAPI);
-
+  console.log("Fico data from API:", brandDoc.franchiseDetails?.fico);
+console.log("Type of Fico:", typeof brandDoc.franchiseDetails?.fico);
   return {
     // Brand Details
     fullName: brandDoc.brandDetails?.fullName || "",
@@ -74,8 +74,7 @@ console.log("=== FLATTEN DEBUG ===");
     franchiseOutlets: brandDoc.franchiseDetails?.franchiseOutlets || "",
     franchiseSinceYear: brandDoc.franchiseDetails?.franchiseSinceYear || "",
     totalOutlets: brandDoc.franchiseDetails?.totalOutlets || "",
-    fico: brandDoc.franchiseDetails?.fico || [],
-    trainingSupport: brandDoc.franchiseDetails?.trainingSupport || [],
+fico: Array.isArray(brandDoc.franchiseDetails?.fico) ? brandDoc.franchiseDetails.fico : [],    trainingSupport: brandDoc.franchiseDetails?.trainingSupport || [],
     uniqueSellingPoints: brandDoc.franchiseDetails?.uniqueSellingPoints || [],
 
         franchiseTags: franchiseTagsFromAPI,
@@ -104,6 +103,21 @@ console.log("=== FLATTEN DEBUG ===");
   };
 };
 const BrandListingEdit = () => {
+  const params = useParams();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+    
+    const uuid = params?.uuid || 
+                 location?.state?.uuid || 
+                 searchParams.get("uuid") ||
+                 localStorage.getItem("brandUUID") || 
+                 localStorage.getItem("investorUUID");
+                 
+    console.log("Save attempted with UUID:", uuid);
+    // if (!uuid) return;
+
+    // setSaveStatus({ loading: true, success: false, error: "" });
+
   const [formData, setFormData] = useState({});
   const [originalData, setOriginalData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -112,6 +126,18 @@ const BrandListingEdit = () => {
     loading: false,
     success: false,
     error: "",
+  });
+  const [currentTags, setCurrentTags] = useState({
+    PrimaryClassifications: [],
+    productServiceTypes: [],
+    TargetAudience: [],
+    ServiceModel: [],
+    PricingValue: [],
+    AmbienceExperience: [],
+    FeaturesAmenities: [],
+    TechnologyIntegration: [],
+    SustainabilityEthics: [],
+    BusinessOperations: [],
   });
    const  id  = useParams();
   console.log("Brand ID:", id.uuid);
@@ -226,28 +252,39 @@ const BrandListingEdit = () => {
     }));
   };
 
-  const handleArrayChange = (field, value) => {
-    if (field === "awards") {
-      // For awards, we need to preserve both description and image data
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    }
-  };
-const handleObjectChange = (field, keyOrValue, maybeValue) => {
+ const handleArrayChange = (field, value) => {
+  console.log(`🔄 Updating ${field}:`, value);
+  
+  // Special handling for awards array
+  if (field === "awards") {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  } else {
+    // For all other arrays including fico
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  }
+};
+ const handleObjectChange = (field, keyOrValue, maybeValue) => {
+  console.log(`📝 Object change - Field: ${field}, KeyOrValue:`, keyOrValue, "MaybeValue:", maybeValue);
+  
+  // Update currentTags when franchiseTags changes
+  if (field === "franchiseTags" && typeof keyOrValue === "object" && maybeValue === undefined) {
+    console.log("🔄 Updating currentTags with:", keyOrValue);
+    setCurrentTags(keyOrValue);
+  }
+  
   setFormData((prev) => {
     // Case 1: Replace whole object (FranchiseDetailsEdit passes object for franchiseTags)
     if (field === "franchiseTags" && typeof keyOrValue === "object" && maybeValue === undefined) {
-      console.log("Updating entire franchiseTags object:", keyOrValue);
+      console.log("📦 Updating entire franchiseTags object:", keyOrValue);
       return {
         ...prev,
-        [field]: keyOrValue,  // ✅ overwrite full franchiseTags object
+        [field]: keyOrValue,
       };
     }
 
@@ -396,32 +433,37 @@ const handleObjectChange = (field, keyOrValue, maybeValue) => {
   };
 
   const handleSave = async () => {
-     const params = useParams();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-    
-    const uuid = params?.uuid || 
-                 location?.state?.uuid || 
-                 searchParams.get("uuid") ||
-                 localStorage.getItem("brandUUID") || 
-                 localStorage.getItem("investorUUID");
-                 
     console.log("Save attempted with UUID:", uuid);
-    if (!uuid) return;
-
+    console.log("fico data being saved:", formData.fico);
+    if (!uuid) {
+      setSaveStatus({
+        loading: false,
+        success: false,
+        error: "No UUID found for saving.",
+      });
+      return;
+    }
     setSaveStatus({ loading: true, success: false, error: "" });
-
+     
     try {
       // Step 1: Update brand details and franchise details
       const formDataToSend = new FormData();
 
-       const franchiseTagsForBackend = { ...formData.franchiseTags };
-    
-    // If frontend has productServiceTypes, copy it to ProductServiceTypes for backend
-    if (franchiseTagsForBackend.productServiceTypes) {
-      franchiseTagsForBackend.ProductServiceTypes = franchiseTagsForBackend.productServiceTypes;
-    }
+     const franchiseTagsForBackend = { 
+      PrimaryClassifications: currentTags.PrimaryClassifications || [],
+      ProductServiceTypes: currentTags.ProductServiceTypes || currentTags.productServiceTypes || [],
+      TargetAudience: currentTags.TargetAudience || [],
+      ServiceModel: currentTags.ServiceModel || [],
+      PricingValue: currentTags.PricingValue || [],
+      AmbienceExperience: currentTags.AmbienceExperience || [],
+      FeaturesAmenities: currentTags.FeaturesAmenities || [],
+      TechnologyIntegration: currentTags.TechnologyIntegration || [],
+      SustainabilityEthics: currentTags.SustainabilityEthics || [],
+      BusinessOperations: currentTags.BusinessOperations || [],
+    };
 
+    console.log("Final franchiseTags for backend:", franchiseTagsForBackend);
+    console.log("fico data being saved:", formData.fico);
       // Prepare the data structure that matches the backend expectation
       const updateData = {
         brandDetails: {
@@ -461,8 +503,7 @@ const handleObjectChange = (field, keyOrValue, maybeValue) => {
           franchiseOutlets: formData.franchiseOutlets,
           franchiseSinceYear: formData.franchiseSinceYear,
           totalOutlets: formData.totalOutlets,
-          fico: formData.fico,
-          trainingSupport: formData.trainingSupport,
+          fico: formData.fico || [],
           uniqueSellingPoints: formData.uniqueSellingPoints,
           franchiseTags: franchiseTagsForBackend,
         },

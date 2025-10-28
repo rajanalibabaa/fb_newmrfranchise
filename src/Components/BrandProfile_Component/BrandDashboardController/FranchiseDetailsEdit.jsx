@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
   TextField,
+  Chip,
+  Stack,
+  Collapse,
   FormControl,
   FormLabel,
   FormControlLabel,
@@ -8,6 +11,9 @@ import {
   RadioGroup,
   InputAdornment,
   Grid,
+  Drawer,
+  AppBar,
+  Toolbar,
   Typography,
   Box,
   Select,
@@ -37,7 +43,8 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
-import { Delete as DeleteIcon, Edit as EditIcon, InfoOutlined } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
+import { Delete as DeleteIcon, Edit as EditIcon, InfoOutlined,Category, ExpandMore, ExpandLess } from "@mui/icons-material";
 import categories from "../../../Pages/Registration/BrandLIstingRegister/BrandCategories";
 const FranchiseDetailsEdit = ({
   data = {},
@@ -95,6 +102,10 @@ const FranchiseDetailsEdit = ({
     roi: false,
   });
   const [currentUSP, setCurrentUSP] = useState("");
+  const [showSelectedBar, setShowSelectedBar] = useState(false);
+
+const [drawerOpen, setDrawerOpen] = useState(false);
+const [tempSelectedChild, setTempSelectedChild] = useState([]);
   const [editIndex, setEditIndex] = useState(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
@@ -154,7 +165,6 @@ const [currentTags, setCurrentTags] = useState({
     BusinessOperations: [],
   });
 
-
  useEffect(() => {
   if (data.franchiseTags) {
     console.log("Updating currentTags with data:", data.franchiseTags); 
@@ -196,11 +206,38 @@ const [currentTags, setCurrentTags] = useState({
   }
 }, [data.franchiseTags]);
 
+const handleOpenDrawer = () => {
+  console.log("✅ handleOpenDrawer triggered!");
+  if (!selectedCategory.sub || !selectedCategory.main) return;
+  setTempSelectedChild(selectedCategory.child || []);
+  setDrawerOpen(true);
+};
+
+
+const handleChildToggle = (child) => {
+  setTempSelectedChild((prevSelected) =>
+    prevSelected.includes(child)
+      ? prevSelected.filter((item) => item !== child)
+      : [...prevSelected, child]
+  );
+};
+
+const handleDone = () => {
+  const newCategory = {
+    ...selectedCategory,
+    child: tempSelectedChild,
+  };
+  setSelectedCategory(newCategory);
+  onObjectChange("brandCategories", {
+    ...newCategory,
+    child: tempSelectedChild.join(" - "),
+  });
+  setDrawerOpen(false);
+};
+
   // Handle tag change (FIXED)
- // Handle tag change (FIXED VERSION)
 const handleTagChange = (tagType) => (e) => {
   const { target: { value } } = e;
-  
   console.log(`Updating ${tagType} with:`, value); // Debug log
   
   // Update local state first
@@ -208,7 +245,6 @@ const handleTagChange = (tagType) => (e) => {
     ...currentTags,
     [tagType]: value,
   };
-  
   setCurrentTags(updatedTags);
   
   // Update the main form data - pass the ENTIRE updated franchiseTags object
@@ -287,6 +323,14 @@ const handleTagChange = (tagType) => (e) => {
       });
     }
   }, [editIndex, data.fico]);
+
+  // Add this useEffect after your other useEffects
+useEffect(() => {
+  console.log("🔍 FranchiseDetailsEdit - Received data:", data);
+  console.log("🔍 FranchiseDetailsEdit - FICO data:", data.fico);
+  console.log("🔍 FranchiseDetailsEdit - isEditing:", isEditing);
+}, [data, data.fico, isEditing]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "companyOwnedOutlets" || name === "franchiseOutlets") {
@@ -453,69 +497,64 @@ const handleTagChange = (tagType) => (e) => {
     }
     return null;
   };
-  const handleAddOrUpdateFicoModel = () => {
-    const validationError = validateFicoModel();
-    if (validationError) {
-      alert(validationError);
-      return;
-    }
-    const formattedFicoModel = {
-      ...currentFicoModel,
-      franchiseFee: noFees.franchiseFee
-        ? "No Fee"
-        : `${currentFicoModel.franchiseFee}${
-            currentFicoModel.franchiseFeeUnit === "No Fee"
-              ? ""
-              : currentFicoModel.franchiseFeeUnit
-          }`,
-      royaltyFee: noFees.royaltyFee
-        ? "No Fee"
-        : `${currentFicoModel.royaltyFee}${
-            currentFicoModel.royaltyFeeUnit === "No Fee"
-              ? ""
-              : currentFicoModel.royaltyFeeUnit
-          }`,
-      interiorCost: noFees.interiorCost
-        ? "No Fee"
-        : `${currentFicoModel.interiorCost}${
-            currentFicoModel.interiorCostUnit === "No Fee"
-              ? ""
-              : currentFicoModel.interiorCostUnit
-          }`,
-      stockInvestment: noFees.stockInvestment
-        ? "No Fee"
-        : `${currentFicoModel.stockInvestment}${
-            currentFicoModel.stockInvestmentUnit === "No Fee"
-              ? ""
-              : currentFicoModel.stockInvestmentUnit
-          }`,
-      otherCost: noFees.otherCost
-        ? "No Fee"
-        : `${currentFicoModel.otherCost}${
-            currentFicoModel.otherCostUnit === "No Fee"
-              ? ""
-              : currentFicoModel.otherCostUnit
-          }`,
-      requireWorkingCapital: noFees.requireWorkingCapital
-        ? "No Fee"
-        : `${currentFicoModel.requireWorkingCapital}${
-            currentFicoModel.requireWorkingCapitalUnit === "No Fee"
-              ? ""
-              : currentFicoModel.requireWorkingCapitalUnit
-          }`,
-      roi: noFees.roi ? "No Fee" : currentFicoModel.roi,
-      payBackPeriod: noFees.roi ? "No Fee" : currentFicoModel.payBackPeriod,
-    };
-    let updatedFico;
-    if (editIndex !== null) {
-      updatedFico = [...(data.fico || [])];
-      updatedFico[editIndex] = formattedFicoModel;
-    } else {
-      updatedFico = [...(data.fico || []), formattedFicoModel];
-    }
-    onArrayChange("fico", updatedFico);
-    resetFicoForm();
+ const handleAddOrUpdateFicoModel = () => {
+  const validationError = validateFicoModel();
+  if (validationError) {
+    alert(validationError);
+    return;
+  }
+  
+  const formattedFicoModel = {
+    ...currentFicoModel,
+    franchiseFee: noFees.franchiseFee
+      ? "No Fee"
+      : currentFicoModel.franchiseFee && currentFicoModel.franchiseFeeUnit !== "select"
+      ? `${currentFicoModel.franchiseFee}${currentFicoModel.franchiseFeeUnit}`
+      : "",
+    royaltyFee: noFees.royaltyFee
+      ? "No Fee"
+      : currentFicoModel.royaltyFee && currentFicoModel.royaltyFeeUnit !== "select"
+      ? `${currentFicoModel.royaltyFee}${currentFicoModel.royaltyFeeUnit}`
+      : "",
+    interiorCost: noFees.interiorCost
+      ? "No Fee"
+      : currentFicoModel.interiorCost && currentFicoModel.interiorCostUnit !== "select"
+      ? `${currentFicoModel.interiorCost}${currentFicoModel.interiorCostUnit}`
+      : "",
+    stockInvestment: noFees.stockInvestment
+      ? "No Fee"
+      : currentFicoModel.stockInvestment && currentFicoModel.stockInvestmentUnit !== "select"
+      ? `${currentFicoModel.stockInvestment}${currentFicoModel.stockInvestmentUnit}`
+      : "",
+    otherCost: noFees.otherCost
+      ? "No Fee"
+      : currentFicoModel.otherCost && currentFicoModel.otherCostUnit !== "select"
+      ? `${currentFicoModel.otherCost}${currentFicoModel.otherCostUnit}`
+      : "",
+    requireWorkingCapital: noFees.requireWorkingCapital
+      ? "No Fee"
+      : currentFicoModel.requireWorkingCapital && currentFicoModel.requireWorkingCapitalUnit !== "select"
+      ? `${currentFicoModel.requireWorkingCapital}${currentFicoModel.requireWorkingCapitalUnit}`
+      : "",
+    roi: noFees.roi ? "No Fee" : currentFicoModel.roi,
+    payBackPeriod: noFees.roi ? "No Fee" : currentFicoModel.payBackPeriod,
   };
+
+  console.log("💾 Saving FICO model:", formattedFicoModel);
+
+  let updatedFico;
+  if (editIndex !== null) {
+    updatedFico = [...(data.fico || [])];
+    updatedFico[editIndex] = formattedFicoModel;
+  } else {
+    updatedFico = [...(data.fico || []), formattedFicoModel];
+  }
+  
+  console.log("💾 Updated FICO array:", updatedFico);
+  onArrayChange("fico", updatedFico);
+  resetFicoForm();
+};
+
   const handleEditFicoModel = (index) => {
     setEditIndex(index);
   };
@@ -647,10 +686,17 @@ const handleTagChange = (tagType) => (e) => {
       : (data.trainingSupport || []).filter((v) => v !== option);
     onArrayChange("trainingSupport", newValue);
   };
-  const formatCurrency = (value) => {
-    if (!value) return "";
-    return value !== "No Fee" ? `${value}.Rs` : value;
-  };
+const formatCurrency = (value) => {
+  if (!value || value === "No Fee" || value === "select") return value || "N/A";
+  
+  // If value already contains the unit, return as is
+  if (typeof value === 'string' && (value.includes('Lakhs') || value.includes('Thousands') || value.includes('%'))) {
+    return value;
+  }
+  
+  // Otherwise, add .Rs suffix
+  return `${value}.Rs`;
+};
   return (
     <Box sx={{ pr: 1, mr: { sm: 0, md: 10 }, ml: { sm: 0, md: 10 } }}>
       {/* Delete Confirmation Dialog */}
@@ -669,103 +715,157 @@ const handleTagChange = (tagType) => (e) => {
           </Button>
         </DialogActions>
       </Dialog>
-      {/* Brand Categories Section */}
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
-        Brand Categories
-      </Typography>
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          mt: 3,
-          display: "grid",
-          gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
-          gap: 2,
-          mb: 2,
+      
+    
+
+{/* Brand Categories Section - Sub-child dropdown shows items in grid (3 columns) */}
+<Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
+  Brand Categories
+</Typography>
+
+<Grid
+  container
+  spacing={2}
+  sx={{
+    mb: 4,
+    alignItems: "flex-start",
+    flexWrap: "nowrap", 
+    overflowX: "auto",  
+  }}
+>
+  {/* Industries */}
+  <Grid item xs={12} sm={4} md={4} sx={{ minWidth: 300 }}>
+    <FormControl fullWidth size="medium">
+      <InputLabel id="industries-label">Industries</InputLabel>
+      <Select
+        labelId="industries-label"
+        id="industries-select"
+        value={selectedCategory.main || ""}
+        label="Industries"
+        onChange={handleMainCategoryChange}
+        disabled={!isEditing}
+        sx={{ minHeight: 56 }}
+        MenuProps={{
+          PaperProps: { sx: { maxHeight: 320, width: 360 } },
         }}
       >
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth size="medium">
-            <InputLabel>Industries</InputLabel>
-            <Select
-              value={selectedCategory.main || ""}
-              label="Industries"
-              onChange={handleMainCategoryChange}
-              error={!!errors.mainCategory}
-              disabled={!isEditing}
-            >
-              {categories.map((category) => (
-                <MenuItem key={category.name} value={category.name}>
-                  {category.name}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.mainCategory && (
-              <FormHelperText error>{errors.mainCategory}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth size="medium">
-            <InputLabel>Main Category</InputLabel>
-            <Select
-              value={selectedCategory.sub || ""}
-              label="Main Category"
-              onChange={handleSubCategoryChange}
-              error={!!errors.subCategory}
-              disabled={!isEditing || !selectedCategory.main}
-            >
-              {selectedCategory.main &&
-                categories
-                  .find((cat) => cat.name === selectedCategory.main)
-                  ?.children?.map((subCategory) => (
-                    <MenuItem key={subCategory.name} value={subCategory.name}>
-                      {subCategory.name}
-                    </MenuItem>
-                  ))}
-            </Select>
-            {errors.subCategory && (
-              <FormHelperText error>{errors.subCategory}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={4}>
-          <FormControl fullWidth size="medium">
-            <InputLabel>Sub Category</InputLabel>
-            <Select
-              multiple
-              value={selectedCategory.child || []}
-              label="Sub Category"
-              onChange={handleChildCategoryChange}
-              error={!!errors.childCategory}
-              renderValue={(selected) =>
-                selected.length > 0
-                  ? selected.join(" - ")
-                  : "Select sub categories"
-              }
-              disabled={!isEditing || !selectedCategory.sub}
-            >
-              {selectedCategory.sub &&
-                categories
-                  .find((cat) => cat.name === selectedCategory.main)
-                  ?.children?.find((sub) => sub.name === selectedCategory.sub)
-                  ?.children?.map((child) => (
-                    <MenuItem key={child} value={child}>
-                      <Checkbox
-                        checked={
-                          selectedCategory.child.indexOf(child) > -1
-                        }
-                      />
-                      <ListItemText primary={child} />
-                    </MenuItem>
-                  ))}
-            </Select>
-            {errors.childCategory && (
-              <FormHelperText error>{errors.childCategory}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-      </Grid>
+        {categories.map((category) => (
+          <MenuItem key={category.name} value={category.name}>
+            {category.name}
+          </MenuItem>
+        ))}
+      </Select>
+      {errors.mainCategory && (
+        <FormHelperText error>{errors.mainCategory}</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+
+  {/* Main Category */}
+  <Grid item xs={12} sm={4} md={4} sx={{ minWidth: 300 }}>
+    <FormControl fullWidth size="medium">
+      <InputLabel id="main-cat-label">Main Category</InputLabel>
+      <Select
+        labelId="main-cat-label"
+        id="main-cat-select"
+        value={selectedCategory.sub || ""}
+        label="Main Category"
+        onChange={handleSubCategoryChange}
+        disabled={!isEditing || !selectedCategory.main}
+        sx={{ minHeight: 56 }}
+        MenuProps={{
+          PaperProps: { sx: { maxHeight: 320, width: 360 } },
+        }}
+      >
+        {selectedCategory.main &&
+          categories
+            .find((cat) => cat.name === selectedCategory.main)
+            ?.children?.map((subCategory) => (
+              <MenuItem key={subCategory.name} value={subCategory.name}>
+                {subCategory.name}
+              </MenuItem>
+            ))}
+      </Select>
+      {errors.subCategory && (
+        <FormHelperText error>{errors.subCategory}</FormHelperText>
+      )}
+    </FormControl>
+  </Grid>
+
+{/* <Grid item xs={12} sm={4} md={4} sx={{ minWidth: 300 }}>
+  <FormControl fullWidth size="medium">
+    <InputLabel shrink htmlFor="sub-cat-field">Sub Category</InputLabel>
+
+    <TextField
+      id="sub-cat-field"
+      variant="outlined"
+      value={
+        selectedCategory.child?.length
+          ?''
+          : ''
+      }
+      placeholder="Select sub categories"
+      onClick={handleOpenDrawer}
+      InputProps={{ readOnly: true }}
+      disabled={!isEditing || !selectedCategory.sub}
+      sx={{
+        minHeight: 56,
+        '& .MuiInputBase-input': {
+          cursor: isEditing ? 'pointer' : 'default',
+          userSelect: 'none',
+        },
+      }}
+    />
+
+   
+  </FormControl>
+  
+</Grid> */}
+
+</Grid>
+ {!!selectedCategory.child?.length && (
+      <Box sx={{ mt: 2, width: '100%' }}>
+        <Box
+          onClick={() => setShowSelectedBar((v) => !v)}
+          sx={{
+            px: 2,
+            py: 1,
+            mb:3,
+            bgcolor: 'grey.100',
+            borderRadius: 1,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            cursor: 'pointer',
+            userSelect: 'none',
+          }}
+        >
+          <Typography variant="subtitle1" fontWeight={700}>
+            View Selected Categories ({selectedCategory.child.length})
+          </Typography>
+          {showSelectedBar ? <ExpandLess /> : <ExpandMore />}
+        </Box>
+
+        <Collapse in={showSelectedBar}>
+          <Stack
+            direction="row"
+            flexWrap="wrap"
+            gap={1}
+            sx={{ px: 2, py: 2,  borderRadius: 1 }}
+          >
+            {selectedCategory.child.map((child) => (
+              <Chip
+                key={child}
+                label={child}
+                size="small"
+                onDelete={isEditing ? () => handleChildToggle(child) : undefined}
+              />
+            ))}
+          </Stack>
+        </Collapse>
+      </Box>
+    )}
+
  <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
         Franchise Tags
       </Typography>
@@ -1233,6 +1333,134 @@ const handleTagChange = (tagType) => (e) => {
           </FormControl>
         </Grid>
       </Grid>
+{/* Display saved Franchise Tags */}
+<Box sx={{ mt: 4 }}>
+  <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+    Saved Franchise Tags
+  </Typography>
+  <Box 
+    sx={{ 
+      width: "100%", 
+      overflowX: "auto", 
+      margin: "0 auto",
+      border: "1px solid #e0e0e0",
+      borderRadius: 1
+    }}
+  >
+    <TableContainer>
+      <Table
+        stickyHeader
+        aria-label="saved franchise tags"
+        size="medium"
+        sx={{
+          minWidth: 1200,
+          "& th, & td": {
+            padding: "12px 16px",
+            fontSize: "0.875rem",
+            whiteSpace: "nowrap",
+            borderRight: "1px solid #e0e0e0",
+          },
+          "& th:last-child, & td:last-child": {
+            borderRight: "none",
+          },
+        }}
+      >
+        <TableHead>
+          <TableRow>
+            {[
+              "Primary Classification",
+              "Product/Service Types", 
+              "Target Audience",
+              "Service Model",
+              "Pricing Value",
+              "Ambience & Experience",
+              "Features & Amenities",
+              "Technology Integration",
+              "Sustainability & Ethics",
+              "Business Operations",
+            ].map((label, i) => (
+              <TableCell
+                key={i}
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 1,
+                }}
+              >
+                {label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+     <TableBody>
+  {Object.values(currentTags).some(tagArray => tagArray.length > 0) ? (
+    <TableRow hover>
+      <TableCell>
+        {Array.isArray(currentTags.PrimaryClassifications) && currentTags.PrimaryClassifications.length > 0 
+          ? [...new Set(currentTags.PrimaryClassifications)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.productServiceTypes) && currentTags.productServiceTypes.length > 0 
+          ? [...new Set(currentTags.productServiceTypes)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.TargetAudience) && currentTags.TargetAudience.length > 0 
+          ? [...new Set(currentTags.TargetAudience)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.ServiceModel) && currentTags.ServiceModel.length > 0 
+          ? [...new Set(currentTags.ServiceModel)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.PricingValue) && currentTags.PricingValue.length > 0 
+          ? [...new Set(currentTags.PricingValue)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.AmbienceExperience) && currentTags.AmbienceExperience.length > 0 
+          ? [...new Set(currentTags.AmbienceExperience)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.FeaturesAmenities) && currentTags.FeaturesAmenities.length > 0 
+          ? [...new Set(currentTags.FeaturesAmenities)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.TechnologyIntegration) && currentTags.TechnologyIntegration.length > 0 
+          ? [...new Set(currentTags.TechnologyIntegration)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.SustainabilityEthics) && currentTags.SustainabilityEthics.length > 0 
+          ? [...new Set(currentTags.SustainabilityEthics)].join(', ')
+          : "None selected"}
+      </TableCell>
+      <TableCell>
+        {Array.isArray(currentTags.BusinessOperations) && currentTags.BusinessOperations.length > 0 
+          ? [...new Set(currentTags.BusinessOperations)].join(', ')
+          : "None selected"}
+      </TableCell>
+    </TableRow>
+  ) : (
+    <TableRow>
+      <TableCell colSpan={10} align="center" sx={{ py: 4, color: 'text.secondary', fontStyle: 'italic' }}>
+        No franchise tags added yet. {isEditing && "Use the form above to add franchise tags."}
+      </TableCell>
+    </TableRow>
+  )}
+</TableBody>
+
+      </Table>
+    </TableContainer>
+  </Box>
+</Box>
 
 
       <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
@@ -1443,777 +1671,937 @@ const handleTagChange = (tagType) => (e) => {
           />
         </Grid>
       </Grid>
-      {/* Franchise Details Section */}
-      <Typography variant="h6" fontWeight={700} sx={{ mt: 2, color: "#ff9800" }}>
-        Franchise Business Models
-      </Typography>
-      {errors.fico && typeof errors.fico === "string" && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {errors.fico}
-        </Typography>
-      )}
-      {/* Current FICO Model Form - Only show when editing */}
-      {isEditing && (
-        <>
-          <Grid
-            container
-            spacing={2}
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
-              gap: 2,
-              mb: 2,
-              mt: 2,
-            }}
+    {/* Franchise Details Section */}
+<Typography variant="h6" fontWeight={700} sx={{ mt: 2, color: "#ff9800" }}>
+  Franchise Business Models
+</Typography>
+{errors.fico && typeof errors.fico === "string" && (
+  <Typography color="error" sx={{ mb: 2 }}>
+    {errors.fico}
+  </Typography>
+)}
+{/* Current FICO Model Form - Only show when editing */}
+<Box sx={{ mb: 4 }}>
+  {/* {isEditing && ( */}
+    {/* <> */}
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
+          gap: 2,
+          mb: 2,
+          mt: 2,
+        }}
+      >
+        {/* Column 1 - Franchise Model */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            error={!!errors.franchiseModel}
+            required
+            size="medium"
           >
-            {/* Column 1 - Franchise Model */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                error={!!errors.franchiseModel}
-                required
-                size="medium"
-              >
-                <InputLabel>Franchise Model</InputLabel>
-                <Select
-                  value={currentFicoModel.franchiseModel}
-                  onChange={handleFicoChange}
-                  name="franchiseModel"
-                  label="Franchise Model"
-                >
-                  {franchiseModels.map((model) => (
-                    <MenuItem key={model} value={model}>
-                      {model}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.franchiseModel && (
-                  <FormHelperText error>{errors.franchiseModel}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 2 - Franchise Type */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                error={!!errors.franchiseType}
-                required
-                size="medium"
-              >
-                <InputLabel>Franchise Type</InputLabel>
-                <Select
-                  value={currentFicoModel.franchiseType}
-                  onChange={handleFicoChange}
-                  name="franchiseType"
-                  label="Franchise Type*"
-                >
-                  {franchiseTypes.map((type) => (
-                    <MenuItem key={type} value={type}>
-                      {type}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.franchiseType && (
-                  <FormHelperText error>{errors.franchiseType}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 3 - Investment Range */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                error={!!errors.investmentRange}
-                required
-                size="medium"
-              >
-                <InputLabel>Investment Range</InputLabel>
-                <Select
-                  value={currentFicoModel.investmentRange}
-                  onChange={handleFicoChange}
-                  name="investmentRange"
-                  label="Investment Range*"
-                >
-                  {investmentRanges.map((range) => (
-                    <MenuItem key={range.value} value={range.value}>
-                      {range.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.investmentRange && (
-                  <FormHelperText error>{errors.investmentRange}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 4 - Area Required */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                size="medium"
-                required
-                error={!!errors.areaRequired}
-              >
-                <InputLabel>Area Required</InputLabel>
-                <Select
-                  label="Area Required"
-                  name="areaRequired"
-                  value={currentFicoModel.areaRequired || ""}
-                  onChange={handleFicoChange}
-                  endAdornment={
-                    <InputAdornment position="end" sx={{ mr: 2 }}>
-                      Sq.Ft
-                    </InputAdornment>
-                  }
-                >
-                  <MenuItem value="No Space Required">
-                    No Space Required
-                  </MenuItem>
-                  <MenuItem value="100 - 200 Sq. Ft.">100-200 Sq. Ft.</MenuItem>
-                  <MenuItem value="200 - 500 Sq. Ft.">200-500 Sq. Ft.</MenuItem>
-                  <MenuItem value="500 - 1,000 Sq. Ft.">
-                    500-1,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="1,000 - 2,000 Sq. Ft.">
-                    1,000-2,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="2,000 - 3,000 Sq. Ft.">
-                    2,000-3,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="3,000 - 5,000 Sq. Ft.">
-                    3,000-5,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="5,000 - 7,000 Sq. Ft.">
-                    5,000-7,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="7,000 - 10,000 Sq. Ft.">
-                    7,000-10,000 Sq. Ft.
-                  </MenuItem>
-                  <MenuItem value="10,000 - 15,000 Sq. Ft.">
-                    10,000-15,000 Sq. Ft.
-                  </MenuItem>
-                </Select>
-                {errors.areaRequired && (
-                  <FormHelperText error>{errors.areaRequired}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 5 agreementPeriod */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                error={!!errors.agreementPeriod}
-                required
-                size="medium"
-              >
-                <InputLabel>Agreement Period </InputLabel>
-                <Select
-                  label="Agreement Period "
-                  name="agreementPeriod"
-                  value={currentFicoModel.agreementPeriod || ""}
-                  onChange={handleFicoChange}
-                  renderValue={(selected) => (selected ? `${selected} ` : "")}
-                  endAdornment={
-                    <InputAdornment position="end" sx={{ mr: 2 }}>
-                      Years
-                    </InputAdornment>
-                  }
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        width: 250,
-                        maxHeight: 300,
-                        "& .MuiList-root": {
-                          display: "grid",
-                          gridTemplateColumns: "repeat(5, 1fr)",
-                          gap: "4px",
-                          padding: "4px",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  {Array.from({ length: 50 }, (_, i) => i + 1).map((year) => (
-                    <MenuItem
-                      key={year}
-                      value={year}
-                      sx={{
-                        minWidth: 0,
-                        padding: "6px 4px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {year}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.agreementPeriod && (
-                  <FormHelperText error>{errors.agreementPeriod}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 6 - Franchise Fee */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Franchise Fee"
-                  name="franchiseFee"
-                  value={currentFicoModel.franchiseFee}
-                  onChange={handleFicoChange}
-                  error={!!errors.franchiseFee}
-                  helperText={errors.franchiseFee}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.franchiseFeeUnit}
-                          onChange={handleFeeUnitChange("franchiseFee")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {otherFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.franchiseFee,
-                  }}
-                  required
-                  disabled={noFees.franchiseFee}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 7 - Interior Cost */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Interior Cost"
-                  name="interiorCost"
-                  value={currentFicoModel.interiorCost}
-                  onChange={handleFicoChange}
-                  error={!!errors.interiorCost}
-                  helperText={errors.interiorCost}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.interiorCostUnit}
-                          onChange={handleFeeUnitChange("interiorCost")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {otherFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.interiorCost,
-                  }}
-                  required
-                  disabled={noFees.interiorCost}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 8 - Stock Investment */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Stock Investment"
-                  name="stockInvestment"
-                  value={currentFicoModel.stockInvestment}
-                  onChange={handleFicoChange}
-                  error={!!errors.stockInvestment}
-                  helperText={errors.stockInvestment}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.stockInvestmentUnit}
-                          onChange={handleFeeUnitChange("stockInvestment")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {otherFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.stockInvestment,
-                  }}
-                  required
-                  disabled={noFees.stockInvestment}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 9 - Other Cost */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Required Additional Cost"
-                  name="otherCost"
-                  value={currentFicoModel.otherCost}
-                  onChange={handleFicoChange}
-                  error={!!errors.otherCost}
-                  helperText={errors.otherCost}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.otherCostUnit}
-                          onChange={handleFeeUnitChange("otherCost")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {otherFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.otherCost,
-                  }}
-                  required
-                  disabled={noFees.otherCost}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 10 - Required Investment Capital */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Annual Working Capital"
-                  name="requireWorkingCapital"
-                  value={currentFicoModel.requireWorkingCapital}
-                  onChange={handleFicoChange}
-                  error={!!errors.requireWorkingCapital}
-                  helperText={errors.requireWorkingCapital}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.requireWorkingCapitalUnit}
-                          onChange={handleFeeUnitChange("requireWorkingCapital")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {otherFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.requireWorkingCapital,
-                  }}
-                  required
-                  disabled={noFees.requireWorkingCapital}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 11 - Royalty Fee */}
-            <Grid item>
-              <FormControl fullWidth>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Royalty Fee"
-                  name="royaltyFee"
-                  value={currentFicoModel.royaltyFee}
-                  onChange={handleFicoChange}
-                  error={!!errors.royaltyFee}
-                  helperText={errors.royaltyFee}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <Select
-                          value={currentFicoModel.royaltyFeeUnit}
-                          onChange={handleFeeUnitChange("royaltyFee")}
-                          sx={{
-                            "& .MuiSelect-select": {
-                              padding: "8px 8px",
-                              fontSize: "0.875rem",
-                            },
-                            "& .MuiOutlinedInput-notchedOutline": {
-                              border: "none",
-                            },
-                          }}
-                        >
-                          {royaltyFeeUnits.map((unit) => (
-                            <MenuItem key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </InputAdornment>
-                    ),
-                    readOnly: noFees.royaltyFee,
-                  }}
-                  required
-                  disabled={noFees.royaltyFee}
-                />
-              </FormControl>
-            </Grid>
-            {/* Column 12 - Break Even */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                size="medium"
-                required
-                error={!!errors.breakEven}
-              >
-                <InputLabel>Break Even (months)</InputLabel>
-                <Select
-                  label="Break Even (months)*"
-                  name="breakEven"
-                  value={currentFicoModel.breakEven || ""}
-                  onChange={handleFicoChange}
-                >
-                  <MenuItem value="0 to 6 Months">0 to 6 Months</MenuItem>
-                  <MenuItem value="6 to 12 Months">6 to 12 Months</MenuItem>
-                  <MenuItem value="12 to 18 Months">12 to 18 Months</MenuItem>
-                  <MenuItem value="18 to 24 Months">18 to 24 Months</MenuItem>
-                  <MenuItem value="24 to 36 Months">24 to 36 Months</MenuItem>
-                  <MenuItem value="36 to 48 Months">36 to 48 Months</MenuItem>
-                  <MenuItem value="48 to 60 Months">48 to 60 Months</MenuItem>
-                </Select>
-                {errors.breakEven && (
-                  <FormHelperText error>{errors.breakEven}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 13 - ROI */}
-            <Grid item>
-              <FormControl
-                fullWidth
-                size="medium"
-                required
-                error={!!errors.roi}
-              >
-                <InputLabel>ROI (%)</InputLabel>
-                <Select
-                  label="ROI (%)"
-                  name="roi"
-                  value={currentFicoModel.roi || ""}
-                  onChange={handleFicoChange}
-                  renderValue={(selected) => (selected ? `${selected} %` : "")}
-                  disabled={noFees.roi}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        width: 390,
-                        maxHeight: 300,
-                        "& .MuiList-root": {
-                          display: "grid",
-                          gridTemplateColumns: "repeat(10, 1fr)",
-                          gap: "4px",
-                          padding: "4px",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  {Array.from({ length: 99 }, (_, i) => (
-                    <MenuItem
-                      key={i + 1}
-                      value={`${i + 1}`}
-                      sx={{
-                        minWidth: 0,
-                        padding: "6px 4px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {i + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.roi && (
-                  <FormHelperText error>{errors.roi}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-            {/* Column 14 - PayBack Period */}
-            <Grid item>
-              <TextField
-                fullWidth
-                size="medium"
-                label="PayBack Period"
-                name="payBackPeriod"
-                value={currentFicoModel.payBackPeriod}
-                onChange={handleFicoChange}
-                error={!!errors.payBackPeriod}
-                helperText={errors.payBackPeriod}
-                InputProps={{
-                  readOnly: true,
-                }}
-                required
-                disabled={noFees.roi}
-              />
-            </Grid>
-            <Grid item>
-              <FormControl
-                fullWidth
-                size="medium"
-                required
-                error={!!errors.marginOnSales}
-              >
-                <InputLabel>MarginOnSales (%)</InputLabel>
-                <Select
-                  label="Margin ON Sales (%)"
-                  name="marginOnSales"
-                  value={currentFicoModel.marginOnSales || ""}
-                  onChange={handleFicoChange}
-                  renderValue={(selected) => (selected ? `${selected} %` : "")}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        width: 390,
-                        maxHeight: 300,
-                        "& .MuiList-root": {
-                          display: "grid",
-                          gridTemplateColumns: "repeat(10, 1fr)",
-                          gap: "4px",
-                          padding: "4px",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  {Array.from({ length: 99 }, (_, i) => (
-                    <MenuItem
-                      key={i + 1}
-                      value={`${i + 1}`}
-                      sx={{
-                        minWidth: 0,
-                        padding: "6px 4px",
-                        display: "flex",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {i + 1}
-                    </MenuItem>
-                  ))}
-                </Select>
-                {errors.marginOnSales && (
-                  <FormHelperText error>{errors.marginOnSales}</FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-          </Grid>
-          {/* Add/Update/Cancel Buttons */}
-          <Grid
-            item
-            xs={12}
-            mt={1}
-            sx={{ display: "flex", justifyContent: "space-evenly", gap: 2 }}
+            <InputLabel>Franchise Model</InputLabel>
+            <Select
+              value={currentFicoModel.franchiseModel}
+              onChange={handleFicoChange}
+              name="franchiseModel"
+              label="Franchise Model"
+            >
+              {franchiseModels.map((model) => (
+                <MenuItem key={model} value={model}>
+                  {model}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.franchiseModel && (
+              <FormHelperText error>{errors.franchiseModel}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 2 - Franchise Type */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            error={!!errors.franchiseType}
+            required
+            size="medium"
           >
-            <Button
-              variant="contained"
-              onClick={handleAddOrUpdateFicoModel}
-              size="large"
-              sx={{
-                backgroundColor: "#7ad03a",
-                color: "#fff",
-                "&:hover": { backgroundColor: "#388e3c" },
-                padding: "8px 70px",
+            <InputLabel>Franchise Type</InputLabel>
+            <Select
+              value={currentFicoModel.franchiseType}
+              onChange={handleFicoChange}
+              name="franchiseType"
+              label="Franchise Type*"
+            >
+              {franchiseTypes.map((type) => (
+                <MenuItem key={type} value={type}>
+                  {type}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.franchiseType && (
+              <FormHelperText error>{errors.franchiseType}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 3 - Investment Range */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            error={!!errors.investmentRange}
+            required
+            size="medium"
+          >
+            <InputLabel>Investment Range</InputLabel>
+            <Select
+              value={currentFicoModel.investmentRange}
+              onChange={handleFicoChange}
+              name="investmentRange"
+              label="Investment Range*"
+            >
+              {investmentRanges.map((range) => (
+                <MenuItem key={range.value} value={range.value}>
+                  {range.label}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.investmentRange && (
+              <FormHelperText error>{errors.investmentRange}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 4 - Area Required */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            size="medium"
+            required
+            error={!!errors.areaRequired}
+          >
+            <InputLabel>Area Required</InputLabel>
+            <Select
+              label="Area Required"
+              name="areaRequired"
+              value={currentFicoModel.areaRequired || ""}
+              onChange={handleFicoChange}
+              endAdornment={
+                <InputAdornment position="end" sx={{ mr: 2 }}>
+                  Sq.Ft
+                </InputAdornment>
+              }
+            >
+              <MenuItem value="No Space Required">
+                No Space Required
+              </MenuItem>
+              <MenuItem value="100 - 200 Sq. Ft.">100-200 Sq. Ft.</MenuItem>
+              <MenuItem value="200 - 500 Sq. Ft.">200-500 Sq. Ft.</MenuItem>
+              <MenuItem value="500 - 1,000 Sq. Ft.">
+                500-1,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="1,000 - 2,000 Sq. Ft.">
+                1,000-2,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="2,000 - 3,000 Sq. Ft.">
+                2,000-3,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="3,000 - 5,000 Sq. Ft.">
+                3,000-5,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="5,000 - 7,000 Sq. Ft.">
+                5,000-7,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="7,000 - 10,000 Sq. Ft.">
+                7,000-10,000 Sq. Ft.
+              </MenuItem>
+              <MenuItem value="10,000 - 15,000 Sq. Ft.">
+                10,000-15,000 Sq. Ft.
+              </MenuItem>
+            </Select>
+            {errors.areaRequired && (
+              <FormHelperText error>{errors.areaRequired}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 5 - Agreement Period */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            error={!!errors.agreementPeriod}
+            required
+            size="medium"
+          >
+            <InputLabel>Agreement Period </InputLabel>
+            <Select
+              label="Agreement Period "
+              name="agreementPeriod"
+              value={currentFicoModel.agreementPeriod || ""}
+              onChange={handleFicoChange}
+              renderValue={(selected) => (selected ? `${selected} ` : "")}
+              endAdornment={
+                <InputAdornment position="end" sx={{ mr: 2 }}>
+                  Years
+                </InputAdornment>
+              }
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    width: 250,
+                    maxHeight: 300,
+                    "& .MuiList-root": {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(5, 1fr)",
+                      gap: "4px",
+                      padding: "4px",
+                    },
+                  },
+                },
               }}
             >
-              {editIndex !== null ? "Update Model" : "Add Model"}
-            </Button>
-            {editIndex !== null && (
-              <Button
-                variant="outlined"
-                onClick={handleCancelEdit}
-                size="large"
-                sx={{
-                  padding: "8px 70px",
-                }}
-              >
-                Cancel
-              </Button>
+              {Array.from({ length: 50 }, (_, i) => i + 1).map((year) => (
+                <MenuItem
+                  key={year}
+                  value={year}
+                  sx={{
+                    minWidth: 0,
+                    padding: "6px 4px",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {year}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.agreementPeriod && (
+              <FormHelperText error>{errors.agreementPeriod}</FormHelperText>
             )}
-          </Grid>
-        </>
-      )}
-      {/* Display saved FICO models */}
-      {data.fico?.length > 0 && (
-        <Box sx={{ mt: 4 }}>
-          <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-            Saved Franchise Models
-          </Typography>
-          <Box sx={{ width: "100%", overflowX: "auto", margin: "0 auto" }}>
-            <TableContainer sx={{ maxHeight: 600 }}>
-              <Table
-                stickyHeader
-                aria-label="saved franchise models"
-                size="medium"
-                sx={{
-                  fontSize: "1rem",
-                  "& th, & td": {
-                    padding: "12px 16px",
-                    fontSize: "1rem",
-                    whiteSpace: "nowrap",
-                  },
-                }}
-              >
-                <TableHead>
-                  <TableRow>
-                    {[
-                      "Model Type",
-                      "Franchise Type",
-                      "Investment Range",
-                      "Area Required",
-                      "Agreement Period",
-                      "Franchise Fee",
-                      "Interior Cost",
-                      "Stock Cost",
-                      "Additional Cost",
-                      "Annual Working Capital",
-                      "Royalty Fee",
-                      "Break Even",
-                      "ROI (%)",
-                      "Payback",
-                      "Margin On Sales",
-                      "Actions",
-                    ].map((label, i) => (
-                      <TableCell
-                        key={i}
-                        sx={{
-                          fontWeight: "bold",
-                          backgroundColor: "#f5f5f5",
-                        }}
-                      >
-                        {label}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {data.fico?.map((model, index) => (
-                    <TableRow
-                      key={index}
-                      hover
+          </FormControl>
+        </Grid>
+
+        {/* Column 6 - Franchise Fee */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Franchise Fee"
+              name="franchiseFee"
+              value={currentFicoModel.franchiseFee}
+              onChange={handleFicoChange}
+              error={!!errors.franchiseFee}
+              helperText={errors.franchiseFee}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.franchiseFeeUnit}
+                      onChange={handleFeeUnitChange("franchiseFee")}
                       sx={{
-                        "&:last-child td, &:last-child th": { border: 0 },
-                        fontSize: "0.75rem",
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
                       }}
                     >
-                      <TableCell>{model.franchiseModel}</TableCell>
-                      <TableCell>{model.franchiseType}</TableCell>
-                      <TableCell>{model.investmentRange}</TableCell>
-                      <TableCell>{model.areaRequired}</TableCell>
-                      <TableCell>{model.agreementPeriod}</TableCell>
-                      <TableCell>
-                        {formatCurrency(model.franchiseFee)}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(model.interiorCost)}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(model.stockInvestment)}
-                      </TableCell>
-                      <TableCell>{formatCurrency(model.otherCost)}</TableCell>
-                      <TableCell>
-                        {formatCurrency(model.requireWorkingCapital)}
-                      </TableCell>
-                      <TableCell>
-                        {model.royaltyFee && model.royaltyFee !== "No Fee"
-                          ? `${model.royaltyFee}${
-                              model.royaltyFeeUnit === "%" ? "%" : ""
-                            }`
-                          : model.royaltyFee}
-                      </TableCell>
-                      <TableCell>{model.breakEven}</TableCell>
-                      <TableCell>{model.roi}%</TableCell>
-                      <TableCell>{model.payBackPeriod}</TableCell>
-                      <TableCell>{model.marginOnSales}%</TableCell>
-                      <TableCell>
-                        {isEditing && (
-                          <>
-                            <IconButton
-                              onClick={() => handleEditFicoModel(index)}
-                              color="primary"
-                              size="small"
-                              aria-label="edit"
-                              sx={{ mr: 1 }}
-                            >
-                              <EditIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              onClick={() => handleDeleteFicoModel(index)}
-                              color="error"
-                              size="small"
-                              aria-label="delete"
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </IconButton>
-                          </>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Box>
+                      {otherFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.franchiseFee,
+              }}
+              required
+              disabled={noFees.franchiseFee}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 7 - Interior Cost */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Interior Cost"
+              name="interiorCost"
+              value={currentFicoModel.interiorCost}
+              onChange={handleFicoChange}
+              error={!!errors.interiorCost}
+              helperText={errors.interiorCost}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.interiorCostUnit}
+                      onChange={handleFeeUnitChange("interiorCost")}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                      }}
+                    >
+                      {otherFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.interiorCost,
+              }}
+              required
+              disabled={noFees.interiorCost}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 8 - Stock Investment */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Stock Investment"
+              name="stockInvestment"
+              value={currentFicoModel.stockInvestment}
+              onChange={handleFicoChange}
+              error={!!errors.stockInvestment}
+              helperText={errors.stockInvestment}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.stockInvestmentUnit}
+                      onChange={handleFeeUnitChange("stockInvestment")}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                      }}
+                    >
+                      {otherFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.stockInvestment,
+              }}
+              required
+              disabled={noFees.stockInvestment}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 9 - Other Cost */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Required Additional Cost"
+              name="otherCost"
+              value={currentFicoModel.otherCost}
+              onChange={handleFicoChange}
+              error={!!errors.otherCost}
+              helperText={errors.otherCost}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.otherCostUnit}
+                      onChange={handleFeeUnitChange("otherCost")}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                      }}
+                    >
+                      {otherFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.otherCost,
+              }}
+              required
+              disabled={noFees.otherCost}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 10 - Required Investment Capital */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Annual Working Capital"
+              name="requireWorkingCapital"
+              value={currentFicoModel.requireWorkingCapital}
+              onChange={handleFicoChange}
+              error={!!errors.requireWorkingCapital}
+              helperText={errors.requireWorkingCapital}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.requireWorkingCapitalUnit}
+                      onChange={handleFeeUnitChange("requireWorkingCapital")}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                      }}
+                    >
+                      {otherFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.requireWorkingCapital,
+              }}
+              required
+              disabled={noFees.requireWorkingCapital}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 11 - Royalty Fee */}
+        <Grid item>
+          <FormControl fullWidth>
+            <TextField
+              fullWidth
+              size="medium"
+              label="Royalty Fee"
+              name="royaltyFee"
+              value={currentFicoModel.royaltyFee}
+              onChange={handleFicoChange}
+              error={!!errors.royaltyFee}
+              helperText={errors.royaltyFee}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Select
+                      value={currentFicoModel.royaltyFeeUnit}
+                      onChange={handleFeeUnitChange("royaltyFee")}
+                      sx={{
+                        "& .MuiSelect-select": {
+                          padding: "8px 8px",
+                          fontSize: "0.875rem",
+                        },
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          border: "none",
+                        },
+                      }}
+                    >
+                      {royaltyFeeUnits.map((unit) => (
+                        <MenuItem key={unit.value} value={unit.value}>
+                          {unit.label}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </InputAdornment>
+                ),
+                readOnly: noFees.royaltyFee,
+              }}
+              required
+              disabled={noFees.royaltyFee}
+            />
+          </FormControl>
+        </Grid>
+
+        {/* Column 12 - Break Even */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            size="medium"
+            required
+            error={!!errors.breakEven}
+          >
+            <InputLabel>Break Even (months)</InputLabel>
+            <Select
+              label="Break Even (months)*"
+              name="breakEven"
+              value={currentFicoModel.breakEven || ""}
+              onChange={handleFicoChange}
+            >
+              <MenuItem value="0 to 6 Months">0 to 6 Months</MenuItem>
+              <MenuItem value="6 to 12 Months">6 to 12 Months</MenuItem>
+              <MenuItem value="12 to 18 Months">12 to 18 Months</MenuItem>
+              <MenuItem value="18 to 24 Months">18 to 24 Months</MenuItem>
+              <MenuItem value="24 to 36 Months">24 to 36 Months</MenuItem>
+              <MenuItem value="36 to 48 Months">36 to 48 Months</MenuItem>
+              <MenuItem value="48 to 60 Months">48 to 60 Months</MenuItem>
+            </Select>
+            {errors.breakEven && (
+              <FormHelperText error>{errors.breakEven}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 13 - ROI */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            size="medium"
+            required
+            error={!!errors.roi}
+          >
+            <InputLabel>ROI (%)</InputLabel>
+            <Select
+              label="ROI (%)"
+              name="roi"
+              value={currentFicoModel.roi || ""}
+              onChange={handleFicoChange}
+              renderValue={(selected) => (selected ? `${selected} %` : "")}
+              disabled={noFees.roi}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    width: 390,
+                    maxHeight: 300,
+                    "& .MuiList-root": {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(10, 1fr)",
+                      gap: "4px",
+                      padding: "4px",
+                    },
+                  },
+                },
+              }}
+            >
+              {Array.from({ length: 99 }, (_, i) => (
+                <MenuItem
+                  key={i + 1}
+                  value={`${i + 1}`}
+                  sx={{
+                    minWidth: 0,
+                    padding: "6px 4px",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {i + 1}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.roi && (
+              <FormHelperText error>{errors.roi}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+
+        {/* Column 14 - PayBack Period */}
+        <Grid item>
+          <TextField
+            fullWidth
+            size="medium"
+            label="PayBack Period"
+            name="payBackPeriod"
+            value={currentFicoModel.payBackPeriod}
+            onChange={handleFicoChange}
+            error={!!errors.payBackPeriod}
+            helperText={errors.payBackPeriod}
+            InputProps={{
+              readOnly: true,
+            }}
+            required
+            disabled={noFees.roi}
+          />
+        </Grid>
+
+        {/* Column 15 - Margin on Sales */}
+        <Grid item>
+          <FormControl
+            fullWidth
+            size="medium"
+            required
+            error={!!errors.marginOnSales}
+          >
+            <InputLabel>MarginOnSales (%)</InputLabel>
+            <Select
+              label="Margin ON Sales (%)"
+              name="marginOnSales"
+              value={currentFicoModel.marginOnSales || ""}
+              onChange={handleFicoChange}
+              renderValue={(selected) => (selected ? `${selected} %` : "")}
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    width: 390,
+                    maxHeight: 300,
+                    "& .MuiList-root": {
+                      display: "grid",
+                      gridTemplateColumns: "repeat(10, 1fr)",
+                      gap: "4px",
+                      padding: "4px",
+                    },
+                  },
+                },
+              }}
+            >
+              {Array.from({ length: 99 }, (_, i) => (
+                <MenuItem
+                  key={i + 1}
+                  value={`${i + 1}`}
+                  sx={{
+                    minWidth: 0,
+                    padding: "6px 4px",
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
+                  {i + 1}
+                </MenuItem>
+              ))}
+            </Select>
+            {errors.marginOnSales && (
+              <FormHelperText error>{errors.marginOnSales}</FormHelperText>
+            )}
+          </FormControl>
+        </Grid>
+      </Grid>
+
+      {/* Add/Update/Cancel Buttons */}
+      <Grid
+        item
+        xs={12}
+        mt={1}
+        sx={{ display: "flex", justifyContent: "space-evenly", gap: 2 }}
+      >
+        <Button
+          variant="contained"
+          onClick={handleAddOrUpdateFicoModel}
+          size="large"
+          sx={{
+            backgroundColor: "#7ad03a",
+            color: "#fff",
+            "&:hover": { backgroundColor: "#388e3c" },
+            padding: "8px 70px",
+          }}
+        >
+          {editIndex !== null ? "Update Model" : "Add Model"}
+        </Button>
+        {editIndex !== null && (
+          <Button
+            variant="outlined"
+            onClick={handleCancelEdit}
+            size="large"
+            sx={{
+              padding: "8px 70px",
+            }}
+          >
+            Cancel
+          </Button>
+        )}
+      </Grid>
+    {/* </> */}
+{/* )} */}
+</Box>
+{/* Drawer for sub-category selection */}
+<Drawer
+  anchor="top"
+  open={Boolean(drawerOpen)}
+  onClose={() => setDrawerOpen(false)}
+  PaperProps={{
+    sx: { width:"100%" },
+  }}
+>
+  <AppBar
+    position="sticky"
+    color="default"
+    elevation={1}
+    sx={{
+      backgroundColor: "#fff",
+      borderBottom: "1px solid #e0e0e0",
+    }}
+  >
+    <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Typography variant="h6" sx={{ color: "#ff9800", fontWeight: "bold" }}>
+        All Categories
+      </Typography>
+      <IconButton edge="end" onClick={() => setDrawerOpen(false)}>
+        <CloseIcon />
+      </IconButton>
+    </Toolbar>
+  </AppBar>
+
+  <Box sx={{ p: 2 }}>
+    {/* Main + Sub Categories */}
+    <List dense sx={{ maxHeight: "72vh", overflowY: "auto" }}>
+      {categories.map((mainCat) => (
+        <Box key={mainCat.name} sx={{ mb: 2 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: "bold",
+              color: "#ff9800",
+              mb: 1,
+              mt: 1,
+            }}
+          >
+            {mainCat.name}
+          </Typography>
+
+          {mainCat.children?.map((subCat) => (
+            <Box key={subCat.name} sx={{ mb: 1.5 }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 600,
+                  mb: 0.5,
+                  ml: 1.5,
+                  color: "#555",
+                }}
+              >
+                {subCat.name}
+              </Typography>
+
+              <Box
+                sx={{
+                  display: "grid",
+                  gridTemplateColumns: { xs: "1fr", sm: "1fr", md: "repeat(2, 1fr)" },
+                  gap: 1,
+                  pl: 3,
+                }}
+              >
+                {subCat.children?.map((child) => (
+                  <ListItem
+                    key={child}
+                    button
+                    onClick={() => handleChildToggle(child)}
+                    sx={{
+                      borderRadius: "6px",
+                      "&:hover": {
+                        backgroundColor: "rgba(255, 152, 0, 0.08)",
+                      },
+                      p: 0.5,
+                    }}
+                  >
+                    <Checkbox
+                      edge="start"
+                      checked={tempSelectedChild.includes(child)}
+                      tabIndex={-1}
+                      disableRipple
+                      sx={{ mr: 1 }}
+                    />
+                    <ListItemText
+                      primaryTypographyProps={{ fontSize: "0.9rem" }}
+                      primary={child}
+                    />
+                  </ListItem>
+                ))}
+              </Box>
+            </Box>
+          ))}
         </Box>
-      )}
+      ))}
+    </List>
+
+    {/* Done Button */}
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "flex-end",
+        mt: 2,
+        borderTop: "1px solid #eee",
+        pt: 2,
+      }}
+    >
+      <Button
+        onClick={handleDone}
+        variant="contained"
+        sx={{
+          backgroundColor: "#ff9800",
+          color: "#fff",
+          "&:hover": { backgroundColor: "#fb8c00" },
+        }}
+      >
+        Done
+      </Button>
+    </Box>
+  </Box>
+</Drawer>
+
+
+
+{/* Display saved FICO models - ALWAYS SHOW THE TABLE */}
+<Box sx={{ mt: 4 }}>
+  <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+    Saved Franchise Models {data.fico?.length > 0 && `(${data.fico.length})`}
+  </Typography>
+  <Box sx={{ width: "100%", overflowX: "auto", margin: "0 auto" }}>
+    <TableContainer sx={{ maxHeight: 600 }}>
+      <Table
+        stickyHeader
+        aria-label="saved franchise models"
+        size="medium"
+        sx={{
+          fontSize: "1rem",
+          "& th, & td": {
+            padding: "12px 16px",
+            fontSize: "1rem",
+            whiteSpace: "nowrap",
+          },
+        }}
+      >
+        <TableHead>
+          <TableRow>
+            {[
+              "Model Type",
+              "Franchise Type",
+              "Investment Range",
+              "Area Required",
+              "Agreement Period",
+              "Franchise Fee",
+              "Interior Cost",
+              "Stock Cost",
+              "Additional Cost",
+              "Annual Working Capital",
+              "Royalty Fee",
+              "Break Even",
+              "ROI (%)",
+              "Payback",
+              "Margin On Sales",
+              "Actions",
+            ].map((label, i) => (
+              <TableCell
+                key={i}
+                sx={{
+                  fontWeight: "bold",
+                  backgroundColor: "#f5f5f5",
+                }}
+              >
+                {label}
+              </TableCell>
+            ))}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {data.fico && data.fico.length > 0 ? (
+            data.fico.map((model, index) => (
+              <TableRow
+                key={index}
+                hover
+                sx={{
+                  "&:last-child td, &:last-child th": { border: 0 },
+                  fontSize: "0.75rem",
+                }}
+              >
+                <TableCell>{model.franchiseModel || "N/A"}</TableCell>
+                <TableCell>{model.franchiseType || "N/A"}</TableCell>
+                <TableCell>{model.investmentRange || "N/A"}</TableCell>
+                <TableCell>{model.areaRequired || "N/A"}</TableCell>
+                <TableCell>{model.agreementPeriod || "N/A"}</TableCell>
+                <TableCell>
+                  {formatCurrency(model.franchiseFee)}
+                </TableCell>
+                <TableCell>
+                  {formatCurrency(model.interiorCost)}
+                </TableCell>
+                <TableCell>
+                  {formatCurrency(model.stockInvestment)}
+                </TableCell>
+                <TableCell>{formatCurrency(model.otherCost)}</TableCell>
+                <TableCell>
+                  {formatCurrency(model.requireWorkingCapital)}
+                </TableCell>
+                <TableCell>
+                  {model.royaltyFee && model.royaltyFee !== "No Fee"
+                    ? `${model.royaltyFee}${
+                        model.royaltyFeeUnit === "%" ? "%" : ""
+                      }`
+                    : model.royaltyFee}
+                </TableCell>
+                <TableCell>{model.breakEven}</TableCell>
+                <TableCell>{model.roi}%</TableCell>
+                <TableCell>{model.payBackPeriod}</TableCell>
+                <TableCell>{model.marginOnSales}%</TableCell>
+                <TableCell>
+                  {isEditing && (
+                    <>
+                      <IconButton
+                        onClick={() => handleEditFicoModel(index)}
+                        color="primary"
+                        size="small"
+                        aria-label="edit"
+                        sx={{ mr: 1 }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDeleteFicoModel(index)}
+                        color="error"
+                        size="small"
+                        aria-label="delete"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          ) : (
+            // Empty state row
+            <TableRow>
+              <TableCell 
+                colSpan={16} 
+                align="center" 
+                sx={{ 
+                  py: 4,
+                  color: 'text.secondary',
+                  fontStyle: 'italic'
+                }}
+              >
+                No franchise models added yet. {isEditing && "Use the form above to add your first franchise model."}
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+    </TableContainer>
+  </Box>
+</Box>
       <Divider
         sx={{
           my: 2,
