@@ -1,20 +1,20 @@
 import React from 'react';
-import { Box, Typography, Divider, Grid } from '@mui/material';
+import { Box, Typography, Divider, Grid, Chip } from '@mui/material';
 
 const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
   if (!franchiseTagsDetails) return null;
 
   const tagSections = [
-    { key: 'AmbienceExperience', label: 'Ambience & Experience' },
-    { key: 'BusinessOperations', label: 'Business Operations' },
-    { key: 'FeaturesAmenities', label: 'Features & Amenities' },
-    { key: 'PricingValue', label: 'Pricing & Value' },
-    { key: 'PrimaryClassifications', label: 'Primary Classifications' },
+        { key: 'PrimaryClassifications', label: 'Primary Classifications' },
     { key: 'ProductServiceTypes', label: 'Product & Service Types' },
-    { key: 'ServiceModel', label: 'Service Model' },
-    { key: 'SustainabilityEthics', label: 'Sustainability & Ethics' },
     { key: 'TargetAudience', label: 'Target Audience' },
+    { key: 'ServiceModel', label: 'Service Model' },
+    { key: 'PricingValue', label: 'Pricing & Value' },
+    { key: 'AmbienceExperience', label: 'Ambience & Experience' },
+    { key: 'FeaturesAmenities', label: 'Features & Amenities' },
     { key: 'TechnologyIntegration', label: 'Technology Integration' },
+    { key: 'BusinessOperations', label: 'Business Operations' },
+    { key: 'SustainabilityEthics', label: 'Sustainability & Ethics' },
   ];
 
   return (
@@ -43,7 +43,7 @@ const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
         }}
       >
         {tagSections.map((section, index) => {
-          const items = franchiseTagsDetails[section.key];
+          const items = franchiseTagsDetails[section.key] || [];
           if (!items || items.length === 0) return null;
 
           return (
@@ -98,20 +98,23 @@ const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
                   }}
                 >
                   {items.map((tag, i) => (
-                    <Typography
+                    <Chip
                       key={i}
-                      variant="body2"
-                      sx={{
-                        fontSize: '0.85rem',
-                        fontWeight: 500,
-                        borderRadius: 1,
-                        px: 1,
-                        py: 0.3,
-                        whiteSpace: 'nowrap',
-                      }}
-                    >
-                      {tag}
-                    </Typography>
+                      label={tag}
+                       size="small"
+                  variant="outlined"
+                  sx={{
+                    // fontSize: isMobile ? "0.65rem" : "0.75rem",
+                    height: "24px",
+                    backgroundColor: "#f8f9fa",
+                    borderColor: "#7AD03A",
+                    color: "black",
+                    "& .MuiChip-label": {
+                      padding: "0 8px",
+                      whiteSpace: "nowrap",
+                    }
+                  }}
+                    />
                   ))}
                 </Box>
               </Box>
@@ -119,6 +122,8 @@ const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
           );
         })}
       </Box>
+            <Divider sx={{ mb: 2 }} />
+
     </Box>
   );
 };
