@@ -174,7 +174,7 @@ const initialFormData = {
     uniqueSellingPoints: [],
     franchiseTags:{
       PrimaryClassifications: [],
-      productServiceTypes: [],
+      // productServiceTypes: [],
       TargetAudience: [],
       ServiceModel: [],
       PricingValue: [],
