@@ -112,7 +112,8 @@ const [drawerOpen, setDrawerOpen] = useState(false);
 const [showSelectedServiceTags, setShowSelectedServiceTags] = useState(false);
 const [serviceTagDrawerOpen, setServiceTagDrawerOpen] = useState(false);
 const [tempSelectedChild, setTempSelectedChild] = useState([]);
-const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]);  const franchiseTypes = [
+const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]); 
+ const franchiseTypes = [
     "Single Unit",
     "Multi Unit",
     "Master Franchise",
@@ -806,6 +807,7 @@ const handleServiceTagDone = () => {
       : (data.trainingSupport || []).filter((v) => v !== option);
     onArrayChange("trainingSupport", newValue);
   };
+
 const formatCurrency = (value) => {
   if (!value || value === "No Fee" || value === "select") return value || "N/A";
   
@@ -835,8 +837,6 @@ const formatCurrency = (value) => {
           </Button>
         </DialogActions>
       </Dialog>
-      
-    
 
 {/* Brand Categories Section - Sub-child dropdown shows items in grid (3 columns) */}
 <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
@@ -911,31 +911,31 @@ const formatCurrency = (value) => {
   </Grid>
 
   {/* Product Tag */}
-  <Grid item xs={12} md={3}>
-    <FormControl fullWidth size="medium">
-      <InputLabel shrink htmlFor="sub-cat-field">Product Tag</InputLabel>
-      <TextField
-        id="sub-cat-field"
-        // variant="outlined"
-        value={
-          selectedCategory.child?.length
-            ? `${selectedCategory.child.length} tag(s) selected`
-            : 'Select Product Tags'
-        }
-        placeholder="Select Product Tags"
-        onClick={handleOpenDrawer}
-        InputProps={{ readOnly: true }}
-        disabled={!isEditing || !selectedCategory.sub}
-        sx={{
-          minHeight: 56,
-          '& .MuiInputBase-input': {
-            cursor: isEditing ? 'pointer' : 'default',
-            userSelect: 'none',
-          },
-        }}
-      />
-    </FormControl>
-  </Grid>
+<Grid item xs={12} md={3}>
+  <FormControl fullWidth size="medium">
+    <InputLabel shrink htmlFor="sub-cat-field">Product Tag</InputLabel>
+    <TextField
+      id="sub-cat-field"
+      variant="outlined"
+      value={
+        selectedCategory.child?.length
+          ? `${selectedCategory.child.length} tag(s) selected`
+          : 'Select Product Tags'
+      }
+      placeholder="Select Product Tags"
+      onClick={handleOpenDrawer}
+      InputProps={{ readOnly: true }}
+      disabled={!isEditing} // Remove the !selectedCategory.sub condition
+      sx={{
+        minHeight: 56,
+        '& .MuiInputBase-input': {
+          cursor: isEditing ? 'pointer' : 'default',
+          userSelect: 'none',
+        },
+      }}
+    />
+  </FormControl>
+</Grid>
 
   {/* Service Tag */}
   <Grid item xs={12} md={3}>
@@ -1159,6 +1159,115 @@ const formatCurrency = (value) => {
     </Box>
   </Box>
 </Drawer>
+
+{/*Drawer for product tags */}
+<Drawer
+  anchor="top"
+  open={drawerOpen}
+  onClose={() => setDrawerOpen(false)}
+  PaperProps={{ sx: { height: "95vh" } }}
+>
+  <AppBar position="sticky" color="default" elevation={1}>
+    <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Typography variant="h6" sx={{ color: "#ff9800" }}>
+        Select Product Tags - All Categories
+      </Typography>
+      <IconButton onClick={() => setDrawerOpen(false)}>
+        <CloseIcon />
+      </IconButton>
+    </Toolbar>
+  </AppBar>
+
+  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
+    {/* Show ALL categories and their children */}
+    {categories.map((category) => (
+      <Box key={category.name} sx={{ mb: 4 }}>
+        <Typography
+          variant="h6"
+          sx={{ 
+            fontWeight: 700, 
+            mb: 2, 
+            color: "#ff9800",
+            borderBottom: "2px solid #ff9800",
+            pb: 1
+          }}
+        >
+          {category.name}
+        </Typography>
+        
+        {category.children?.map((subCategory) => (
+          <Box key={subCategory.name} sx={{ mb: 3, ml: 2 }}>
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
+            >
+              {subCategory.name}
+            </Typography>
+            
+            <Grid container spacing={1}>
+              {subCategory.children?.map((child) => (
+                <Grid item xs={12} sm={6} md={3} key={child}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={tempSelectedChild.includes(child)}
+                        onChange={() => handleChildToggle(child)}
+                        color="primary"
+                      />
+                    }
+                    label={
+                      <Typography variant="body2">
+                        {child}
+                      </Typography>
+                    }
+                    sx={{
+                      width: '100%',
+                      margin: 0,
+                      '& .MuiFormControlLabel-label': {
+                        width: '100%',
+                      }
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        ))}
+      </Box>
+    ))}
+  </Box>
+
+  <Box
+    sx={{
+      position: "sticky",
+      bottom: 0,
+      p: 2,
+      bgcolor: "background.paper",
+      borderTop: "1px solid rgba(0,0,0,0.12)",
+      display: "flex",
+      justifyContent: "space-between",
+    }}
+  >
+    <Typography>{tempSelectedChild.length} tag(s) selected</Typography>
+    <Box>
+      <Button
+        onClick={() => setDrawerOpen(false)}
+        sx={{ mr: 2 }}
+        variant="outlined"
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleDone}
+        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
+      >
+        Done
+      </Button>
+    </Box>
+  </Box>
+</Drawer>
+
 
 
  {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
