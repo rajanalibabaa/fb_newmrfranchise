@@ -474,7 +474,7 @@ const investmentRanges = [
   });
   // Drawer handlers
   const handleOpenDrawer = () => {
-    if (!selectedCategory.sub || !selectedCategory.main) return;
+    // if (!selectedCategory.sub || !selectedCategory.main) return;
     setTempSelectedChild(selectedCategory.child || []);
     setDrawerOpen(true);
   };
@@ -748,7 +748,7 @@ const handleServiceTagDone = () => {
               placeholder="Select Product Tags"
               onClick={handleOpenDrawer}
               InputProps={{ readOnly: true }}
-              disabled={!selectedCategory.sub}
+              // disabled={!selectedCategory.sub}
               sx={{
                 minHeight: 56,
                 '& .MuiInputBase-input': {
@@ -887,174 +887,217 @@ const handleServiceTagDone = () => {
       )}
 
       {/* Drawer for Product Tags */}
-      <Drawer
-        anchor="top"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { height: "95vh" } }}
-      >
-        <AppBar position="sticky" color="default" elevation={1}>
-          <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Typography variant="h6" sx={{ color: "#ff9800" }}>
-              All Product Tags - {selectedCategory.sub}
-            </Typography>
-            <IconButton onClick={() => setDrawerOpen(false)}>
-              <Close />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+<Drawer
+  anchor="top"
+  open={drawerOpen}
+  onClose={() => setDrawerOpen(false)}
+  PaperProps={{ sx: { height: "95vh" } }}
+>
+  <AppBar position="sticky" color="default" elevation={1}>
+    <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Typography variant="h6" sx={{ color: "#ff9800" }}>
+        All Product Tags - Browse All Categories
+      </Typography>
+      <IconButton onClick={() => setDrawerOpen(false)}>
+        <Close />
+      </IconButton>
+    </Toolbar>
+  </AppBar>
 
-        <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
-          <Grid container spacing={1}>
-            {selectedCategory.sub &&
-              categories
-                .find((cat) => cat.name === selectedCategory.main)
-                ?.children?.find((sub) => sub.name === selectedCategory.sub)
-                ?.children?.map((child) => (
-                  <Grid item xs={6} md={3} key={child}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={tempSelectedChild.includes(child)}
-                          onChange={() => handleChildToggle(child)}
-                          color="primary"
-                        />
+  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
+    {categories.map((mainCategory) => (
+      <Box key={mainCategory.name} sx={{ mb: 4 }}>
+        {/* Main Category Header */}
+        <Typography
+          variant="h6"
+          sx={{ 
+            fontWeight: 700, 
+            mb: 2, 
+            color: "#ff9800",
+            borderBottom: "2px solid #ff9800",
+            pb: 1
+          }}
+        >
+          {mainCategory.name}
+        </Typography>
+
+        {/* Sub Categories */}
+        {mainCategory.children?.map((subCategory) => (
+          <Box key={subCategory.name} sx={{ mb: 3, ml: 2 }}>
+            {/* Sub Category Header */}
+            <Typography
+              variant="subtitle1"
+              sx={{ 
+                fontWeight: 600, 
+                mb: 1, 
+                color: "text.primary",
+                borderBottom: "1px solid #e0e0e0",
+                pb: 0.5
+              }}
+            >
+              {subCategory.name}
+            </Typography>
+
+            {/* Child Categories */}
+            <Grid container spacing={1} sx={{ ml: 1 }}>
+              {subCategory.children?.map((child) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={child}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={tempSelectedChild.includes(child)}
+                        onChange={() => handleChildToggle(child)}
+                        color="primary"
+                      />
+                    }
+                    label={child}
+                    sx={{
+                      width: '100%',
+                      '& .MuiFormControlLabel-label': {
+                        fontSize: '0.9rem'
                       }
-                      label={child}
-                    />
-                  </Grid>
-                ))}
-          </Grid>
-        </Box>
-
-        <Box
-          sx={{
-            position: "sticky",
-            bottom: 0,
-            p: 2,
-            bgcolor: "background.paper",
-            borderTop: "1px solid rgba(0,0,0,0.12)",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Typography>{tempSelectedChild.length} tag(s) selected</Typography>
-          <Box>
-            <Button
-              onClick={() => setDrawerOpen(false)}
-              sx={{ mr: 2 }}
-              variant="outlined"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleDone}
-              sx={{ backgroundColor: "#ff9800", color: "#fff" }}
-            >
-              Done
-            </Button>
+                    }}
+                  />
+                </Grid>
+              ))}
+            </Grid>
           </Box>
-        </Box>
-      </Drawer>
+        ))}
+      </Box>
+    ))}
+  </Box>
 
-      {/* Drawer for Service Tags */}
-      <Drawer
-        anchor="top"
-        open={serviceTagDrawerOpen}
-        onClose={() => setServiceTagDrawerOpen(false)}
-        PaperProps={{ sx: { height: "95vh" } }}
+  <Box
+    sx={{
+      position: "sticky",
+      bottom: 0,
+      p: 2,
+      bgcolor: "background.paper",
+      borderTop: "1px solid rgba(0,0,0,0.12)",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+    }}
+  >
+    <Typography variant="body1" fontWeight={500}>
+      {tempSelectedChild.length} tag(s) selected
+    </Typography>
+    <Box>
+      <Button
+        onClick={() => setDrawerOpen(false)}
+        sx={{ mr: 2 }}
+        variant="outlined"
       >
-        <AppBar position="sticky" color="default" elevation={1}>
-          <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Typography variant="h6" sx={{ color: "#ff9800" }}>
-              All Service Tags
-            </Typography>
-            <IconButton onClick={() => setServiceTagDrawerOpen(false)}>
-              <Close />
-            </IconButton>
-          </Toolbar>
-        </AppBar>
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleDone}
+        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
+      >
+        Done
+      </Button>
+    </Box>
+  </Box>
+</Drawer>
 
-        <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
-          {Object.entries(serviceTagGroups).map(([groupLabel, options]) => (
-            <Box key={groupLabel} sx={{ mb: 3 }}>
-              <Typography
-                variant="subtitle1"
-                sx={{ fontWeight: 700, mb: 1, color: "#ff9800" }}
-              >
-                {groupLabel}
-              </Typography>
+{/* Drawer for Service Tags - Make sure this exists */}
+<Drawer
+  anchor="top"
+  open={serviceTagDrawerOpen}
+  onClose={() => setServiceTagDrawerOpen(false)}
+  PaperProps={{ sx: { height: "95vh" } }}
+>
+  <AppBar position="sticky" color="default" elevation={1}>
+    <Toolbar sx={{ justifyContent: "space-between" }}>
+      <Typography variant="h6" sx={{ color: "#ff9800" }}>
+        All Service Tags
+      </Typography>
+      <IconButton onClick={() => setServiceTagDrawerOpen(false)}>
+        <Close />
+      </IconButton>
+    </Toolbar>
+  </AppBar>
 
-            <Grid container spacing={1}>
-  {options.map((opt) => (
-    <Grid item xs={12} sm={6} md={3} key={opt}>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={tempSelectedServiceTags.includes(opt)}
-            onChange={() => handleServiceTagToggle(opt)}
-            color="primary"
-          />
-        }
-        label={
-          <Typography variant="body2">
-            {opt}
-          </Typography>
-        }
-        sx={{
-          width: '100%',
-          margin: 0,
-          '& .MuiFormControlLabel-label': {
-            width: '100%',
-          }
-        }}
-      />
-    </Grid>
-  ))}
-</Grid>
-            </Box>
-          ))}
-        </Box>
-
-        <Box
-          sx={{
-            position: "sticky",
-            bottom: 0,
-            p: 2,
-            bgcolor: "background.paper",
-            borderTop: "1px solid rgba(0,0,0,0.12)",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
+  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
+    {Object.entries(serviceTagGroups).map(([groupLabel, options]) => (
+      <Box key={groupLabel} sx={{ mb: 3 }}>
+        <Typography
+          variant="subtitle1"
+          sx={{ fontWeight: 700, mb: 1, color: "#ff9800" }}
         >
-          <Typography></Typography>
-          <Box>
-            <Button
-              onClick={() => setServiceTagDrawerOpen(false)}
-              sx={{ mr: 2 }}
-              variant="outlined"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleServiceTagDone}
-              sx={{ backgroundColor: "#ff9800", color: "#fff" }}
-            >
-              Done
-            </Button>
-          </Box>
-        </Box>
-      </Drawer>
+          {groupLabel}
+        </Typography>
+
+        <Grid container spacing={1}>
+          {options.map((opt) => (
+            <Grid item xs={12} sm={6} md={3} key={opt}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={tempSelectedServiceTags.includes(opt)}
+                    onChange={() => handleServiceTagToggle(opt)}
+                    color="primary"
+                  />
+                }
+                label={
+                  <Typography variant="body2">
+                    {opt}
+                  </Typography>
+                }
+                sx={{
+                  width: '100%',
+                  margin: 0,
+                  '& .MuiFormControlLabel-label': {
+                    width: '100%',
+                  }
+                }}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    ))}
+  </Box>
+
+  <Box
+    sx={{
+      position: "sticky",
+      bottom: 0,
+      p: 2,
+      bgcolor: "background.paper",
+      borderTop: "1px solid rgba(0,0,0,0.12)",
+      display: "flex",
+      justifyContent: "space-between",
+    }}
+  >
+    <Typography>{tempSelectedServiceTags.length} tag(s) selected</Typography>
+    <Box>
+      <Button
+        onClick={() => setServiceTagDrawerOpen(false)}
+        sx={{ mr: 2 }}
+        variant="outlined"
+      >
+        Cancel
+      </Button>
+      <Button
+        variant="contained"
+        onClick={handleServiceTagDone}
+        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
+      >
+        Done
+      </Button>
+    </Box>
+  </Box>
+</Drawer>
 
 
-      <Typography variant="h6"
+      {/* <Typography variant="h6"
         fontWeight={700}
         sx={{ mb: 3, color: "#ff9800" }}>
 Franchise Tags
-      </Typography>
-<Grid
+      </Typography> */}
+{/* <Grid
   container
   spacing={2}
   sx={{
@@ -1064,9 +1107,9 @@ Franchise Tags
     mb: 4,
     mt: 2,
   }}
->
+> */}
   {/* Primary Classification */}
-  <Grid item xs={12}>
+  {/* <Grid item xs={12}>
     <FormControl
       fullWidth
       error={!!errors.PrimaryClassifications}
@@ -1109,7 +1152,7 @@ Franchise Tags
         </FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Product/Service Types */}
   {/* <Grid item>
@@ -1156,7 +1199,7 @@ Franchise Tags
   </Grid> */}
 
   {/* Target Audience */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.TargetAudience}
@@ -1197,10 +1240,10 @@ Franchise Tags
         <FormHelperText error>{errors.TargetAudience}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Service Model */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.ServiceModel}
@@ -1241,10 +1284,10 @@ Franchise Tags
         <FormHelperText error>{errors.ServiceModel}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Pricing Value */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.PricingValue}
@@ -1285,10 +1328,10 @@ Franchise Tags
         <FormHelperText error>{errors.PricingValue}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Ambience Experience */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.AmbienceExperience}
@@ -1329,10 +1372,10 @@ Franchise Tags
         <FormHelperText error>{errors.AmbienceExperience}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Features & Amenities */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.FeaturesAmenities}
@@ -1373,10 +1416,10 @@ Franchise Tags
         <FormHelperText error>{errors.FeaturesAmenities}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Technology Integration */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.TechnologyIntegration}
@@ -1417,10 +1460,10 @@ Franchise Tags
         <FormHelperText error>{errors.TechnologyIntegration}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Sustainability & Ethics */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.SustainabilityEthics}
@@ -1461,10 +1504,10 @@ Franchise Tags
         <FormHelperText error>{errors.SustainabilityEthics}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
+  </Grid> */}
 
   {/* Business Operations */}
-  <Grid item>
+  {/* <Grid item>
     <FormControl
       fullWidth
       error={!!errors.BusinessOperations}
@@ -1505,8 +1548,8 @@ Franchise Tags
         <FormHelperText error>{errors.BusinessOperations}</FormHelperText>
       )}
     </FormControl>
-  </Grid>
-</Grid>
+  </Grid> */}
+{/* </Grid> */}
 
 
 
