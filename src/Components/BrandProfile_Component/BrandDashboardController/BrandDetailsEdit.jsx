@@ -899,9 +899,6 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
           gap: 2,
         }}
       >
-  
-
-    
       </Grid>
     </Box>
   );
