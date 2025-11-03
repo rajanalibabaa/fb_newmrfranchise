@@ -70,7 +70,7 @@ const [currentTags, setCurrentTags] = React.useState({
   FeaturesAmenities: data.franchiseTags?.FeaturesAmenities || [],
   TechnologyIntegration: data.franchiseTags?.TechnologyIntegration || [],
   SustainabilityEthics: data.franchiseTags?.SustainabilityEthics || [],
-  BusinessOperations: data.franchiseTags?.BusinessOperations || [],
+  // BusinessOperations: data.franchiseTags?.BusinessOperations || [],
 });
 
 
@@ -419,7 +419,7 @@ const FeaturesAmenities=["Live Music","Sports Screening","Free Wi-Fi","Parking A
 const TechnologyIntegration=["Online Ordering","Mobile App","QR Code Menu","Digital Payments","Self-Order Kiosks","Contactless Delivery"]
 const SustainabilityEthics  =["Organic Ingredients","Locally Sourced","Sustainable Sourcing","Eco-Friendly Packaging","Waste Reduction","Energy Efficient","Social Responsibility"]
 // const productServiceType = ["North Indian","South Indian","Punjab","Bengali","Gujarati","Italian","Chinese","Thai","Japanese","Korean","French","Mexican","Burgers","Sandwiches","Pizza","Tacos","Biryani","Wraps","Curry","Tandoori","Kebabs","Tea","Juices","Coffee","Smoothies",  ]
-const BusinessOperation= ["Franchise Opportunity","Company-Owned","Chain","Single Unit","Multi-Unit","Area Development","Master Franchise"]
+// const BusinessOperation= ["Franchise Opportunity","Company-Owned","Chain","Single Unit","Multi-Unit","Area Development","Master Franchise"]
 
 const serviceTagGroups = {
     "Primary Classification": PrimaryClassifications,
@@ -431,7 +431,7 @@ const serviceTagGroups = {
     "Features & Amenities": FeaturesAmenities,
     "Technology Integration": TechnologyIntegration,
     "Sustainability & Ethics": SustainabilityEthics,
-    "Business Operations": BusinessOperation,
+    // "Business Operations": BusinessOperation,
   };
 
 const [selectedServiceTags, setSelectedServiceTags] = useState(
@@ -547,9 +547,9 @@ const handleServiceTagDone = () => {
       case "Sustainability & Ethics":
         propertyName = "SustainabilityEthics";
         break;
-      case "Business Operations":
-        propertyName = "BusinessOperations";
-        break;
+      // case "Business Operations":
+      //   propertyName = "BusinessOperations";
+      //   break;
       default:
         propertyName = groupLabel.replace(/[^a-zA-Z]/g, "");
     }
