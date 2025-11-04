@@ -299,19 +299,13 @@ const BrandCard = memo(
           </Box>
 
           <Divider sx={{ my: 1 }} />
-
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography >
+<Typography >
              
               {brandCategories?.sub ? (
   <Tooltip title={brandCategories?.sub} arrow>
     <Chip
       label={
-        brandCategories.sub.length > 25
+        brandCategories.sub.length > 35
           ? `${brandCategories.sub.slice(0, 25)}...`
           : brandCategories.sub
       }
@@ -321,7 +315,7 @@ const BrandCard = memo(
         color: "orange.dark",
         fontWeight: 150,
         ml:0.5,
-        maxWidth: 175, 
+        maxWidth: 250, 
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap",
@@ -340,54 +334,65 @@ const BrandCard = memo(
 )}
 
             </Typography>
-            <Box>
-              <IconButton
-                ref={likeButtonRef}
-                onClick={handleLike}
-                disabled={likeProcessing}
-                size="small"
-              >
-                {likeProcessing ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <Favorite
-                    sx={{
-                      color: isLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
-                    }}
-                  />
-                )}
-              </IconButton>
-              <IconButton
-                ref={shortlistButtonRef}
-                onClick={handleToggleShortList}
-                size="small"
-                disabled={shortlistProcessing}
-                sx={{
-                  color: isShortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.23)",
-                }}
-              >
-                {shortlistProcessing ? (
-                  <CircularProgress size={24} />
-                ) : (
-                  <RiBookmark3Fill size={21} />
-                )}
-              </IconButton>
-            </Box>
-          </Box>
+
+
+       
+            
+   
 
           <Box
             sx={{
-              mb: 1,
               minHeight: 32,
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
             }}
-          >            
+          >     
+          
+                 
                         <Typography variant="body2" component="div" sx={titleStyles}>
               {brandname}
             </Typography>
 
+       <Box
+  display="flex"
+  flexDirection={'column'}
+  justifyContent="flex-end"
+>
+  <IconButton
+    ref={likeButtonRef}
+    onClick={handleLike}
+    disabled={likeProcessing}
+    size="small"
+  >
+    {likeProcessing ? (
+      <CircularProgress size={20} />
+    ) : (
+      <Favorite
+        sx={{
+          color: isLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
+          fontSize: 22,
+        }}
+      />
+    )}
+  </IconButton>
+
+  <IconButton
+    ref={shortlistButtonRef}
+    onClick={handleToggleShortList}
+    size="small"
+    disabled={shortlistProcessing}
+  >
+    {shortlistProcessing ? (
+      <CircularProgress size={20} />
+    ) : (
+      <RiBookmark3Fill
+        size={21}
+        color={isShortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.23)"}
+      />
+    )}
+  </IconButton>
+</Box>
             {/* {brandCategories?.main ? (
               <Chip
                 label={brandCategories?.main}

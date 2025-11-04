@@ -84,18 +84,19 @@ const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchi
     <Box ref={overviewRef}>
       {/* Franchise Tags: Render instantly */
       }
-      {hasData(FranchiseTags) && (
-        <FranchiseTagsOverView 
-        franchiseTagsDetails={FranchiseTags}
-        />
-      )}
-      {/* Franchise Details: Render instantly */}
+       {/* Franchise Details: Render instantly */}
       {hasData(franchiseDetails.fico) && (
         <FranchiseDetailsTable
           ficoDetails={franchiseDetails.fico}
           formatCurrency={formatCurrency}
         />
       )}
+      {hasData(FranchiseTags) && (
+        <FranchiseTagsOverView 
+        franchiseTagsDetails={FranchiseTags}
+        />
+      )}
+     
 
       {/* Brand Description: Render instantly */}
       {franchiseDetails.brandDescription && (

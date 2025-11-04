@@ -16,12 +16,15 @@ import ViewedBrands from "./DashBoardFunctions/ViewedBrands";
 import LikedTab from "./DashBoardFunctions/LikedTab";
 import AppliedTab from "./DashBoardFunctions/AppliedTab";
 import ShortlistedTab from "./DashBoardFunctions/ShortlistedTab";
+import { loginSuccess } from "../../Redux/Slices/navbarSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [appliedBrands, setAppliedBrands] = useState([]);
+  console.log("Applied brands data view",appliedBrands);
+  
   const [likedStates, setLikedStates] = useState({});
   const [shortlistedStates, setShortlistedStates] = useState({});
   const [removeMsg, setRemoveMsg] = useState("");
@@ -46,7 +49,7 @@ const Dashboard = () => {
   const stats = useMemo(() => ({
     totalViews: viewPagination.totalItems || 0,
     totalLikes: likedBrandsState.pagination?.total || 0,
-    totalApplications: appliedBrands.length,
+    totalApplications: appliedBrands.length || 0,
     totalShortlisted: shortListState.pagination?.total || 0
   }), [viewPagination, likedBrandsState, appliedBrands, shortListState]);
 
@@ -73,18 +76,23 @@ const Dashboard = () => {
     setIsPaginating(true);
 
     const config = {
+      
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${AccessToken}`,
+      },
+      params:{
+        schemas: 'FoodAndBeverageLeads',
+        applyId:investorUUID                 
+
       }
     };
 
     // Run axios calls in parallel
     const [appliedRes, userRes] = await Promise.all([
-      axios.get(`${api.instantApplyApi.get.getInstaApplyById}/${investorUUID}`, config),
+      axios.get(`${api.instantApplyApi.get.getInstaApplyById}`, config),
       axios.get(`${api.user.get.investor}/${investorUUID}`, config),
     ]);
-
     // Dispatch Redux thunks separately (no destructuring here)
     await Promise.all([
       dispatch(fetchLikedBrandsById({ userId: investorUUID, page: 1, limit: itemsPerPage })),
@@ -95,12 +103,13 @@ const Dashboard = () => {
     console.log("📌 Applied Response:", appliedRes.data);
     console.log("📌 User Response:", userRes.data);
 
+const allDocs = appliedRes.data?.data?.results?.flatMap(result => result.data) || [];
     // Enhance applied brands
     const enhancedAppliedBrands = await Promise.all(
-      appliedRes.data?.data?.map(async (item) => {
-        if (!item.application?.brandId) return item;
+      allDocs.map(async (item) => {
+        if (!item.apply?.brandId) return item;
 
-        const brandDetails = await fetchBrandDetails(item.application.brandId, config);
+        const brandDetails = await fetchBrandDetails(item.apply.brandId, config);
         return {
           ...item,
           brandDetails: brandDetails || {}
@@ -108,7 +117,7 @@ const Dashboard = () => {
       }) || []
     );
 
-    setAppliedBrands(enhancedAppliedBrands);
+    setAppliedBrands(enhancedAppliedBrands|| []);
     setUserData(userRes.data?.data || null);
 
   } catch (error) {

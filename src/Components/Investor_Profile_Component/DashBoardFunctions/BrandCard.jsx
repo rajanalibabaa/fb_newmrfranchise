@@ -230,7 +230,7 @@ const dispatch = useDispatch();
             overflowWrap: "normal"
           }}
         >
-          {breakText(item.brandCategories?.child || brandCategoryChild, 30)}
+          {breakText(item.brandCategories?.sub || brandCategoryChild, 30)}
         </Typography>
 
         <Stack direction="column" spacing={0.5} sx={{ mb: 0.5, width: "100%" }}>

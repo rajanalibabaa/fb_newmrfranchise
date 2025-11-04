@@ -15,7 +15,10 @@ import {
   Avatar,
   IconButton,
 } from "@mui/material";
-import { Favorite, Bookmark, Visibility, AssignmentTurnedIn } from "@mui/icons-material";
+import {
+  Visibility,
+  AssignmentTurnedIn,
+} from "@mui/icons-material";
 import { useDispatch } from "react-redux";
 import { openBrandDialog } from "../../../Redux/Slices/OpenBrandNewPageSlice";
 
@@ -29,7 +32,13 @@ const AppliedTab = ({
   isPaginating,
 }) => {
 
-  const dispatch = useDispatch()
+
+  const dispatch = useDispatch();
+
+  const handleViewDetails = (brandId) => {
+    if (brandId) dispatch(openBrandDialog(brandId));
+  };
+
   if (isLoading) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
@@ -46,14 +55,10 @@ const AppliedTab = ({
     );
   }
 
-  const handleViewDetails = (brandID)=> {
-    
-    dispatch(openBrandDialog(brandID));
-  }
-
   return (
     <>
       {isPaginating && <LinearProgress sx={{ width: "100%", mb: 2 }} />}
+
       {items.length > 0 ? (
         <>
           <TableContainer component={Paper}>
@@ -68,30 +73,35 @@ const AppliedTab = ({
                   <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
-                {items.map((item) => {
-                  const app = item.application;
+                {items.map((item, index) => {
+                  const app = item.apply ; // handle flexible data shapes
+                  
+                  const uniqueKey = `${app.applyId || "unknown"}-${index}`; // ensure uniqueness
+
                   return (
-                    <TableRow key={app.applyId}>
+                    <TableRow key={uniqueKey}>
                       <TableCell>
                         <Avatar
-                          src={app.brandLogo}
-                          alt={app.brandName}
+                          src={item.brandLogo || ""}
+                          alt={item.brandName || "Brand"}
                           variant="square"
                           sx={{ width: 50, height: 50 }}
                         />
                       </TableCell>
-                      <TableCell>{app.brandName}</TableCell>
-                      <TableCell>{app.investmentRange}</TableCell>
-                      <TableCell>{app.planToInvest}</TableCell>
+
+                      <TableCell>{item.brandName || "N/A"}</TableCell>
+                      <TableCell>{item.investmentRange || "N/A"}</TableCell>
+                      <TableCell>{item.planToInvest || "N/A"}</TableCell>
                       <TableCell>
-                        {app.city}, {app.state}
+                        {item.district || "—"}, {item.state || "—"}
                       </TableCell>
+
                       <TableCell align="center">
-                        
                         <IconButton
-                          color="secondary"
-                          onClick={() => handleViewDetails(app.brandId)}
+                          color="warning"
+                          onClick={() => handleViewDetails(item.brandId)}
                         >
                           <Visibility />
                         </IconButton>
