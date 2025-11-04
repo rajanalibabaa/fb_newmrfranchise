@@ -189,8 +189,9 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
         setIsTransitioning(true);
         dispatch(clearBrands());
         setActiveCategory(index);
-        setActiveSubCategory(null);
         setHoveredChild(null);
+
+        setActiveSubCategory(null);
         // Don't wait for state updates to complete
         setIsTransitioning(false);
       }
@@ -199,19 +200,39 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
   );
 
   // Immediate subcategory change handler
-  const handleSubCategoryHover = useCallback(
-    (subCategory) => {
-      if (activeSubCategory?.name !== subCategory.name) {
-        setIsTransitioning(true);
-        dispatch(clearBrands());
-        setActiveSubCategory(subCategory);
-        setHoveredChild(null);
-        // Don't wait for state updates to complete
-        setIsTransitioning(false);
-      }
-    },
-    [activeSubCategory, dispatch]
-  );
+const handleSubCategoryHover = useCallback(
+(subCategory) => {
+if (activeSubCategory?.name !== subCategory.name) {
+// Show subchild column immediately
+setActiveSubCategory(subCategory);
+
+  // Auto-pick first child and load its brands
+  const firstChild = subCategory?.children?.[0];
+  if (firstChild) {
+    const childName =
+      typeof firstChild === "string" ? firstChild : firstChild.name;
+
+    setHoveredChild(childName);
+    setIsTransitioning(true);
+    dispatch(clearBrands());
+
+    dispatch(
+      fetchBrandsByChildCategory({
+        subCategory: subCategory.name,
+        childCategory: childName,
+        page: 1,
+        limit: 30,
+      })
+    ).finally(() => setIsTransitioning(false));
+  } else {
+    // No children → clear brands
+    setHoveredChild(null);
+    dispatch(clearBrands());
+  }
+}
+},
+[activeSubCategory, dispatch]
+);
 
   // Prefetch adjacent categories when a subcategory is selected
   useEffect(() => {
