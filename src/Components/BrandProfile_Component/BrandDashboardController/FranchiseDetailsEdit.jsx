@@ -879,7 +879,7 @@ const formatCurrency = (value) => {
 <Box
   sx={{
     display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(240px, 1fr))", // Fixed 4 columns with min 250px
+    gridTemplateColumns: "repeat(4, minmax(240px, 1fr))", 
     gap: 2,
     mb: 4,
     width: "100%",
@@ -980,7 +980,6 @@ const formatCurrency = (value) => {
 
   {/* Product Tag */}
   <FormControl fullWidth size="medium">
-    <InputLabel shrink htmlFor="sub-cat-field">Product Tag</InputLabel>
     <TextField
       id="sub-cat-field"
       value={
@@ -1007,7 +1006,6 @@ const formatCurrency = (value) => {
 
   {/* Service Tag */}
   <FormControl fullWidth size="medium">
-    <InputLabel shrink htmlFor="service-tag-field">Service Tag</InputLabel>
     <TextField
       id="service-tag-field"
       variant="outlined"
