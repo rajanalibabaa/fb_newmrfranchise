@@ -39,6 +39,8 @@ const BrandHeader = ({
   const likeButtonRef = useRef(null);
   const shortlistButtonRef = useRef(null);
 
+  console.log('brand loading ', brand);
+  
   // 🎉 Confetti effect to use element position
   const triggerCelebration = (color, buttonRef) => {
     if (buttonRef && buttonRef.current) {
@@ -319,7 +321,7 @@ const BrandHeader = ({
                         <strong>Total Outlets</strong>
                       </TableCell>
                       <TableCell sx={{ width: "30%", textAlign: "center" }}>
-                        <strong>Expansion Location</strong>
+                        <strong>Origin Location</strong>
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -384,7 +386,7 @@ const BrandHeader = ({
                           py: isMobile ? "8px" : "12px",
                         }}
                       >
-                        {(() => {
+                        {/* {(() => {
                           const locations =
                             brand?.[0]?.brandexpansionlocationdatas
                               ?.expansionLocations?.domestic?.locations || [];
@@ -421,7 +423,10 @@ const BrandHeader = ({
                               )}
                             </>
                           );
-                        })()}
+                        })()} */}
+
+  {brand?.[0]?.brandDetails?.state || "N/A"} , {brand?.[0]?.brandDetails?.city || "N/A"}
+
                       </TableCell>
                     </TableRow>
                   </TableBody>
