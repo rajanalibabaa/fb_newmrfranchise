@@ -160,7 +160,8 @@ const InvestorDashboard = () => {
       icon: ReachUsIcon,
       text: "Reach Us",
       tooltip: "Contact support"
-    }
+    },
+    
   ], [navigate]);
 
   return (
