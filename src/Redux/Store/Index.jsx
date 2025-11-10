@@ -17,6 +17,7 @@ import brandCategoryReducer from "../../Redux/Slices/SideMenuHoverBrandSlices";
 import ShortListBrands from "../../Redux/Slices/shortlistslice";
 import LikedBrands from "../../Redux/Slices/likeSlice"
 import viewedBrands from "../../Redux/Slices/viewSlice.jsx"
+import userRequestReducer from "../Slices/userRequestSlice.jsx"
 
 
 // Combine reducers first
@@ -34,6 +35,7 @@ const rootReducer = combineReducers({
   shortList: ShortListBrands,
   likedBrands: LikedBrands,
   viewBrands: viewedBrands,
+  requests: userRequestReducer
 });
 
 // Persist config

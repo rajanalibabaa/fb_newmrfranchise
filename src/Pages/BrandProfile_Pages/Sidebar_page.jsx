@@ -120,18 +120,7 @@ const Sidebar = () => {
         >
           Brand Listing Controller
         </RouterLink>
-        {/* <RouterLink to="/brandDashboard/branddetailcontrol" style={navLinkStyle}>
-        Brand Details
-        </RouterLink>
-         <RouterLink to="/brandDashboard/franchisedetailcontrol" style={navLinkStyle}>
-        Franchise Details
-        </RouterLink>
-          <RouterLink to="/brandDashboard/expansionlocationcontrol" style={navLinkStyle}>
-        Expansion Location
-        </RouterLink>
-          <RouterLink to="/brandDashboard/uploadcontrol" style={navLinkStyle}>
-        Uploads
-        </RouterLink> */}
+       
         <RouterLink 
           to="/brandDashboard/brandsearchus" 
           style={navLinkStyle}
@@ -139,44 +128,16 @@ const Sidebar = () => {
         >
           Reach Us
         </RouterLink>
+        <RouterLink
+          to="/brandDashboard/actionmanager"
+          style={navLinkStyle}
+          onClick={() => isMobile && setMobileOpen(false)}
+        >
+          Action Manager
+        </RouterLink>
       </Box>
 
-      {/* Optional: Feedback & Complaint buttons */}
-      {/* <Box sx={{ mt: 3, textAlign: "center" }}>
-        <Button
-          component={RouterLink}
-          to="/brandDashboard/brandfeedback"
-          fullWidth
-          variant="contained"
-          sx={{
-            bgcolor: "#ffab00",
-            color: "#fff",
-            fontWeight: 600,
-            mb: 1,
-            borderRadius: 1,
-            "&:hover": { bgcolor: "#ffa000" },
-          }}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Feedback
-        </Button>
-        <Button
-          component={RouterLink}
-          to="/brandDashboard/brandcomplaint"
-          fullWidth
-          variant="contained"
-          sx={{
-            bgcolor: "#ffab00",
-            color: "#fff",
-            fontWeight: 600,
-            borderRadius: 1,
-            "&:hover": { bgcolor: "#ffa000" },
-          }}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Complaint
-        </Button>
-      </Box> */}
+     
     </Box>
   );
 
