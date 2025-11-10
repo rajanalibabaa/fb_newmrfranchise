@@ -54,6 +54,9 @@ const FranchiseDetailsEdit = lazy(() => import('./Components/BrandProfile_Compon
 const ExpansionLocationEdit = lazy(() => import('./Components/BrandProfile_Component/BrandDashboardController/ExpansionLocationEdit'));
 const UploadsEdit = lazy(() => import('./Components/BrandProfile_Component/BrandDashboardController/UploadsEdit.jsx'));
 
+//payment page
+const PaymentPage = lazy(() => import('./Components/Footers/QuickLinks/PaymentPAge/PaymentPage.jsx'));
+
 // Footer Pages
 const AboutUs = lazy(() => import('./Components/Footers/HelpAndSupport/AboutUs'));
 const ContactUs = lazy(() => import('./Components/Footers/HelpAndSupport/ContactUs'));
@@ -146,6 +149,7 @@ const App = () => {
               <Route path="/brands/:brandId" element={<BrandDetailsPage />} />
               <Route path="/brandviewpage" element={<BrandCategroyViewPage />} />
               <Route path="/brands" element={<BrandCategroyViewPage />} />
+              <Route path="/PaymentPage" element={<PaymentPage />} />
               
               {/* Authentication Routes */}
               <Route path="/loginpage" element={<LoginPage />} />

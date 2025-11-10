@@ -89,9 +89,9 @@ const AdvertisingPage = () => {
   return (
     <Box>
       <Box><Navbar /></Box>
-      <Container sx={{ py: 4 }}>
+      {/* <Container > */}
         <Box>
-          <Typography 
+          {/* <Typography 
             variant="h4" 
             component="h1" 
             gutterBottom 
@@ -106,9 +106,9 @@ const AdvertisingPage = () => {
             }}
           >
             Advertising Membership
-          </Typography>
+          </Typography> */}
           
-          <Stepper
+          {/* <Stepper
             activeStep={activeStep}
             alternativeLabel
             sx={{
@@ -152,15 +152,15 @@ const AdvertisingPage = () => {
                 </StepLabel>
               </Step>
             ))}
-          </Stepper>
+          </Stepper> */}
         
-          <Box sx={{ mt: 2 }}>
+          <Box >
             {getStepContent(activeStep)}
           </Box>
 
           {/* Navigation buttons */}
           {activeStep !== 0 && (
-            <Stack direction="row" justifyContent="space-between" sx={{ mt: 4 }}>
+            <Stack direction="row" justifyContent="space-between" >
               {/* Back Button (always shown except on first step) */}
               <Button
                 startIcon={<ArrowBack />}
@@ -185,7 +185,7 @@ const AdvertisingPage = () => {
                   aria-label="complete payment"
                   sx={{
                     borderRadius: 2,
-                    px: 3,
+                    // px: 3,
                     textTransform: 'none',
                     background: 'linear-gradient(90deg, #10b981, #3b82f6)',
                     '&:hover': {
@@ -204,8 +204,8 @@ const AdvertisingPage = () => {
                   aria-label="go back to home"
                   sx={{
                     borderRadius: 2,
-                    px: 4,
-                    py: 1.5,
+                    // px: 4,
+                    // py: 1.5,
                     textTransform: 'none',
                     background: 'linear-gradient(90deg, #10b981, #3b82f6)',
                     boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)',
@@ -256,7 +256,7 @@ const AdvertisingPage = () => {
             </Stack>
           )}
         </Box>
-      </Container>
+      {/* </Container> */}
       <Box><Footer /></Box>
     </Box>
   );

@@ -1,406 +1,935 @@
-import { useState } from 'react';
-import {
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  Chip,
-  Checkbox,
-  useTheme,
-  Tabs,
-  Tab,
-  Badge,
-  Avatar,
-  Stack
-} from '@mui/material';
-import {
-  Diamond as DiamondIcon,
-  WorkspacePremium as PremiumIcon,
-  Star as StarIcon,
-  Bolt as BoltIcon,
-  CheckCircle as CheckCircleIcon
-} from '@mui/icons-material';
+  import { useState, useEffect } from 'react';
+  import {
+    Box,
+    Grid,
+    Card,
+    CardContent,
+    Typography,
+    Button,
+    Chip,
+    useTheme,
+    Container,
+    Stack,
+    CircularProgress,
+    Alert,
+    Divider,
+    Fade,
+    alpha
+  } from '@mui/material';
+  import { keyframes } from '@emotion/react';
+  import {
+    Check as CheckIcon,
+    Star as StarIcon,
+    Bolt as BoltIcon,
+    WorkspacePremium as PremiumIcon,
+    Diamond as DiamondIcon,
+    TrendingUp as TrendingUpIcon,
+    AutoAwesome as AutoAwesomeIcon
+  } from '@mui/icons-material';
+  import { useNavigate } from 'react-router-dom';
 
-const MembershipSelection = ({ onNext, onContinueToPayment }) => {
-  const theme = useTheme();
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [tabValue, setTabValue] = useState(0);
+  // Animation keyframes
+  const floatAnimation = keyframes`
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(2deg); }
+  `;
 
-  const membershipOptions = [
-    {
-      tier: 'Free',
-      icon: <CheckCircleIcon fontSize="small" />,
-      color: theme.palette.mode === 'dark' ? '#6b7280' : '#9ca3af',
-      gradient: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)',
-      plans: {
-        BASIC: { months: 3, leads: 5, totalLeads: 5, price: 0 },
+  const glowAnimation = keyframes`
+    0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+  `;
+
+  const pulseAnimation = keyframes`
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  `;
+
+  const shimmerAnimation = keyframes`
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+  `;
+
+  const slideDownAnimation = keyframes`
+    0% { transform: translateY(-100px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  `;
+
+  const MembershipSelection = ({ onNext, onContinueToPayment }) => {
+    const theme = useTheme();
+    const navigate = useNavigate();
+    const [selectedPlan, setSelectedPlan] = useState(null);
+    const [packages, setPackages] = useState([]);
+    const [listingPackages, setListingPackages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [hoveredCard, setHoveredCard] = useState(null);
+
+    // Fetch packages from API
+    useEffect(() => {
+      const fetchPackages = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+          
+          const response = await fetch('http://localhost:5000/api/v1/brandadvertise/payment', {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const contentType = response.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server returned non-JSON response');
+          }
+          
+          const data = await response.json();
+          console.log('Full API Response:', data);
+          
+          // Check if data exists and has the expected structure
+          if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
+            const packageData = data.data[0];
+            console.log('Package Data:', packageData);
+            
+            const membershipPkgs = [];
+            const listingPkgs = [];
+
+            // Extract membership packages from the nested structure
+            if (packageData.free && typeof packageData.free === 'object') {
+              membershipPkgs.push({ 
+                ...packageData.free, 
+                name: 'Free',
+                _id: packageData.free._id 
+              });
+            }
+            if (packageData.silver && typeof packageData.silver === 'object') {
+              membershipPkgs.push({ 
+                ...packageData.silver, 
+                name: 'Silver',
+                _id: packageData.silver._id 
+              });
+            }
+            if (packageData.gold && typeof packageData.gold === 'object') {
+              membershipPkgs.push({ 
+                ...packageData.gold, 
+                name: 'Gold',
+                _id: packageData.gold._id 
+              });
+            }
+            if (packageData.platinum && typeof packageData.platinum === 'object') {
+              membershipPkgs.push({ 
+                ...packageData.platinum, 
+                name: 'Platinum',
+                _id: packageData.platinum._id 
+              });
+            }
+            if (packageData.exclusive && typeof packageData.exclusive === 'object') {
+              membershipPkgs.push({ 
+                ...packageData.exclusive, 
+                name: 'Exclusive',
+                _id: packageData.exclusive._id 
+              });
+            }
+
+            // Extract listing packages from array
+            if (packageData.listingPackages && Array.isArray(packageData.listingPackages)) {
+              listingPkgs.push(...packageData.listingPackages.map(pkg => ({
+                ...pkg,
+                name: `Listing - ${pkg.periodMonths || 0} Months`
+              })));
+            }
+
+            console.log('Processed Membership Packages:', membershipPkgs);
+            console.log('Processed Listing Packages:', listingPkgs);
+
+            setPackages(membershipPkgs);
+            setListingPackages(listingPkgs);
+          } else {
+            throw new Error('Invalid data structure received from API');
+          }
+          
+        } catch (err) {
+          console.error('Error fetching packages:', err);
+          setError(err.message);
+          setPackages([]);
+          setListingPackages([]);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchPackages();
+    }, []);
+
+    const tierConfig = {
+      'Free': { 
+        color: '#000000',
+        badgeColor: '#9ca3af',
+        popular: false, 
+        icon: <CheckIcon />,
+        gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        badgeGradient: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)',
+        shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+      },
+      'Silver': { 
+        color: '#000000',
+        badgeColor: '#9ca3af', 
+        popular: false, 
+        icon: <DiamondIcon />,
+        gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        badgeGradient: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
+        shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+      },
+      'Gold': { 
+        color: '#000000',
+        badgeColor: '#d4b01e', 
+        popular: true, 
+        icon: <PremiumIcon />,
+        gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        badgeGradient: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+        shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+      },
+      'Platinum': { 
+        color: '#000000',
+        badgeColor: '#a5b4fc', 
+        popular: false, 
+        icon: <StarIcon />,
+        gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        badgeGradient: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
+        shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+      },
+      'Exclusive': { 
+        color: '#000000',
+        badgeColor: '#f59e0b', 
+        popular: false, 
+        icon: <BoltIcon />,
+        gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+        badgeGradient: 'linear-gradient(135deg, #fef3c7, #fcd34d)',
+        shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
       }
-    },
-    {
-      tier: 'Silver',
-      icon: <DiamondIcon fontSize="small" />,
-      color: '#a1a1aa',
-      gradient: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
-      plans: {
-        BASIC: { months: 3, leads: 30, totalLeads: 90, price: 13500 },
-        PRO: { months: 6, leads: 45, totalLeads: 270, price: 27000 },
-        GROWTH: { months: 12, leads: 60, totalLeads: 720, price: 54000 }
-      }
-    },
-    {
-      tier: 'Gold',
-      icon: <PremiumIcon fontSize="small" />,
-      color: '#d4b01e',
-      gradient: 'linear-gradient(135deg, #fef3c7, #fde68a)',
-      popular: true,
-      plans: {
-        BASIC: { months: 3, leads: 45, totalLeads: 135, price: 20250 },
-        PRO: { months: 6, leads: 60, totalLeads: 360, price: 40500 },
-        GROWTH: { months: 12, leads: 75, totalLeads: 900, price: 81000 }
-      }
-    },
-    {
-      tier: 'Platinum',
-      icon: <StarIcon fontSize="small" />,
-      color: '#a5b4fc',
-      gradient: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
-      plans: {
-        BASIC: { months: 3, leads: 60, totalLeads: 180, price: 27000 },
-        PRO: { months: 6, leads: 75, totalLeads: 450, price: 54000 },
-        GROWTH: { months: 12, leads: 90, totalLeads: 1080, price: 108000 }
-      }
+    };
+
+    const handlePlanSelect = (pkg, isListing = false) => {
+      const config = tierConfig[pkg.name] || tierConfig['Free'];
+      setSelectedPlan({
+        ...pkg,
+        tier: pkg.name,
+        isListingPackage: isListing,
+        color: config.badgeColor,
+        gradient: config.badgeGradient,
+        description: isListing ? `Listing - ${pkg.periodMonths} Months` : `${pkg.name} Package`,
+        price: isListing ? pkg.amount : pkg.totalAmount
+      });
+    };
+
+  const handleContinueToPayment = () => {
+    console.log('Continue to payment clicked');
+    console.log('Selected plan:', selectedPlan);
+    
+    if (selectedPlan) {
+      console.log('Navigating to payment page...');
+      navigate('/PaymentPage', { state: { selectedPlan } }); 
+    } else {
+      console.error('No plan selected');
+      alert('Please select a plan first');
     }
-  ];
-
-  const handleTabChange = (event, newValue) => {
-    setTabValue(newValue);
-    setSelectedPlan(null);
   };
 
-  const handlePlanSelect = (tier, plan, details) => {
-    setSelectedPlan({
-      tier,
-      plan,
-      ...details,
-      color: membershipOptions.find(m => m.tier === tier).color,
-      gradient: membershipOptions.find(m => m.tier === tier).gradient
-    });
-  };
-
-  const currentTier = membershipOptions[tabValue];
-  const isPaidTier = ['Silver', 'Gold', 'Platinum'].includes(selectedPlan?.tier);
-
-  return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
-      <Typography variant="subtitle1" align="center" color="text.secondary" sx={{ mb: 4 }}>
-        Select the perfect package for your business growth
-      </Typography>
-
-      {/* Tier Selection Tabs */}
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'center',
-        mb: 4,
-        position: 'relative'
-      }}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange}
-          variant="scrollable"
-          scrollButtons="auto"
+    const LoadingState = () => (
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          minHeight: 400,
+          flexDirection: 'column',
+          gap: 3
+        }}
+      >
+        <CircularProgress 
+          size={60} 
           sx={{
-            '& .MuiTabs-indicator': {
-              height: 3,
-              backgroundColor: currentTier.color
+            animation: `${glowAnimation} 2s ease-in-out infinite`,
+          }}
+        />
+        <Typography 
+          variant="h6" 
+          color="text.secondary"
+          sx={{
+            background: 'linear-gradient(90deg, #666, #999, #666)',
+            backgroundSize: '200% 100%',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            animation: `${shimmerAnimation} 2s infinite linear`,
+          }}
+        >
+          Loading amazing packages for you...
+        </Typography>
+      </Box>
+    );
+
+    const ErrorState = ({ error }) => (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Alert 
+          severity="error" 
+          sx={{ 
+            borderRadius: 3,
+            animation: `${pulseAnimation} 2s ease-in-out infinite`,
+            '& .MuiAlert-message': {
+              width: '100%'
             }
           }}
         >
-          {membershipOptions.map((option, index) => (
-            <Tab
-              key={option.tier}
-              label={
-                <Badge 
-                  badgeContent={option.popular ? "POPULAR" : null} 
-                  color="primary"
+          <Typography variant="h6" gutterBottom>
+            Oops! Something went wrong
+          </Typography>
+          <Typography variant="body2">
+            {error}
+          </Typography>
+          <Button 
+            variant="outlined" 
+            sx={{ mt: 2 }}
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </Button>
+        </Alert>
+      </Container>
+    );
+
+    if (loading) {
+      return <LoadingState />;
+    }
+
+    if (error) {
+      return <ErrorState error={error} />;
+    }
+
+    return (
+      <Container maxWidth="xl" sx={{ py: 6, position: 'relative' }}>
+        {/* Center Page Floating Summary Box */}
+        {selectedPlan && (
+          <Fade in>
+            <Box 
+              sx={{ 
+                position: 'fixed',
+                top: '20%',
+                left: '35%',
+                transform: 'translate(-50%, -50%)',
+                width: '90%',
+                maxWidth: 500,
+                background: `linear-gradient(135deg, ${alpha(selectedPlan.color, 0.95)}, ${alpha(selectedPlan.color, 0.85)})`,
+                borderRadius: 3,
+                border: `2px solid ${alpha(selectedPlan.color, 0.5)}`,
+                textAlign: 'center',
+                zIndex: 1000,
+                boxShadow: `0 20px 60px ${alpha(selectedPlan.color, 0.4)}`,
+                animation: `${slideDownAnimation} 0.5s ease-out, ${pulseAnimation} 3s ease-in-out infinite`,
+                backdropFilter: 'blur(10px)',
+                color: theme.palette.getContrastText(selectedPlan.color),
+                overflow: 'hidden',
+              }}
+            >
+              {/* Header Section */}
+              <Box sx={{ p: 3, pb: 2 }}>
+                <Box
                   sx={{
-                    '& .MuiBadge-badge': {
-                      top: -10,
-                      right: -30,
-                      fontSize: 10,
-                      fontWeight: 700,
-                      textTransform: 'uppercase'
-                    }
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    background: `linear-gradient(135deg, ${alpha('#ffffff', 0.2)}, ${alpha('#ffffff', 0.1)})`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px',
+                    border: `2px solid ${alpha('#ffffff', 0.3)}`,
+                    animation: `${floatAnimation} 3s ease-in-out infinite`,
                   }}
                 >
-                  <Box sx={{ 
-                    display: 'flex', 
-                    alignItems: 'center',
-                    gap: 1,
-                    px: 2,
-                    color: tabValue === index ? currentTier.color : 'inherit'
-                  }}>
-                    <Avatar sx={{ 
-                      bgcolor: tabValue === index ? currentTier.color : 'transparent',
-                      color: tabValue === index ? 
-                        theme.palette.getContrastText(currentTier.color) : 
-                        theme.palette.text.secondary,
-                      width: 32,
-                      height: 32,
-                      background: option.gradient
-                    }}>
-                      {option.icon}
-                    </Avatar>
-                    {option.tier}
-                  </Box>
-                </Badge>
-              }
-              sx={{
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: 600,
-                minHeight: 64,
-                '&.Mui-selected': {
-                  color: currentTier.color
-                }
-              }}
-            />
-          ))}
-        </Tabs>
-      </Box>
+                  <AutoAwesomeIcon sx={{ color: 'white', fontSize: 28 }} />
+                </Box>
+                
+                <Typography variant="h5" fontWeight="bold" gutterBottom>
+                  🎉 Excellent Choice!
+                </Typography>
+                <Typography variant="body1" sx={{ opacity: 0.9, mb: 2 }}>
+                  You've selected the <strong>{selectedPlan.description}</strong>
+                </Typography>
 
-      {/* Plan Cards */}
-      <Grid container spacing={3} justifyContent="center">
-        {Object.entries(currentTier.plans).map(([plan, details]) => {
-          const isSelected = selectedPlan?.plan === plan;
-          return (
-            <Grid item xs={12} sm={6} md={4} key={plan}>
-              <Card
-                onClick={() => handlePlanSelect(currentTier.tier, plan, details)}
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  border: isSelected ? `2px solid ${currentTier.color}` : `1px solid ${theme.palette.divider}`,
-                  transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: isSelected ? `0 10px 25px -5px ${currentTier.color}40` : '0 4px 6px -1px rgba(0,0,0,0.1)',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 20px 25px -5px ${currentTier.color}20, 0 10px 10px -5px ${currentTier.color}10`,
-                    borderColor: currentTier.color
-                  },
-                  '&:before': {
-                    content: '""',
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 6,
-                    background: currentTier.gradient
-                  }
+                {/* Price Display */}
+                <Box 
+                  sx={{
+                    background: `linear-gradient(135deg, ${alpha('#ffffff', 0.2)}, ${alpha('#ffffff', 0.1)})`,
+                    p: 2,
+                    borderRadius: 2,
+                    border: `1px solid ${alpha('#ffffff', 0.2)}`,
+                    mb: 2,
+                  }}
+                >
+                  <Typography variant="h3" fontWeight="bold" gutterBottom>
+                    ₹{selectedPlan.price}
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                    Total Amount
+                  </Typography>
+                </Box>
+
+                {/* Plan Details - Only show for membership packages */}
+                {!selectedPlan.isListingPackage && (
+                  <Box 
+                    sx={{ 
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(3, 1fr)',
+                      gap: 2,
+                      mt: 2,
+                    }}
+                  >
+                    <Box textAlign="center">
+                      <Typography variant="body2" sx={{ opacity: 0.8, fontSize: '0.75rem' }}>Duration</Typography>
+                      <Typography variant="body1" fontWeight="bold" fontSize="0.9rem">
+                        {selectedPlan.totalMonths} months
+                      </Typography>
+                    </Box>
+                    <Box textAlign="center">
+                      <Typography variant="body2" sx={{ opacity: 0.8, fontSize: '0.75rem' }}>Monthly Leads</Typography>
+                      <Typography variant="body1" fontWeight="bold" fontSize="0.9rem">
+                        {selectedPlan.perMonthLead}
+                      </Typography>
+                    </Box>
+                    <Box textAlign="center">
+                      <Typography variant="body2" sx={{ opacity: 0.8, fontSize: '0.75rem' }}>Total Leads</Typography>
+                      <Typography variant="body1" fontWeight="bold" fontSize="0.9rem">
+                        {selectedPlan.totalLeads}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+
+              {/* Buttons Section - Fixed at bottom */}
+              <Box 
+                sx={{ 
+                  background: alpha('#000000', 0.1),
+                  p: 2,
+                  borderTop: `1px solid ${alpha('#ffffff', 0.2)}`,
                 }}
               >
-                <CardContent sx={{ 
-                  flexGrow: 1,
-                  p: 3,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  height: '100%'
-                }}>
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    mb: 2
-                  }}>
-                    <Typography variant="h6" sx={{ 
-                      fontWeight: 700,
-                      textTransform: 'uppercase',
-                      letterSpacing: 1,
-                      color: 'text.primary'
-                    }}>
-                      {plan}
-                    </Typography>
-                    <Checkbox
-                      checked={isSelected}
-                      onChange={() => handlePlanSelect(currentTier.tier, plan, details)}
-                      icon={<BoltIcon color="action" />}
-                      checkedIcon={<CheckCircleIcon sx={{ color: currentTier.color }} />}
-                      sx={{
-                        p: 0,
-                        '& .MuiSvgIcon-root': {
-                          fontSize: 28
-                        }
-                      }}
-                    />
-                  </Box>
+                <Stack direction="row" spacing={2} justifyContent="center">
+                  <Button
+                    variant="outlined"
+                    size="medium"
+                    onClick={() => setSelectedPlan(null)}
+                    sx={{
+                      borderColor: 'white',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      flex: 1,
+                      py: 1,
+                      '&:hover': {
+                        backgroundColor: alpha('#ffffff', 0.1),
+                        borderColor: 'white',
+                      },
+                    }}
+                  >
+                    Back to Plans
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="medium"
+                    onClick={handleContinueToPayment}
+                    sx={{
+                      background: 'linear-gradient(135deg, #ffffff, #f0f0f0)',
+                      color: selectedPlan.color,
+                      fontWeight: 'bold',
+                      boxShadow: `0 4px 15px ${alpha('#000000', 0.2)}`,
+                      flex: 1,
+                      py: 1,
+                      '&:hover': {
+                        background: 'linear-gradient(135deg, #f0f0f0, #e0e0e0)',
+                        transform: 'translateY(-2px)',
+                        boxShadow: `0 6px 20px ${alpha('#000000', 0.3)}`,
+                      },
+                      transition: 'all 0.3s ease',
+                    }}
+                  >
+                    Continue to Payment
+                  </Button>
+                </Stack>
+              </Box>
+            </Box>
+          </Fade>
+        )}
 
-                  <Box sx={{ 
-                    background: currentTier.gradient,
-                    p: 2.5,
-                    borderRadius: 1.5,
-                    mb: 3,
-                    textAlign: 'center',
-                    border: `1px solid ${theme.palette.divider}`
-                  }}>
-                    <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
-                      ₹{details.price.toLocaleString()}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      For {details.months} months
-                    </Typography>
-                  </Box>
+        {/* Overlay when summary is shown */}
+        {selectedPlan && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: alpha('#000000', 0.5),
+              zIndex: 999,
+              backdropFilter: 'blur(2px)',
+            }}
+            onClick={() => setSelectedPlan(null)}
+          />
+        )}
 
-                  <Stack spacing={1.5} sx={{ mb: 3, flexGrow: 1 }}>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      py: 1.5,
-                      borderBottom: `1px solid ${theme.palette.divider}`
-                    }}>
-                      <Typography variant="body2" color="text.secondary">Monthly Leads:</Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {details.leads}
-                      </Typography>
-                    </Box>
-                    <Box sx={{ 
-                      display: 'flex', 
-                      justifyContent: 'space-between',
-                      py: 1.5,
-                      borderBottom: `1px solid ${theme.palette.divider}`
-                    }}>
-                      <Typography variant="body2" color="text.secondary">Total Leads:</Typography>
-                      <Typography variant="body2" fontWeight={600}>
-                        {details.totalLeads}
-                      </Typography>
-                    </Box>
-                  </Stack>
-
-                  {plan === 'PRO' && (
-                    <Chip 
-                      label="Best Value" 
-                      size="small" 
-                      sx={{ 
-                        mt: 'auto',
-                        alignSelf: 'center',
-                        backgroundColor: currentTier.color,
-                        color: theme.palette.getContrastText(currentTier.color),
-                        fontWeight: 600,
-                        px: 1.5,
-                        py: 0.5
-                      }} 
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </Grid>
-          );
-        })}
-      </Grid>
-
-      {/* Action Buttons */}
-      {selectedPlan && (
-        <Box sx={{ 
-          mt: 6,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center'
-        }}>
-          <Box sx={{
-            background: selectedPlan.gradient,
-            p: 3,
-            borderRadius: 2,
-            width: '100%',
-            maxWidth: 600,
-            textAlign: 'center',
-            mb: 3,
-            border: `1px solid ${theme.palette.divider}`,
-            boxShadow: `0 4px 6px -1px ${selectedPlan.color}20`
-          }}>
-            <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>
-              You selected: <span style={{ color: selectedPlan.color, fontWeight: 700 }}>{selectedPlan.tier} {selectedPlan.plan}</span>
+        {/* Main Content */}
+        <Box>
+          {/* Header Section */}
+          <Box textAlign="center" mb={8}>
+            <Typography 
+              variant="h2" 
+              fontWeight="bold" 
+              gutterBottom
+              sx={{
+                background: `linear-gradient(135deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main}, ${theme.palette.primary.main})`,
+                backgroundSize: '200% 200%',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontSize: { xs: '2.5rem', md: '3.5rem' },
+                animation: `${shimmerAnimation} 3s ease-in-out infinite`,
+              }}
+            >
+              Choose Your Perfect Plan
             </Typography>
-            <Typography variant="body1" color="text.secondary">
-              {selectedPlan.leads} leads/month for {selectedPlan.months} months
-            </Typography>
-            <Typography variant="h5" sx={{ mt: 2, fontWeight: 800 }}>
-              Total: ₹{selectedPlan.price.toLocaleString()}
+            <Typography 
+              variant="h6" 
+              color="text.secondary" 
+              sx={{ 
+                maxWidth: 600, 
+                mx: 'auto',
+                fontSize: { xs: '1rem', md: '1.25rem' },
+                lineHeight: 1.6
+              }}
+            >
+              Scale your business with our flexible packages. All plans include essential features with no hidden fees.
             </Typography>
           </Box>
 
-          {isPaidTier ? (
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={() => onNext?.(selectedPlan)}
-                sx={{
-                  px: 6,
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  borderRadius: 2,
-                }}
-              >
-                View Additional Banner Ads
-              </Button>
-              <Button
-                variant="contained"
-                size="large"
-                onClick={() => {
-                  if (typeof onContinueToPayment === 'function') {
-                    onContinueToPayment(selectedPlan);
-                  } else {
-                    // Fallback: pass a hint to parent if you didn't add a second handler
-                    onNext?.(selectedPlan, { skipBanners: true });
-                  }
-                }}
-                sx={{
-                  px: 6,
-                  py: 1.5,
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  borderRadius: 2,
-                  background: '#ffad33',
-                  boxShadow: `0 4px 15px ${selectedPlan.color}40`,
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 6px 20px ${selectedPlan.color}60`
-                  }
-                }}
-              >
-                Continue to Payment
-              </Button>
-            </Stack>
-          ) : (
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => onNext?.(selectedPlan)}
-              sx={{
-                px: 6,
-                py: 1.5,
-                fontSize: '1rem',
-                fontWeight: 700,
-                borderRadius: 2,
-                background: '#ffad33',
-                boxShadow: `0 4px 15px ${selectedPlan.color}40`,
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: `0 6px 20px ${selectedPlan.color}60`
-                }
-              }}
-            >
-              Continue to Banner Ads
-            </Button>
+          {/* Membership Packages */}
+          <Grid container spacing={4} justifyContent="center" mb={10}>
+            {packages.map((pkg, index) => {
+              const config = tierConfig[pkg.name] || tierConfig['Free'];
+              const isSelected = selectedPlan?._id === pkg._id;
+              const isPopular = config.popular;
+              const isHovered = hoveredCard === pkg._id;
+              
+              return (
+                <Grid item xs={12} md={6} lg={4} key={pkg._id}>
+                  <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
+                    <Card 
+                      onMouseEnter={() => setHoveredCard(pkg._id)}
+                      onMouseLeave={() => setHoveredCard(null)}
+                      onClick={() => handlePlanSelect(pkg)}
+                      sx={{
+                        height: '100%',
+                        border: isSelected ? `3px solid ${config.badgeColor}` : '2px solid #e5e7eb',
+                        borderColor: isSelected ? config.badgeColor : '#e5e7eb',
+                        background: config.gradient,
+                        transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        boxShadow: isSelected 
+                          ? `0 25px 50px -12px ${alpha(config.badgeColor, 0.4)}, 0 0 30px ${alpha(config.badgeColor, 0.3)}`
+                          : '0 8px 25px rgba(0, 0, 0, 0.1)',
+                        animation: isPopular ? `${floatAnimation} 3s ease-in-out infinite` : 'none',
+                        transform: isHovered ? 'translateY(-15px) scale(1.02)' : 'translateY(0px) scale(1)',
+                        cursor: 'pointer',
+                        '&:hover': {
+                          transform: 'translateY(-15px) scale(1.02)',
+                          boxShadow: `0 40px 80px -20px ${alpha(config.badgeColor, 0.3)}, 0 0 40px ${alpha(config.badgeColor, 0.2)}`,
+                          borderColor: config.badgeColor,
+                        },
+                        '&::before': {
+                          content: '""',
+                          position: 'absolute',
+                          top: 0,
+                          left: '-100%',
+                          width: '100%',
+                          height: '100%',
+                          background: config.shineGradient,
+                          transition: 'left 0.8s ease',
+                          zIndex: 1,
+                        },
+                        '&:hover::before': {
+                          left: '100%',
+                        }
+                      }}
+                    >
+                      {/* Animated Background Elements */}
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: -50,
+                          right: -50,
+                          width: 100,
+                          height: 100,
+                          borderRadius: '50%',
+                          background: `radial-gradient(circle, ${alpha(config.badgeColor, 0.1)} 0%, transparent 70%)`,
+                          animation: `${floatAnimation} 4s ease-in-out infinite`,
+                          animationDelay: `${index * 0.5}s`,
+                        }}
+                      />
+                      
+                      {/* Popular Badge */}
+                      {isPopular && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: -8,
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            background: config.badgeGradient,
+                            color: theme.palette.getContrastText(config.badgeColor),
+                            px: 3,
+                            py: 1,
+                            borderRadius: 4,
+                            fontSize: '0.75rem',
+                            fontWeight: 'bold',
+                            textTransform: 'uppercase',
+                            letterSpacing: 1,
+                            boxShadow: `0 8px 20px ${alpha(config.badgeColor, 0.4)}`,
+                            zIndex: 2,
+                            animation: `${pulseAnimation} 2s ease-in-out infinite`,
+                          }}
+                        >
+                          <TrendingUpIcon sx={{ fontSize: 16, mr: 1 }} />
+                          Most Popular
+                        </Box>
+                      )}
+
+                      {/* Selection Glow Effect */}
+                      {isSelected && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: -2,
+                            left: -2,
+                            right: -2,
+                            bottom: -2,
+                            borderRadius: 'inherit',
+                            background: `conic-gradient(from 0deg, ${config.badgeColor}, ${alpha(config.badgeColor, 0.3)}, ${config.badgeColor})`,
+                            animation: `${glowAnimation} 2s ease-in-out infinite`,
+                            zIndex: 0,
+                          }}
+                        />
+                      )}
+
+                      <CardContent sx={{ 
+                        p: 4, 
+                        height: '100%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        position: 'relative',
+                        zIndex: 2,
+                        background: 'transparent',
+                      }}>
+                        {/* Header */}
+                        <Box textAlign="center">
+                          <Box
+                            sx={{
+                              width: 100,
+                              height: 100,
+                              borderRadius: '50%',
+                              background: config.badgeGradient,
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              margin: '0 auto 20px',
+                              color: theme.palette.getContrastText(config.badgeColor),
+                              boxShadow: `0 12px 30px ${alpha(config.badgeColor, 0.4)}`,
+                              position: 'relative',
+                              overflow: 'hidden',
+                              animation: `${isHovered ? pulseAnimation : 'none'} 1s ease-in-out`,
+                              '&::before': {
+                                content: '""',
+                                position: 'absolute',
+                                top: '-50%',
+                                left: '-50%',
+                                width: '200%',
+                                height: '200%',
+                                background: 'linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent)',
+                                transform: 'rotate(45deg)',
+                                transition: 'all 0.6s ease',
+                              },
+                              '&:hover::before': {
+                                transform: 'rotate(45deg) translate(50%, 50%)',
+                              }
+                            }}
+                          >
+                            {config.icon}
+                          </Box>
+                          <Typography 
+                            variant="h4" 
+                            fontWeight="bold" 
+                            gutterBottom
+                            sx={{
+                              color: config.color,
+                            }}
+                          >
+                            {pkg.name}
+                          </Typography>
+                        </Box>
+
+                        {/* Price with floating animation */}
+                        <Box 
+                          textAlign="center" 
+                          sx={{
+                            animation: isHovered ? `${floatAnimation} 1s ease-in-out` : 'none',
+                          }}
+                        >
+                          <Typography 
+                            variant="h1" 
+                            fontWeight="bold" 
+                            sx={{ 
+                              fontSize: '3.5rem',
+                              color: config.color,
+                              textShadow: `0 4px 8px ${alpha(config.badgeColor, 0.2)}`,
+                            }}
+                          >
+                            ₹{pkg.totalAmount}
+                          </Typography>
+                        </Box>
+
+                        <Divider 
+                          sx={{ 
+                            my: 3,
+                            background: `linear-gradient(90deg, transparent, ${config.badgeColor}, transparent)`,
+                            height: 2,
+                            border: 'none',
+                          }} 
+                        />
+
+                        {/* Key Metrics with staggered animations */}
+                        <Stack spacing={2} mb={3}>
+                          {[
+                            { label: 'Monthly Leads:', value: pkg.perMonthLead },
+                            { label: 'Total Leads:', value: pkg.totalLeads },
+                            { label: 'Total Months:', value: pkg.totalMonths }
+                          ].map((metric, metricIndex) => (
+                            <Box 
+                              key={metric.label}
+                              display="flex" 
+                              justifyContent="space-between" 
+                              alignItems="center"
+                              sx={{
+                                animation: isHovered ? 
+                                  `${floatAnimation} 0.6s ease-in-out ${metricIndex * 0.1}s both` : 'none',
+                                transition: 'all 0.3s ease',
+                                padding: '8px 12px',
+                                borderRadius: 2,
+                                background: isHovered ? alpha(config.badgeColor, 0.05) : 'transparent',
+                                transform: isHovered ? 'translateX(5px)' : 'translateX(0)',
+                              }}
+                            >
+                              <Typography variant="body2" color="text.secondary">
+                                {metric.label}
+                              </Typography>
+                              <Typography 
+                                variant="body1" 
+                                fontWeight="bold"
+                                sx={{
+                                  color: config.color,
+                                }}
+                              >
+                                {metric.value}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Stack>
+
+                        {/* Select Button with enhanced effects */}
+                        <Button
+                          fullWidth
+                          variant={isSelected ? "contained" : "outlined"}
+                          startIcon={isSelected ? <CheckIcon /> : <AutoAwesomeIcon />}
+                          sx={{
+                            py: 2,
+                            borderRadius: 3,
+                            fontSize: '1.1rem',
+                            fontWeight: 'bold',
+                            background: isSelected ? config.badgeGradient : 'transparent',
+                            border: isSelected ? 'none' : `2px solid ${config.badgeColor}`,
+                            color: isSelected ? theme.palette.getContrastText(config.badgeColor) : config.badgeColor,
+                            position: 'relative',
+                            overflow: 'hidden',
+                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                            transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                            boxShadow: isSelected ? 
+                              `0 8px 25px ${alpha(config.badgeColor, 0.4)}` :
+                              `0 4px 15px ${alpha(config.badgeColor, 0.2)}`,
+                            '&::before': {
+                              content: '""',
+                              position: 'absolute',
+                              top: 0,
+                              left: '-100%',
+                              width: '100%',
+                              height: '100%',
+                              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                              transition: 'left 0.8s ease',
+                            },
+                            '&:hover': {
+                              background: isSelected ? config.badgeGradient : alpha(config.badgeColor, 0.1),
+                              transform: 'scale(1.05)',
+                              boxShadow: `0 12px 35px ${alpha(config.badgeColor, 0.5)}`,
+                              '&::before': {
+                                left: '100%',
+                              }
+                            },
+                            '&:active': {
+                              transform: 'scale(0.98)',
+                            }
+                          }}
+                        >
+                          {isSelected ? 'Selected' : 'Select Plan'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Fade>
+                </Grid>
+              );
+            })}
+          </Grid>
+
+          {/* Listing Packages */}
+          {listingPackages.length > 0 && (
+            <Box mb={8}>
+              <Box textAlign="center" mb={6}>
+                <Typography 
+                  variant="h3" 
+                  fontWeight="bold" 
+                  gutterBottom
+                  sx={{
+                    color: '#000000',
+                  }}
+                >
+                  Listing Packages
+                </Typography>
+                <Typography variant="h6" color="text.secondary">
+                  Simple listing solutions for your business
+                </Typography>
+              </Box>
+              
+              <Grid container spacing={3} justifyContent="center">
+                {listingPackages.map((pkg, index) => {
+                  const isSelected = selectedPlan?._id === pkg._id;
+                  const listingColor = '#10b981';
+                  const listingGradient = 'linear-gradient(135deg, #d1fae5, #a7f3d0)';
+                  const isHovered = hoveredCard === pkg._id;
+                  
+                  return (
+                    <Grid item xs={12} md={8} lg={6} key={pkg._id}>
+                      <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
+                        <Card 
+                          onMouseEnter={() => setHoveredCard(pkg._id)}
+                          onMouseLeave={() => setHoveredCard(null)}
+                          onClick={() => handlePlanSelect(pkg, true)}
+                          sx={{
+                            border: isSelected ? `3px solid ${listingColor}` : '2px solid #e5e7eb',
+                            borderColor: isSelected ? listingColor : '#e5e7eb',
+                            background: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+                            transition: 'all 0.4s ease',
+                            position: 'relative',
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            '&:hover': {
+                              transform: 'translateY(-8px) scale(1.02)',
+                              boxShadow: `0 25px 50px -12px ${alpha(listingColor, 0.3)}`,
+                              borderColor: listingColor,
+                            },
+                            transform: isHovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
+                          }}
+                        >
+                          {/* Selection Indicator */}
+                          {isSelected && (
+                            <Box
+                              sx={{
+                                position: 'absolute',
+                                top: 19,
+                                right: 20,
+                                width: 24,
+                                height: 24,
+                                borderRadius: '50%',
+                                background: listingGradient,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                zIndex: 2,
+                                animation: `${pulseAnimation} 2s ease-in-out infinite`,
+                              }}
+                            >
+                              <CheckIcon sx={{ fontSize: 16, color: '#065f46' }} />
+                            </Box>
+                          )}
+
+                          <CardContent sx={{ p: 4, position: 'relative' }}>
+                            <Box mb={3}>
+                              <Typography variant="h4" fontWeight="bold" gutterBottom color="#000000">
+                                Listing Package
+                              </Typography>
+                            </Box>
+                            
+                            <Box 
+                              sx={{
+                                background: listingGradient,
+                                p: 3,
+                                borderRadius: 2,
+                                textAlign: 'center',
+                                mb: 3,
+                                position: 'relative',
+                                overflow: 'hidden',
+                                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                                transition: 'transform 0.3s ease',
+                                '&::before': {
+                                  content: '""',
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: '-100%',
+                                  width: '100%',
+                                  height: '100%',
+                                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+                                  transition: 'left 0.8s ease',
+                                },
+                                '&:hover::before': {
+                                  left: '100%',
+                                }
+                              }}
+                            >
+                              <Typography variant="h2" fontWeight="bold" color="#065f46" gutterBottom>
+                                ₹{pkg.amount}
+                              </Typography>
+                            </Box>
+
+                            <Stack direction="row" spacing={4} justifyContent="center">
+                              <Box textAlign="center">
+                                <Typography variant="body2" color="text.secondary">Duration</Typography>
+                                <Typography variant="h6" fontWeight="bold" color="#000000">
+                                  {pkg.periodMonths} Months
+                                </Typography>
+                              </Box>
+                            </Stack>
+                          </CardContent>
+                        </Card>
+                      </Fade>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Box>
           )}
         </Box>
-      )}
-    </Box>
-  );
-};
+      </Container>
+    );
+  };
 
-export default MembershipSelection;
+  export default MembershipSelection;
