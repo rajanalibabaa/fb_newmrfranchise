@@ -23,7 +23,7 @@ import {
   CheckCircle as CheckCircleIcon
 } from '@mui/icons-material';
 
-const MembershipSelection = ({ onNext }) => {
+const MembershipSelection = ({ onNext, onContinueToPayment }) => {
   const theme = useTheme();
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [tabValue, setTabValue] = useState(0);
@@ -35,7 +35,7 @@ const MembershipSelection = ({ onNext }) => {
       color: theme.palette.mode === 'dark' ? '#6b7280' : '#9ca3af',
       gradient: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)',
       plans: {
-        BASIC: { months: 3, leads: 15, totalLeads: 15, price: 0 },
+        BASIC: { months: 3, leads: 5, totalLeads: 5, price: 0 },
       }
     },
     {
@@ -90,6 +90,7 @@ const MembershipSelection = ({ onNext }) => {
   };
 
   const currentTier = membershipOptions[tabValue];
+  const isPaidTier = ['Silver', 'Gold', 'Platinum'].includes(selectedPlan?.tier);
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', p: 3 }}>
@@ -300,7 +301,7 @@ const MembershipSelection = ({ onNext }) => {
         })}
       </Grid>
 
-      {/* Continue Button */}
+      {/* Action Buttons */}
       {selectedPlan && (
         <Box sx={{ 
           mt: 6,
@@ -329,27 +330,73 @@ const MembershipSelection = ({ onNext }) => {
               Total: ₹{selectedPlan.price.toLocaleString()}
             </Typography>
           </Box>
-          
-          <Button
-            variant="contained"
-            size="large"
-            onClick={() => onNext(selectedPlan)}
-            sx={{
-              px: 6,
-              py: 1.5,
-              fontSize: '1rem',
-              fontWeight: 700,
-              borderRadius: 2,
-              background: '#ffad33',
-              boxShadow: `0 4px 15px ${selectedPlan.color}40`,
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: `0 6px 20px ${selectedPlan.color}60`
-              }
-            }}
-          >
-            Continue to Banner Ads
-          </Button>
+
+          {isPaidTier ? (
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <Button
+                variant="outlined"
+                size="large"
+                onClick={() => onNext?.(selectedPlan)}
+                sx={{
+                  px: 6,
+                  py: 1.5,
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                }}
+              >
+                View Additional Banner Ads
+              </Button>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={() => {
+                  if (typeof onContinueToPayment === 'function') {
+                    onContinueToPayment(selectedPlan);
+                  } else {
+                    // Fallback: pass a hint to parent if you didn't add a second handler
+                    onNext?.(selectedPlan, { skipBanners: true });
+                  }
+                }}
+                sx={{
+                  px: 6,
+                  py: 1.5,
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  borderRadius: 2,
+                  background: '#ffad33',
+                  boxShadow: `0 4px 15px ${selectedPlan.color}40`,
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 6px 20px ${selectedPlan.color}60`
+                  }
+                }}
+              >
+                Continue to Payment
+              </Button>
+            </Stack>
+          ) : (
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => onNext?.(selectedPlan)}
+              sx={{
+                px: 6,
+                py: 1.5,
+                fontSize: '1rem',
+                fontWeight: 700,
+                borderRadius: 2,
+                background: '#ffad33',
+                boxShadow: `0 4px 15px ${selectedPlan.color}40`,
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: `0 6px 20px ${selectedPlan.color}60`
+                }
+              }}
+            >
+              Continue to Banner Ads
+            </Button>
+          )}
         </Box>
       )}
     </Box>

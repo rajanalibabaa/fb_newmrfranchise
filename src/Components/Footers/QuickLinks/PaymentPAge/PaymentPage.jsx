@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Typography,
@@ -21,11 +21,10 @@ import {
   AccountBalance,
   Payment,
   QrCode,
-  CheckCircle,
-  LocalAtm
+  CheckCircle
 } from '@mui/icons-material';
 
-const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
+const PaymentPage = ({ membership, banners = [], onBack, onSubmit }) => {
   const [paymentMethod, setPaymentMethod] = useState('upi');
   const [cardDetails, setCardDetails] = useState({
     number: '',
@@ -36,9 +35,24 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
   const [showQR, setShowQR] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const theme = useTheme();
+
+  // GUARD CLAUSE: Show fallback if no membership is selected
+  if (!membership) {
+    return (
+      <Box sx={{ p: 6, textAlign: 'center' }}>
+        <Typography color="error" fontWeight={700} fontSize="1.2rem">
+          No membership selected. Please go back and choose a membership plan.
+        </Typography>
+        <Button onClick={onBack} sx={{ mt: 3 }} variant="contained">
+          Go Back
+        </Button>
+      </Box>
+    );
+  }
+
   // Calculate amounts with GST (18%)
-  const bannerTotal = banners.reduce((sum, banner) => sum + banner.price, 0);
-  const subtotal = membership.price + bannerTotal;
+  const bannerTotal = banners.reduce((sum, banner) => sum + (banner.price || 0), 0);
+  const subtotal = (membership.price || 0) + bannerTotal;
   const gstAmount = Math.round(subtotal * 0.18);
   const totalAmount = subtotal + gstAmount;
 
@@ -87,11 +101,9 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
     const matches = v.match(/\d{4,16}/g);
     const match = matches && matches[0] || '';
     const parts = [];
-    
     for (let i = 0, len = match.length; i < len; i += 4) {
       parts.push(match.substring(i, i + 4));
     }
-    
     if (parts.length) {
       return parts.join(' ');
     }
@@ -122,8 +134,12 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
             
             <Box sx={{ mb: 2 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                <Typography>{membership.metal} {membership.plan} Membership</Typography>
-                <Typography fontWeight={600}>₹{membership.price.toLocaleString()}</Typography>
+                <Typography>
+                  {membership.tier} {membership.plan} Membership
+                </Typography>
+                <Typography fontWeight={600}>
+                  ₹{(membership.price || 0).toLocaleString()}
+                </Typography>
               </Box>
               
               {banners.length > 0 && (
@@ -132,9 +148,13 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                     Banner Ads:
                   </Typography>
                   {banners.map(banner => (
-                    <Box key={banner.id} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2">{banner.name} ({banner.size})</Typography>
-                      <Typography variant="body2">₹{banner.price.toLocaleString()}</Typography>
+                    <Box key={banner.id || banner.name} sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                      <Typography variant="body2">
+                        {banner.name || banner.category} {banner.size ? `(${banner.size})` : ''}
+                      </Typography>
+                      <Typography variant="body2">
+                        ₹{(banner.price || 0).toLocaleString()}
+                      </Typography>
                     </Box>
                   ))}
                 </>
@@ -164,14 +184,14 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
             </Box>
           </Paper>
 
+          {/* Payment method selection (you can enable below payment options for real payments) */}
+          {/* -----------------------------------------------
           {!showQR ? (
             <>
-              {/* Payment Methods */}
-              {/* <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
+              <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
                 <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
                   Select Payment Method
                 </Typography>
-                
                 <RadioGroup
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
@@ -189,7 +209,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                     }
                     sx={{ mb: 2 }}
                   />
-                  
                   <FormControlLabel
                     value="credit_card"
                     control={<Radio />}
@@ -203,7 +222,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                     }
                     sx={{ mb: 2 }}
                   />
-                  
                   <FormControlLabel
                     value="net_banking"
                     control={<Radio />}
@@ -217,15 +235,13 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                     }
                   />
                 </RadioGroup>
-              </Paper> */}
+              </Paper>
 
-              {/* Payment Form */}
               {paymentMethod === 'credit_card' && (
                 <Paper elevation={3} sx={{ p: 3, mb: 4, borderRadius: 3 }}>
                   <Typography variant="h6" sx={{ mb: 3, fontWeight: 600 }}>
                     Card Details
                   </Typography>
-                  
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <TextField
@@ -244,7 +260,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                         }}
                       />
                     </Grid>
-                    
                     <Grid item xs={12}>
                       <TextField
                         fullWidth
@@ -255,7 +270,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                         placeholder="John Doe"
                       />
                     </Grid>
-                    
                     <Grid item xs={6}>
                       <TextField
                         fullWidth
@@ -266,7 +280,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                         placeholder="MM/YY"
                       />
                     </Grid>
-                    
                     <Grid item xs={6}>
                       <TextField
                         fullWidth
@@ -292,7 +305,7 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                 fullWidth
                 variant="contained"
                 size="large"
-                // onClick={handlePaymentSubmit}
+                onClick={handlePaymentSubmit}
                 sx={{
                   py: 2,
                   borderRadius: 2,
@@ -305,18 +318,15 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                   }
                 }}
               >
-                {/* {paymentMethod === 'upi' ? 'Generate UPI QR Code' : `Pay ₹${totalAmount.toLocaleString()}`} */}
-                Please Contact support.team@mrfranchise.in To Buy
+                {paymentMethod === 'upi' ? 'Generate UPI QR Code' : `Pay ₹${totalAmount.toLocaleString()}`}
               </Button>
             </>
           ) : (
             <>
-              {/* UPI QR Code Display
               <Paper elevation={3} sx={{ p: 4, textAlign: 'center', borderRadius: 3, mb: 3 }}>
                 <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
                   Scan to Pay with Google Pay
                 </Typography>
-                
                 <Box sx={{
                   p: 2,
                   border: `2px dashed ${theme.palette.divider}`,
@@ -326,19 +336,15 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                 }}>
                   <QrCode sx={{ fontSize: 200, color: theme.palette.text.primary }} />
                 </Box>
-                
                 <Typography variant="body1" sx={{ mb: 1 }}>
                   Transaction ID: <strong>{upiId}</strong>
                 </Typography>
-                
                 <Typography variant="h5" sx={{ fontWeight: 700, mb: 3 }}>
                   ₹{totalAmount.toLocaleString()}
                 </Typography>
-                
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   Open your UPI app and scan this code to complete payment
                 </Typography>
-                
                 <Box sx={{
                   backgroundColor: theme.palette.grey[100],
                   p: 2,
@@ -350,12 +356,31 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
                   </Typography>
                 </Box>
               </Paper>
-              
               <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
                 Waiting for payment confirmation...
-              </Typography> */}
+              </Typography>
             </>
           )}
+          ----------------------------------------------- */}
+
+          <Button
+            fullWidth
+            variant="contained"
+            size="large"
+            sx={{
+              py: 2,
+              borderRadius: 2,
+              fontSize: '1.1rem',
+              fontWeight: 600,
+              background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: theme.shadows[4]
+              }
+            }}
+          >
+            Please Contact support.team@mrfranchise.in To Buy
+          </Button>
         </>
       ) : (
         /* Payment Success Screen */
@@ -367,7 +392,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
           <Typography variant="body1" sx={{ mb: 3 }}>
             Your payment of ₹{totalAmount.toLocaleString()} has been received.
           </Typography>
-          
           <Box sx={{
             backgroundColor: theme.palette.grey[100],
             p: 3,
@@ -400,7 +424,6 @@ const PaymentPage = ({ membership, banners, onBack, onSubmit }) => {
               <Typography variant="body1" fontWeight={600}>₹{totalAmount.toLocaleString()}</Typography>
             </Box>
           </Box>
-          
           <Button
             variant="contained"
             size="large"

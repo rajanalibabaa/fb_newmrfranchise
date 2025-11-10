@@ -10,7 +10,6 @@ import {
   Checkbox,
   Typography,
   Box,
-  Button,
   useTheme,
   Divider,
   Grid,
@@ -27,9 +26,13 @@ import {
   Restaurant as RestaurantIcon
 } from '@mui/icons-material';
 
-const HomePageLeads = () => {
+// Accept membership as prop!
+const HomePageLeads = ({ membership }) => {
   const theme = useTheme();
   const [selectedPackages, setSelectedPackages] = useState({});
+
+  // Check if Free membership (tier or price)
+  const isFreePlan = membership?.tier === 'Free' || membership?.price === 0;
 
   const packagesData = useMemo(() => [
     {
@@ -98,11 +101,12 @@ const HomePageLeads = () => {
     }
   ], [theme.palette.primary.main]);
 
+  // -- Disable selection when free plan --
   const handleSelectPackage = (category, plan) => {
+    if (isFreePlan) return; // Don't allow selection when Free
     setSelectedPackages(prev => {
       const newSelection = { ...prev };
       const key = `${category}-${plan}`;
-      
       if (newSelection[key]) {
         delete newSelection[key];
       } else {
@@ -113,7 +117,6 @@ const HomePageLeads = () => {
           color: packagesData.find(pkg => pkg.category === category).color
         };
       }
-      
       return newSelection;
     });
   };
@@ -141,6 +144,17 @@ const HomePageLeads = () => {
       }}>
         Home Page Leads Packages
       </Typography>
+
+      {/* Info chip for free membership */}
+      {isFreePlan && (
+        <Box sx={{ mb: 2, textAlign: 'center' }}>
+          <Chip
+            label="Banner ad selection is only available for paid memberships. Please upgrade to select."
+            color="info"
+            sx={{ fontWeight: 600, fontSize: 16, bgcolor: '#e0e7ef', color: '#0c2e43' }}
+          />
+        </Box>
+      )}
       
       <Paper elevation={0} sx={{ 
         borderRadius: 3,
@@ -166,7 +180,7 @@ const HomePageLeads = () => {
                 <TableCell align="center" sx={{ fontWeight: 700, fontSize: '0.875rem' }}>
                   <Badge badgeContent="Popular" color="primary" sx={{ 
                     '& .MuiBadge-badge': {
-                      top: -15,
+                      top: -5,
                       right: -40,
                       fontSize: 10,
                       fontWeight: 700
@@ -221,11 +235,12 @@ const HomePageLeads = () => {
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        cursor: 'pointer',
+                        cursor: isFreePlan ? 'not-allowed' : 'pointer',
+                        opacity: isFreePlan ? 0.65 : 1,
                         border: `1px solid ${selectedPackages[`${pkg.category}-basic`] ? getPlanColor('basic') : theme.palette.divider}`,
                         backgroundColor: selectedPackages[`${pkg.category}-basic`] ? `${getPlanColor('basic')}10` : 'transparent',
                         transition: 'all 0.2s ease',
-                        '&:hover': {
+                        '&:hover': isFreePlan ? {} : {
                           borderColor: getPlanColor('basic'),
                           backgroundColor: `${getPlanColor('basic')}08`
                         }
@@ -233,6 +248,7 @@ const HomePageLeads = () => {
                     >
                       <Checkbox
                         checked={!!selectedPackages[`${pkg.category}-basic`]}
+                        disabled={isFreePlan}
                         sx={{ p: 0, mb: 1 }}
                       />
                       <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -263,11 +279,12 @@ const HomePageLeads = () => {
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        cursor: 'pointer',
+                        cursor: isFreePlan ? 'not-allowed' : 'pointer',
+                        opacity: isFreePlan ? 0.65 : 1,
                         border: `1px solid ${selectedPackages[`${pkg.category}-pro`] ? getPlanColor('pro') : theme.palette.divider}`,
                         backgroundColor: selectedPackages[`${pkg.category}-pro`] ? `${getPlanColor('pro')}10` : 'transparent',
                         transition: 'all 0.2s ease',
-                        '&:hover': {
+                        '&:hover': isFreePlan ? {} : {
                           borderColor: getPlanColor('pro'),
                           backgroundColor: `${getPlanColor('pro')}08`
                         }
@@ -275,6 +292,7 @@ const HomePageLeads = () => {
                     >
                       <Checkbox
                         checked={!!selectedPackages[`${pkg.category}-pro`]}
+                        disabled={isFreePlan}
                         sx={{ p: 0, mb: 1 }}
                       />
                       <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -305,11 +323,12 @@ const HomePageLeads = () => {
                       sx={{
                         p: 2,
                         borderRadius: 2,
-                        cursor: 'pointer',
+                        cursor: isFreePlan ? 'not-allowed' : 'pointer',
+                        opacity: isFreePlan ? 0.65 : 1,
                         border: `1px solid ${selectedPackages[`${pkg.category}-growth`] ? getPlanColor('growth') : theme.palette.divider}`,
                         backgroundColor: selectedPackages[`${pkg.category}-growth`] ? `${getPlanColor('growth')}10` : 'transparent',
                         transition: 'all 0.2s ease',
-                        '&:hover': {
+                        '&:hover': isFreePlan ? {} : {
                           borderColor: getPlanColor('growth'),
                           backgroundColor: `${getPlanColor('growth')}08`
                         }
@@ -317,6 +336,7 @@ const HomePageLeads = () => {
                     >
                       <Checkbox
                         checked={!!selectedPackages[`${pkg.category}-growth`]}
+                        disabled={isFreePlan}
                         sx={{ p: 0, mb: 1 }}
                       />
                       <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
@@ -345,7 +365,8 @@ const HomePageLeads = () => {
         </TableContainer>
       </Paper>
 
-      {Object.keys(selectedPackages).length > 0 && (
+      {/* Only show selected summary if user is not on Free plan and has made a selection */}
+      {Object.keys(selectedPackages).length > 0 && !isFreePlan && (
         <Paper elevation={0} sx={{ 
           p: 3, 
           borderRadius: 3,
@@ -414,26 +435,6 @@ const HomePageLeads = () => {
               ₹{calculateTotal.toLocaleString()}
             </Typography>
           </Box>
-          {/* <Button
-            variant="contained"
-            size="large"
-            fullWidth
-            sx={{ 
-              mt: 3, 
-              py: 1.5, 
-              fontWeight: 700,
-              fontSize: '1rem',
-              borderRadius: 2,
-              background: `linear-gradient(45deg, ${theme.palette.primary.main} 0%, ${theme.palette.secondary.main} 100%)`,
-              boxShadow: 'none',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: `0 4px 12px ${theme.palette.primary.main}40`
-              }
-            }}
-          >
-            Proceed to Payment
-          </Button> */}
         </Paper>
       )}
     </Box>
