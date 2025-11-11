@@ -45,7 +45,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { useDispatch } from "react-redux";
 import { showLoading } from "../../../Redux/Slices/loadingSlice";
 import FranchiseDetails from "./FranchiseDetails";
-
+import AdvertiseWithUs from "../../../Components/Footers/QuickLinks/AdvertiseWithUs.jsx";
 
 const FORM_DATA_KEY = "brandRegistrationFormData";
 const FORM_STEP_KEY = "brandRegistrationActiveStep";
@@ -255,6 +255,9 @@ const BrandRegisterForm = () => {
   // Add loading state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  
+  // State to show AdvertiseWithUs component instead of form
+  const [showAdvertiseWithUs, setShowAdvertiseWithUs] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
@@ -335,7 +338,9 @@ const BrandRegisterForm = () => {
     navigate("/");
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (selectedMembership,selectedListing) => {
+    console.log("Submitting form data nn:" ,selectedListing);
+
     const isValid = validateStep(activeStep);
 
     if (isValid) {
@@ -345,7 +350,7 @@ const BrandRegisterForm = () => {
 
         const formDataSend = new FormData();
 
-        console.log("sending form data",formDataSend);
+        // console.log("sending form data",formDataSend);
         
         // Append brand details
         formDataSend.append(
@@ -378,6 +383,9 @@ const BrandRegisterForm = () => {
             gstNumber: formData.brandDetails.gstNumber,
             pancardNumber: formData.brandDetails.pancardNumber,
             awardText: formData.brandDetails.awardText || [], // Include award texts
+            paymentPackage: selectedMembership?.tier || " ",
+            listingPackages:{periodMonths: selectedListing?.periodMonths || " " , amount: selectedListing?.amount || " "}
+
           })
         );
 
@@ -436,7 +444,7 @@ const BrandRegisterForm = () => {
             });
           }
         });
-console.log("Form data prepared for submission:", formDataSend);
+
         const response = await axios.post(
           "http://localhost:5000/api/v1/brandlisting/createBrandListing",
           formDataSend,
@@ -461,7 +469,7 @@ console.log("Form data prepared for submission:", formDataSend);
           setActiveStep(0);
           setOpenPreview(false);
           setTimeout(() => {
-            navigate("/advertisewithus");
+            // navigate("/");
           }, 1500);
         }else{
           throw new Error("Submission failed. Please try again.");
@@ -480,6 +488,12 @@ console.log("Form data prepared for submission:", formDataSend);
         setIsSubmitting(false);
       }
     }
+  };
+  
+  const handlepakagesDetails = () => {
+    // Show the AdvertiseWithUs component instead of navigating away
+    // This allows us to pass handleSubmit directly as a prop
+    setShowAdvertiseWithUs(true);
   };
 
   const handleBrandDetailsChange = (update) => {
@@ -1231,13 +1245,22 @@ console.log("Form data prepared for submission:", formDataSend);
   };
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-        }}
-      >
+      {/* If showAdvertiseWithUs is true, render AdvertiseWithUs and pass handleSubmit directly */}
+      {showAdvertiseWithUs ? (
+        <AdvertiseWithUs 
+          handleSubmit={handleSubmit} 
+          formData={formData}
+          onBack={() => setShowAdvertiseWithUs(false)}  // Button to go back to form
+        />
+      ) : (
+        // Otherwise, render the form as normal
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100vh",
+          }}
+        >
         <Box
           sx={{
             flexGrow: 1,
@@ -1471,21 +1494,22 @@ console.log("Form data prepared for submission:", formDataSend);
                       "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
                   },
                 }}
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                startIcon={
-                  isSubmitting ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : submitSuccess ? (
-                    <CheckCircleIcon />
-                  ) : null
-                }
+                onClick={handlepakagesDetails}
+                // disabled={isSubmitting}
+                // startIcon={
+                //   isSubmitting ? (
+                //     <CircularProgress size={20} color="inherit" />
+                //   ) : submitSuccess ? (
+                //     <CheckCircleIcon />
+                //   ) : null
+                // }
+                //  {isSubmitting
+                //   ? "Submitting..."
+                //   : submitSuccess
+                //   ? "Submitted!"
+                //   : "Submit"}
               >
-                {isSubmitting
-                  ? "Submitting..."
-                  : submitSuccess
-                  ? "Submitted!"
-                  : "Submit"}
+               Go to pakage details
               </Button>
             ) : (
               <Button
@@ -1573,7 +1597,7 @@ console.log("Form data prepared for submission:", formDataSend);
   {activeStep === steps.length - 1 && (
     <Button
       variant="contained"
-      onClick={handleSubmit}
+      onClick={handlepakagesDetails}
       disabled={isSubmitting}
       startIcon={
         isSubmitting ? (
@@ -1622,6 +1646,7 @@ console.log("Form data prepared for submission:", formDataSend);
           </Alert>
         </Snackbar>
       </Box>
+      )}
       {/* <Footer /> */}
     </>
   );
