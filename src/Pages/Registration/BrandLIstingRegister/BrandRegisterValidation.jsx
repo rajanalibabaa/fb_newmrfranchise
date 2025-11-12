@@ -1,7 +1,7 @@
 const validateBrandDetails = (data) => {
   const errors = {};
   
-  // Helper function to check if a value is empty
+  // // Helper function to check if a value is empty
   // const isEmpty = (value) => !value || !value.toString().trim();
   
   // // Personal Information
@@ -66,27 +66,6 @@ const validateBrandDetails = (data) => {
   // if (isEmpty(data.city)) errors.city = "City is required";
   // if (isEmpty(data.district)) errors.district = "District is required";
   
-  // // Brand Details
-  // if (!Array.isArray(data.brandCategories) || data.brandCategories.length === 0) {
-  //   errors.brandCategories = "At least one category is required";
-  // }
-  
-  // if (isEmpty(data.brandDescription)) {
-  //   errors.brandDescription = "Brand description is required";
-  // }
-  
-  // if (!Array.isArray(data.expansionLocation) || data.expansionLocation.length === 0) {
-  //   errors.expansionLocation = "At least one expansion location is required";
-  // }
-  
-  // // Business Information
-  // if (isEmpty(data.establishedYear)) {
-  //   errors.establishedYear = "Established year is required";
-  // } else if (!/^\d{4}$/.test(data.establishedYear)) {
-  //   errors.establishedYear = "Year must be 4 digits";
-  // } else if (parseInt(data.establishedYear) > new Date().getFullYear()) {
-  //   errors.establishedYear = "Year cannot be in the future";
-  // }
   
   // // Website validation if provided
   // if ( isEmpty(data.website)) {
@@ -102,7 +81,7 @@ const validateBrandDetails = (data) => {
 const validateFranchiseDetails = (data) => {
   const errors = {};
 
-//   // Brand Categories Validation
+// //   // Brand Categories Validation
 //   if (!data.brandCategories?.main) {
 //     errors.mainCategory = "Industry is required";
 //   }
@@ -164,36 +143,29 @@ const validateFranchiseDetails = (data) => {
 //       }
 //       if (!model.franchiseFee) {
 //         errors[`fico[${index}].franchiseFee`] = "Franchise fee is required";
-//       } else if (isNaN(model.franchiseFee)) {
-//         errors[`fico[${index}].franchiseFee`] = "Must be a valid number";
-//       }
+//       } 
 //       if (!model.royaltyFee) {
 //         errors[`fico[${index}].royaltyFee`] = "Royalty fee is required";
 //       }
-//       if (!model.interiorCost) {
+//       if (!model.interiorCost && model.interiorCost !== 0) {
 //         errors[`fico[${index}].interiorCost`] = "Interior cost is required";
-//       } else if (isNaN(model.interiorCost)) {
-//         errors[`fico[${index}].interiorCost`] = "Must be a valid number";
-//       }
+//       } 
 //       if (!model.stockInvestment) {
 //         errors[`fico[${index}].stockInvestment`] = "Stock investment is required";
-//       } else if (isNaN(model.stockInvestment)) {
-//         errors[`fico[${index}].stockInvestment`] = "Must be a valid number";
 //       }
 //       if (!model.otherCost) {
 //         errors[`fico[${index}].otherCost`] = "Other cost is required";
-//       } else if (isNaN(model.otherCost)) {
-//         errors[`fico[${index}].otherCost`] = "Must be a valid number";
-//       }
+//       } 
 //       if (!model.requireWorkingCapital) {
 //         errors[`fico[${index}].requireWorkingCapital`] = "Working capital is required";
-//       } else if (isNaN(model.requireWorkingCapital)) {
-//         errors[`fico[${index}].requireWorkingCapital`] = "Must be a valid number";
-//       }
-//       if (!model.roi) {
+//       } 
+
+//       if (!model.roi && model.roi !== 0) {
 //         errors[`fico[${index}].roi`] = "ROI is required";
-//       } else if (isNaN(model.roi)) {
-//         errors[`fico[${index}].roi`] = "Must be a valid number";
+//       } else if (model.roi && isNaN(model.roi)) {
+//         errors[`fico[${index}].roi`] = "ROI must be a valid number";
+//       } else if (model.roi && Number(model.roi) < 0) {
+//         errors[`fico[${index}].roi`] = "ROI cannot be negative";
 //       }
 //       if (!model.breakEven) {
 //         errors[`fico[${index}].breakEven`] = "Break even period is required";
@@ -201,10 +173,12 @@ const validateFranchiseDetails = (data) => {
 //       if (!model.payBackPeriod) {
 //         errors[`fico[${index}].payBackPeriod`] = "Payback period is required";
 //       }
-//       if (!model.marginOnSales) {
+//       if (!model.marginOnSales && model.marginOnSales !== 0) {
 //         errors[`fico[${index}].marginOnSales`] = "Margin on sales is required";
-//       } else if (isNaN(model.marginOnSales)) {
-//         errors[`fico[${index}].marginOnSales`] = "Must be a valid number";
+//       } else if (model.marginOnSales && isNaN(model.marginOnSales)) {
+//         errors[`fico[${index}].marginOnSales`] = "Margin on sales must be a valid number";
+//       } else if (model.marginOnSales && Number(model.marginOnSales) < 0) {
+//         errors[`fico[${index}].marginOnSales`] = "Margin on sales cannot be negative";
 //       }
 //       if (!model.agreementPeriod) {
 //         errors[`fico[${index}].agreementPeriod`] = "Agreement period is required";
@@ -265,12 +239,12 @@ const validateFranchiseDetails = (data) => {
 const validateExpansionLocationDetails = (data) => {
   const errors = {};
   
-  // 1. Validate "Is your brand expanding internationally?" (required boolean)
+  // // 1. Validate "Is your brand expanding internationally?" (required boolean)
   // if (data?.isInternationalExpansion === null || data?.isInternationalExpansion === undefined) {
   //   errors.isInternationalExpansion = "Please specify if your brand is expanding internationally";
   // }
 
-  // 2. Validate current outlet locations (must have either domestic or international)
+  // // 2. Validate current outlet locations (must have either domestic or international)
   // const hasCurrentDomestic = 
   //   data?.currentOutletLocations?.domestic?.locations?.length > 0;
   // const hasCurrentInternational = 
@@ -280,7 +254,7 @@ const validateExpansionLocationDetails = (data) => {
   //   errors.currentOutletLocations = "Please select at least one location (India or International) for current outlets";
   // }
 
-  // 3. Validate expansion locations (must have either domestic or international)
+  // // 3. Validate expansion locations (must have either domestic or international)
   // const hasExpansionDomestic = 
   //   data?.expansionLocations?.domestic?.locations?.length > 0;
   // const hasExpansionInternational = 

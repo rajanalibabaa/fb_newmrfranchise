@@ -45,7 +45,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { useDispatch } from "react-redux";
 import { showLoading } from "../../../Redux/Slices/loadingSlice";
 import FranchiseDetails from "./FranchiseDetails";
-import AdvertiseWithUs from "../../../Components/Footers/QuickLinks/AdvertiseWithUs.jsx";
+import MembershipPayments from "../../../Components/Footers/QuickLinks/PaymentPAge/MembershipPayment.jsx";
 
 const FORM_DATA_KEY = "brandRegistrationFormData";
 const FORM_STEP_KEY = "brandRegistrationActiveStep";
@@ -257,7 +257,7 @@ const BrandRegisterForm = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   
   // State to show AdvertiseWithUs component instead of form
-  const [showAdvertiseWithUs, setShowAdvertiseWithUs] = useState(false);
+  const [MembershipPayment, setMembershipPayment] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
@@ -299,12 +299,12 @@ const BrandRegisterForm = () => {
           );
           isValid = Object.keys(errors.expansionLocationDetails).length === 0;
           break;
-        // case 3:
-        //   errors.uploads = validateUploadsDetails(formData.uploads || {});
-        //   isValid = Object.keys(errors.uploads).length === 0;
-        //   break;
-        // default:
-        //   break;
+        case 3:
+          errors.uploads = validateUploadsDetails(formData.uploads || {});
+          isValid = Object.keys(errors.uploads).length === 0;
+          break;
+        default:
+          break;
       }
 
       setValidationErrors(errors);
@@ -339,7 +339,7 @@ const BrandRegisterForm = () => {
   };
 
   const handleSubmit = async (selectedMembership,selectedListing) => {
-    console.log("Submitting form data nn:" ,selectedListing);
+    
 
     const isValid = validateStep(activeStep);
 
@@ -350,7 +350,6 @@ const BrandRegisterForm = () => {
 
         const formDataSend = new FormData();
 
-        // console.log("sending form data",formDataSend);
         
         // Append brand details
         formDataSend.append(
@@ -383,11 +382,12 @@ const BrandRegisterForm = () => {
             gstNumber: formData.brandDetails.gstNumber,
             pancardNumber: formData.brandDetails.pancardNumber,
             awardText: formData.brandDetails.awardText || [], // Include award texts
-            paymentPackage: selectedMembership?.tier || " ",
-            listingPackages:{periodMonths: selectedListing?.periodMonths || " " , amount: selectedListing?.amount || " "}
+            paymentPackage: selectedMembership?.tier.toLowerCase(),
+            listingPackages:{ periodMonths: selectedListing?.periodMonths  , amount: selectedListing?.amount }
 
           })
         );
+
 
         // Append franchise details
         formDataSend.append(
@@ -445,6 +445,9 @@ const BrandRegisterForm = () => {
           }
         });
 
+  console.log("sending form data",formDataSend);
+
+
         const response = await axios.post(
           "http://localhost:5000/api/v1/brandlisting/createBrandListing",
           formDataSend,
@@ -456,12 +459,14 @@ const BrandRegisterForm = () => {
         );
 
         if (response.status === 200 && response.data) {
+
           setSubmitSuccess(true);
           setSnackbar({
             open: true,
             message: "Form submitted successfully!",
             severity: "success",
           });
+     
           console.log('Form data submitted successfully:', response.data);
           localStorage.removeItem(FORM_DATA_KEY);
           localStorage.removeItem(FORM_STEP_KEY);
@@ -469,7 +474,7 @@ const BrandRegisterForm = () => {
           setActiveStep(0);
           setOpenPreview(false);
           setTimeout(() => {
-            // navigate("/");
+            navigate("/");
           }, 1500);
         }else{
           throw new Error("Submission failed. Please try again.");
@@ -491,9 +496,7 @@ const BrandRegisterForm = () => {
   };
   
   const handlepakagesDetails = () => {
-    // Show the AdvertiseWithUs component instead of navigating away
-    // This allows us to pass handleSubmit directly as a prop
-    setShowAdvertiseWithUs(true);
+    setMembershipPayment(true);
   };
 
   const handleBrandDetailsChange = (update) => {
@@ -1245,12 +1248,17 @@ const BrandRegisterForm = () => {
   };
   return (
     <>
-      {/* If showAdvertiseWithUs is true, render AdvertiseWithUs and pass handleSubmit directly */}
-      {showAdvertiseWithUs ? (
-        <AdvertiseWithUs 
+      {/* If MembershipPayment is true, render AdvertiseWithUs and pass handleSubmit directly */}
+      {MembershipPayment ? (
+        <MembershipPayments 
           handleSubmit={handleSubmit} 
+          snackbar={snackbar}
+          handleCloseSnackbar={handleCloseSnackbar}
+          isSubmitting={isSubmitting}
+          submitSuccess={submitSuccess}
+          setSnackbar={setSnackbar}
           formData={formData}
-          onBack={() => setShowAdvertiseWithUs(false)}  // Button to go back to form
+          onBack={() => setMembershipPayment(false)}  // Button to go back to form
         />
       ) : (
         // Otherwise, render the form as normal
@@ -1509,7 +1517,7 @@ const BrandRegisterForm = () => {
                 //   ? "Submitted!"
                 //   : "Submit"}
               >
-               Go to pakage details
+               Go to package details
               </Button>
             ) : (
               <Button

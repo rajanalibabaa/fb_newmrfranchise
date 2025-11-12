@@ -17,8 +17,10 @@ import {
   useTheme,
   Fade,
   Slide,
+  Snackbar,
   Zoom,
   Grow,
+  Alert,
   keyframes,
 } from "@mui/material";
 import {
@@ -35,7 +37,8 @@ import {
 } from "@mui/icons-material";
 import Navbar from "../../../Navbar/NavBar";
 import Footer from "../../Footer";
-
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CircularProgress from "@mui/material/CircularProgress";
 // Keyframe animations
 const floatAnimation = keyframes`
   0%, 100% { transform: translateY(0px); }
@@ -64,7 +67,7 @@ const gradientShift = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPlan, onBack }) => {
+const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPlan, onBack , snackbar, handleCloseSnackbar, isSubmitting, setSnackbar,submitSuccess }) => {
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [cardDetails, setCardDetails] = useState({
     number: "",
@@ -549,21 +552,21 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
                 },
               }}
               onClick={handleSubmit}
-              // disabled={isSubmitting}
-              // startIcon={
-              //   isSubmitting ? (
-              //     <CircularProgress size={20} color="inherit" />
-              //   ) : submitSuccess ? (
-              //     <CheckCircleIcon />
-              //   ) : null
-              // }
-              //  {isSubmitting
-              //   ? "Submitting..."
-              //   : submitSuccess
-              //   ? "Submitted!"
-              //   : "Submit"}
+                disabled={isSubmitting}
+                startIcon={
+                  isSubmitting ? (
+                    <CircularProgress size={20} color="inherit" />
+                  ) : submitSuccess ? (
+                    <CheckCircleIcon />
+                  ) : null
+                }
+           
             >
-              Pay Now
+                 {isSubmitting
+                  ? "paying..."
+                  : submitSuccess
+                  ? "Payment Successful"
+                  : "Confirm and Pay"}
             </Button>
 
               </Paper>
@@ -806,6 +809,21 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
           </Zoom>
         )}
       </Box>
+
+           <Snackbar
+                open={snackbar.open}
+                autoHideDuration={6000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              >
+                <Alert
+                  onClose={handleCloseSnackbar}
+                  severity={snackbar.severity}
+                  sx={{ width: "100%" }}
+                >
+                  {snackbar.message}
+                </Alert>
+              </Snackbar>
 
     </Box>
   );

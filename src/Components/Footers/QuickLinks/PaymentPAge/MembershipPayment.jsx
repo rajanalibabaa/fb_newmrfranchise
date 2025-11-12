@@ -29,6 +29,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import PaymentPage from './PaymentPage';
+import Navbar from '../../../Navbar/NavBar';
 
 // Animation keyframes
 const floatAnimation = keyframes`
@@ -52,7 +53,7 @@ const slideDownAnimation = keyframes`
   100% { transform: translateY(0); opacity: 1; }
 `;
 
-const MembershipSelection = ({ handleSubmit, onBack }) => {
+const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackbar, isSubmitting, setSnackbar,submitSuccess, }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [selectedMembership, setSelectedMembership] = useState(null);
@@ -102,35 +103,35 @@ const MembershipSelection = ({ handleSubmit, onBack }) => {
           if (packageData.free && typeof packageData.free === 'object') {
             membershipPkgs.push({
               ...packageData.free,
-              name: 'Free',
+              name: 'free',
               _id: packageData.free._id
             });
           }
           if (packageData.silver && typeof packageData.silver === 'object') {
             membershipPkgs.push({
               ...packageData.silver,
-              name: 'Silver',
+              name: 'silver',
               _id: packageData.silver._id
             });
           }
           if (packageData.gold && typeof packageData.gold === 'object') {
             membershipPkgs.push({
               ...packageData.gold,
-              name: 'Gold',
+              name: 'gold',
               _id: packageData.gold._id
             });
           }
           if (packageData.platinum && typeof packageData.platinum === 'object') {
             membershipPkgs.push({
               ...packageData.platinum,
-              name: 'Platinum',
+              name: 'platinum',
               _id: packageData.platinum._id
             });
           }
           if (packageData.exclusive && typeof packageData.exclusive === 'object') {
             membershipPkgs.push({
               ...packageData.exclusive,
-              name: 'Exclusive',
+              name: 'exclusive',
               _id: packageData.exclusive._id
             });
           }
@@ -343,20 +344,28 @@ const MembershipSelection = ({ handleSubmit, onBack }) => {
         selectedMembership={selectedMembership}
         selectedListing={selectedListing}
         selectedPlan={selectedPlan}
+        snackbar={snackbar}
+          onCloseSnackbar={handleCloseSnackbar}
+          isSubmitting={isSubmitting}
+          submitSuccess={submitSuccess}
         onBack={() => setShowPaymentPage(false)}
       />
     );
   }
   return (
+
+    <Box >
+      <Navbar />
     <Container maxWidth="xl" sx={{ py: 2, position: 'relative' }}>
+
+        
       {/* Back Button */}
       {onBack && (
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-start', }}>
           <Button
             startIcon={<ArrowBack />}
             onClick={onBack}
-            variant="outlined"
-            sx={{ textTransform: 'none' }}
+            sx={{ textTransform: 'none',bgcolor: "#f0a729ff",color: "#000000" }}
           >
             Back to Form
           </Button>
@@ -1038,6 +1047,7 @@ const MembershipSelection = ({ handleSubmit, onBack }) => {
         )}
       </Box>
     </Container>
+    </Box>
   );
 };
 
