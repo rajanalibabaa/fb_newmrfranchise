@@ -2887,9 +2887,7 @@
 
 // export default BrandExpansionLocationDetails;
 
-
 // File: BrandExpansionLocationDetails.js
-
 
 // import React, { useState, useEffect, useMemo, useCallback } from "react";
 // import {
@@ -4327,9 +4325,6 @@
 
 // export default BrandExpansionLocationDetails;
 
-
-
-
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
@@ -4640,7 +4635,7 @@ const BrandExpansionLocationDetails = ({ data, onChange, errors }) => {
       // Build array of state objects
       const statesList = Object.keys(indianStatesData).map((stateName) => ({
         id: stateName, // using state name as ID for simplicity
-        name: stateName
+        name: stateName,
       }));
       setStates(statesList);
 
@@ -4653,7 +4648,9 @@ const BrandExpansionLocationDetails = ({ data, onChange, errors }) => {
     } catch (error) {
       console.error("Error loading domestic data:", error);
       setError("Failed to load domestic locations data.");
-      enqueueSnackbar("Failed to load domestic locations data", { variant: "error" });
+      enqueueSnackbar("Failed to load domestic locations data", {
+        variant: "error",
+      });
     }
   }, [enqueueSnackbar]);
 
@@ -4993,110 +4990,111 @@ const BrandExpansionLocationDetails = ({ data, onChange, errors }) => {
   );
 
   // Initialize component with data
-useEffect(() => {
-  loadDomesticData();
-  fetchCountries();
+  useEffect(() => {
+    loadDomesticData();
+    fetchCountries();
 
-  if (data?.currentOutletLocations) {
-    // Initialize domestic selections if data exists
-    if (data.currentOutletLocations.domestic?.locations?.length > 0) {
-      const domesticLocations = data.currentOutletLocations.domestic.locations;
-      const selectedStates = domesticLocations.map(loc => loc.state);
-      const selectedDistricts = domesticLocations.flatMap(
-        loc => loc.districts?.map(district => ({
-          state: loc.state,
-          district: district.district,
-        })) || []
-      );
+    if (data?.currentOutletLocations) {
+      // Initialize domestic selections if data exists
+      if (data.currentOutletLocations.domestic?.locations?.length > 0) {
+        const domesticLocations =
+          data.currentOutletLocations.domestic.locations;
+        const selectedStates = domesticLocations.map((loc) => loc.state);
+        const selectedDistricts = domesticLocations.flatMap(
+          (loc) =>
+            loc.districts?.map((district) => ({
+              state: loc.state,
+              district: district.district,
+            })) || []
+        );
 
-      setCurrentDomesticSelections({
-        selectedStates,
-        selectedDistricts,
-      });
+        setCurrentDomesticSelections({
+          selectedStates,
+          selectedDistricts,
+        });
+      }
+
+      // Initialize international selections if data exists
+      if (data.currentOutletLocations.international?.locations?.length > 0) {
+        const intlLocations =
+          data.currentOutletLocations.international.locations;
+        const selectedCountries = intlLocations.map((loc) => loc.country);
+        const selectedStates = {};
+        const selectedCities = {};
+
+        intlLocations.forEach((loc) => {
+          if (loc.states?.length > 0) {
+            selectedStates[loc.country] = loc.states.map(
+              (state) => state.state
+            );
+            loc.states.forEach((state) => {
+              const stateKey = `${loc.country}-${state.state}`;
+              if (state.cities?.length > 0) {
+                selectedCities[stateKey] = state.cities;
+              }
+            });
+          }
+        });
+
+        setCurrentInternationalSelections({
+          selectedCountries,
+          selectedStates,
+          selectedCities,
+        });
+      }
     }
-
-    // Initialize international selections if data exists
-    if (data.currentOutletLocations.international?.locations?.length > 0) {
-      const intlLocations = data.currentOutletLocations.international.locations;
-      const selectedCountries = intlLocations.map(loc => loc.country);
-      const selectedStates = {};
-      const selectedCities = {};
-
-      intlLocations.forEach(loc => {
-        if (loc.states?.length > 0) {
-          selectedStates[loc.country] = loc.states.map(state => state.state);
-          loc.states.forEach(state => {
-            const stateKey = `${loc.country}-${state.state}`;
-            if (state.cities?.length > 0) {
-              selectedCities[stateKey] = state.cities;
-            }
-          });
-        }
-      });
-
-      setCurrentInternationalSelections({
-        selectedCountries,
-        selectedStates,
-        selectedCities,
-      });
-    }
-  }
-}, [data, loadDomesticData, fetchCountries]);
-
-
+  }, [data, loadDomesticData, fetchCountries]);
 
   // Handle international expansion selection
   const handleInternationalExpansionChange = useCallback(
     (value) => {
-      const newValue = value === data?.isInternationalExpansion ? null : value;
+      // Store the selection as 'Yes' or 'No' strings (per requirement)
       onChange({
         ...data,
-        isInternationalExpansion: newValue,
+        isInternationalExpansion: value,
       });
     },
     [data, onChange]
   );
 
   // Handle location type change (domestic/international)
-const handleLocationTypeChange = useCallback((e) => {
-  const newType = e.target.value;
-  setLocationType(newType);
-}, []);
-
+  const handleLocationTypeChange = useCallback((e) => {
+    const newType = e.target.value;
+    setLocationType(newType);
+  }, []);
 
   // Handle current outlet location type change
-const handleCurrentOutletLocationTypeChange = useCallback((e) => {
-  const newType = e.target.value;
-  setCurrentOutletLocationType(newType);
-}, []);
-
+  const handleCurrentOutletLocationTypeChange = useCallback((e) => {
+    const newType = e.target.value;
+    setCurrentOutletLocationType(newType);
+  }, []);
 
   // Handle domestic state selection
- // Fix the handleDomesticStateSelection function
-const handleDomesticStateSelection = useCallback(
-  (selectedStates, type) => {
-    const setSelections =
-      type === "current"
-        ? setCurrentDomesticSelections
-        : setDomesticSelections;
+  // Fix the handleDomesticStateSelection function
+  const handleDomesticStateSelection = useCallback(
+    (selectedStates, type) => {
+      const setSelections =
+        type === "current"
+          ? setCurrentDomesticSelections
+          : setDomesticSelections;
 
-    setSelections((prev) => {
-      const newSelections = {
-        selectedStates,
-        selectedDistricts: prev.selectedDistricts.filter(
-          (district) => selectedStates.includes(district.state)
-        ),
-      };
-      updateFormData(
-        type === "current" ? "current" : "expansion",
-        "domestic",
-        newSelections
-      );
-      return newSelections;
-    });
-  },
-  [updateFormData]
-);
+      setSelections((prev) => {
+        const newSelections = {
+          selectedStates,
+          selectedDistricts: prev.selectedDistricts.filter((district) =>
+            selectedStates.includes(district.state)
+          ),
+        };
+        updateFormData(
+          type === "current" ? "current" : "expansion",
+          "domestic",
+          newSelections
+        );
+        return newSelections;
+      });
+    },
+    [updateFormData]
+  );
 
   // Handle domestic district selection
   const handleDomesticDistrictSelection = useCallback(
@@ -5125,7 +5123,11 @@ const handleDomesticStateSelection = useCallback(
         }
 
         // Update form data immediately
- updateFormData(type === "current" ? "current" : "expansion", "domestic", newSelections);
+        updateFormData(
+          type === "current" ? "current" : "expansion",
+          "domestic",
+          newSelections
+        );
 
         return newSelections;
       });
@@ -5133,17 +5135,17 @@ const handleDomesticStateSelection = useCallback(
     [updateFormData]
   );
 
-// useEffect(() => {
-//   if (domesticSelections.selectedStates.length > 0 || domesticSelections.selectedDistricts.length > 0) {
-//     updateFormData("expansion", "domestic", domesticSelections);
-//   }
-// }, [domesticSelections]); // Remove updateFormData from dependencies
+  // useEffect(() => {
+  //   if (domesticSelections.selectedStates.length > 0 || domesticSelections.selectedDistricts.length > 0) {
+  //     updateFormData("expansion", "domestic", domesticSelections);
+  //   }
+  // }, [domesticSelections]); // Remove updateFormData from dependencies
 
-// useEffect(() => {
-//   if (currentDomesticSelections.selectedStates.length > 0 || currentDomesticSelections.selectedDistricts.length > 0) {
-//     updateFormData("current", "domestic", currentDomesticSelections);
-//   }
-// }, [currentDomesticSelections]); // Remove updateFormData from dependencies
+  // useEffect(() => {
+  //   if (currentDomesticSelections.selectedStates.length > 0 || currentDomesticSelections.selectedDistricts.length > 0) {
+  //     updateFormData("current", "domestic", currentDomesticSelections);
+  //   }
+  // }, [currentDomesticSelections]); // Remove updateFormData from dependencies
 
   // Handle "Select All" for districts in a state
   const handleSelectAllDistricts = useCallback(
@@ -5189,162 +5191,233 @@ const handleDomesticStateSelection = useCallback(
   );
 
   // Remove location items
- // Updated removeLocationItems function
-const removeLocationItems = useCallback(
-  (type, locationType, field, index) => {
-    const updatedData = { ...data };
-    const locationKey = type === "current" ? "currentOutletLocations" : "expansionLocations";
-    
-    if (!updatedData[locationKey]) {
-      updatedData[locationKey] = {
-        domestic: { locations: [] },
-        international: { locations: [] }
-      };
-    }
+  // Updated removeLocationItems function
+  const removeLocationItems = useCallback(
+    (type, locationType, field, index) => {
+      const updatedData = { ...data };
+      const locationKey =
+        type === "current" ? "currentOutletLocations" : "expansionLocations";
 
-    if (locationType === "domestic") {
-      if (field === "state") {
-        // Remove specific state
-        updatedData[locationKey].domestic.locations = 
-          updatedData[locationKey].domestic.locations.filter((_, i) => i !== index);
-      } else if (field === "district") {
-        // Remove specific district from its state
-        const stateIndex = Math.floor(index / 1000);
-        const districtIndex = index % 1000;
-        
-        if (updatedData[locationKey].domestic.locations[stateIndex]?.districts) {
-          updatedData[locationKey].domestic.locations[stateIndex].districts = 
-            updatedData[locationKey].domestic.locations[stateIndex].districts
-              .filter((_, i) => i !== districtIndex);
-              
-          // Remove the state if it has no districts left
-          if (updatedData[locationKey].domestic.locations[stateIndex].districts.length === 0) {
-            updatedData[locationKey].domestic.locations.splice(stateIndex, 1);
-          }
-        }
+      if (!updatedData[locationKey]) {
+        updatedData[locationKey] = {
+          domestic: { locations: [] },
+          international: { locations: [] },
+        };
       }
-    } else {
-      // International locations
-      if (field === "country") {
-        updatedData[locationKey].international.locations = 
-          updatedData[locationKey].international.locations.filter((_, i) => i !== index);
-      } else if (field === "state") {
-        const countryIndex = Math.floor(index / 1000);
-        const stateIndex = index % 1000;
-        
-        if (updatedData[locationKey].international.locations[countryIndex]?.states) {
-          updatedData[locationKey].international.locations[countryIndex].states = 
-            updatedData[locationKey].international.locations[countryIndex].states
-              .filter((_, i) => i !== stateIndex);
-              
-          // Remove the country if it has no states left
-          if (updatedData[locationKey].international.locations[countryIndex].states.length === 0) {
-            updatedData[locationKey].international.locations.splice(countryIndex, 1);
+
+      if (locationType === "domestic") {
+        if (field === "state") {
+          // Remove specific state
+          updatedData[locationKey].domestic.locations = updatedData[
+            locationKey
+          ].domestic.locations.filter((_, i) => i !== index);
+        } else if (field === "district") {
+          // Remove specific district from its state
+          const stateIndex = Math.floor(index / 1000);
+          const districtIndex = index % 1000;
+
+          if (
+            updatedData[locationKey].domestic.locations[stateIndex]?.districts
+          ) {
+            updatedData[locationKey].domestic.locations[stateIndex].districts =
+              updatedData[locationKey].domestic.locations[
+                stateIndex
+              ].districts.filter((_, i) => i !== districtIndex);
+
+            // Remove the state if it has no districts left
+            if (
+              updatedData[locationKey].domestic.locations[stateIndex].districts
+                .length === 0
+            ) {
+              updatedData[locationKey].domestic.locations.splice(stateIndex, 1);
+            }
           }
         }
-      } else if (field === "city") {
-        const countryIndex = Math.floor(index / 1000000);
-        const stateIndex = Math.floor((index % 1000000) / 1000);
-        const cityIndex = index % 1000;
-        
-        if (updatedData[locationKey].international.locations[countryIndex]?.states?.[stateIndex]?.cities) {
-          updatedData[locationKey].international.locations[countryIndex].states[stateIndex].cities = 
-            updatedData[locationKey].international.locations[countryIndex].states[stateIndex].cities
-              .filter((_, i) => i !== cityIndex);
-              
-          // Remove the state if it has no cities left
-          if (updatedData[locationKey].international.locations[countryIndex].states[stateIndex].cities.length === 0) {
-            updatedData[locationKey].international.locations[countryIndex].states.splice(stateIndex, 1);
-            
+      } else {
+        // International locations
+        if (field === "country") {
+          updatedData[locationKey].international.locations = updatedData[
+            locationKey
+          ].international.locations.filter((_, i) => i !== index);
+        } else if (field === "state") {
+          const countryIndex = Math.floor(index / 1000);
+          const stateIndex = index % 1000;
+
+          if (
+            updatedData[locationKey].international.locations[countryIndex]
+              ?.states
+          ) {
+            updatedData[locationKey].international.locations[
+              countryIndex
+            ].states = updatedData[locationKey].international.locations[
+              countryIndex
+            ].states.filter((_, i) => i !== stateIndex);
+
             // Remove the country if it has no states left
-            if (updatedData[locationKey].international.locations[countryIndex].states.length === 0) {
-              updatedData[locationKey].international.locations.splice(countryIndex, 1);
+            if (
+              updatedData[locationKey].international.locations[countryIndex]
+                .states.length === 0
+            ) {
+              updatedData[locationKey].international.locations.splice(
+                countryIndex,
+                1
+              );
+            }
+          }
+        } else if (field === "city") {
+          const countryIndex = Math.floor(index / 1000000);
+          const stateIndex = Math.floor((index % 1000000) / 1000);
+          const cityIndex = index % 1000;
+
+          if (
+            updatedData[locationKey].international.locations[countryIndex]
+              ?.states?.[stateIndex]?.cities
+          ) {
+            updatedData[locationKey].international.locations[
+              countryIndex
+            ].states[stateIndex].cities = updatedData[
+              locationKey
+            ].international.locations[countryIndex].states[
+              stateIndex
+            ].cities.filter((_, i) => i !== cityIndex);
+
+            // Remove the state if it has no cities left
+            if (
+              updatedData[locationKey].international.locations[countryIndex]
+                .states[stateIndex].cities.length === 0
+            ) {
+              updatedData[locationKey].international.locations[
+                countryIndex
+              ].states.splice(stateIndex, 1);
+
+              // Remove the country if it has no states left
+              if (
+                updatedData[locationKey].international.locations[countryIndex]
+                  .states.length === 0
+              ) {
+                updatedData[locationKey].international.locations.splice(
+                  countryIndex,
+                  1
+                );
+              }
             }
           }
         }
       }
-    }
 
-    onChange(updatedData);
-    
-    // Also update the local state to match
-    if (type === "current") {
-      if (locationType === "domestic") {
-        setCurrentDomesticSelections({
-          selectedStates: updatedData[locationKey]?.domestic?.locations?.map(loc => loc.state) || [],
-          selectedDistricts: updatedData[locationKey]?.domestic?.locations?.flatMap(loc => 
-            loc.districts?.map(district => ({
-              state: loc.state,
-              district: district.district
-            })) || []
-          ) || []
-        });
-      } else {
-        setCurrentInternationalSelections({
-          selectedCountries: updatedData[locationKey]?.international?.locations?.map(loc => loc.country) || [],
-          selectedStates: updatedData[locationKey]?.international?.locations?.reduce((acc, loc) => {
-            if (loc.states?.length) {
-              acc[loc.country] = loc.states.map(state => state.state);
-            }
-            return acc;
-          }, {}),
-          selectedCities: updatedData[locationKey]?.international?.locations?.reduce((acc, loc) => {
-            loc.states?.forEach(state => {
-              const key = `${loc.country}-${state.state}`;
-              if (state.cities?.length) {
-                acc[key] = state.cities;
+      onChange(updatedData);
+
+      // Also update the local state to match
+      if (type === "current") {
+        if (locationType === "domestic") {
+          setCurrentDomesticSelections({
+            selectedStates:
+              updatedData[locationKey]?.domestic?.locations?.map(
+                (loc) => loc.state
+              ) || [],
+            selectedDistricts:
+              updatedData[locationKey]?.domestic?.locations?.flatMap(
+                (loc) =>
+                  loc.districts?.map((district) => ({
+                    state: loc.state,
+                    district: district.district,
+                  })) || []
+              ) || [],
+          });
+        } else {
+          setCurrentInternationalSelections({
+            selectedCountries:
+              updatedData[locationKey]?.international?.locations?.map(
+                (loc) => loc.country
+              ) || [],
+            selectedStates: updatedData[
+              locationKey
+            ]?.international?.locations?.reduce((acc, loc) => {
+              if (loc.states?.length) {
+                acc[loc.country] = loc.states.map((state) => state.state);
               }
-            });
-            return acc;
-          }, {})
-        });
-      }
-    } else {
-      if (locationType === "domestic") {
-        setDomesticSelections({
-          selectedStates: updatedData[locationKey]?.domestic?.locations?.map(loc => loc.state) || [],
-          selectedDistricts: updatedData[locationKey]?.domestic?.locations?.flatMap(loc => 
-            loc.districts?.map(district => ({
-              state: loc.state,
-              district: district.district
-            })) || []
-          ) || []
-        });
+              return acc;
+            }, {}),
+            selectedCities: updatedData[
+              locationKey
+            ]?.international?.locations?.reduce((acc, loc) => {
+              loc.states?.forEach((state) => {
+                const key = `${loc.country}-${state.state}`;
+                if (state.cities?.length) {
+                  acc[key] = state.cities;
+                }
+              });
+              return acc;
+            }, {}),
+          });
+        }
       } else {
-        setInternationalSelections({
-          selectedCountries: updatedData[locationKey]?.international?.locations?.map(loc => loc.country) || [],
-          selectedStates: updatedData[locationKey]?.international?.locations?.reduce((acc, loc) => {
-            if (loc.states?.length) {
-              acc[loc.country] = loc.states.map(state => state.state);
-            }
-            return acc;
-          }, {}),
-          selectedCities: updatedData[locationKey]?.international?.locations?.reduce((acc, loc) => {
-            loc.states?.forEach(state => {
-              const key = `${loc.country}-${state.state}`;
-              if (state.cities?.length) {
-                acc[key] = state.cities;
+        if (locationType === "domestic") {
+          setDomesticSelections({
+            selectedStates:
+              updatedData[locationKey]?.domestic?.locations?.map(
+                (loc) => loc.state
+              ) || [],
+            selectedDistricts:
+              updatedData[locationKey]?.domestic?.locations?.flatMap(
+                (loc) =>
+                  loc.districts?.map((district) => ({
+                    state: loc.state,
+                    district: district.district,
+                  })) || []
+              ) || [],
+          });
+        } else {
+          setInternationalSelections({
+            selectedCountries:
+              updatedData[locationKey]?.international?.locations?.map(
+                (loc) => loc.country
+              ) || [],
+            selectedStates: updatedData[
+              locationKey
+            ]?.international?.locations?.reduce((acc, loc) => {
+              if (loc.states?.length) {
+                acc[loc.country] = loc.states.map((state) => state.state);
               }
-            });
-            return acc;
-          }, {})
-        });
+              return acc;
+            }, {}),
+            selectedCities: updatedData[
+              locationKey
+            ]?.international?.locations?.reduce((acc, loc) => {
+              loc.states?.forEach((state) => {
+                const key = `${loc.country}-${state.state}`;
+                if (state.cities?.length) {
+                  acc[key] = state.cities;
+                }
+              });
+              return acc;
+            }, {}),
+          });
+        }
       }
-    }
-  },
-  [data, onChange]
-);
+    },
+    [data, onChange]
+  );
 
   // Main render
   return (
     <Box sx={{ pr: 1, mr: { sm: 0, md: 10 }, ml: { sm: 0, md: 10 } }}>
-      <Typography
-        variant="h6"
-        fontWeight={700}
-        sx={{ mb: 3, color: "#ff9800" }}
-      >
-        Brand Expansion Location Details
-      </Typography>
+      <Box display="flex">
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          sx={{ mb: 3, color: "#ff9800" }}
+        >
+          Brand Expansion Location Details
+        </Typography>
+        <Typography variant="h6" sx={{}}>
+          {errors?.isInternationalExpansion && (
+            <FormHelperText error sx={{ ml: 6, mt: 1, fontSize: 14 }}>
+              {errors.isInternationalExpansion}
+            </FormHelperText>
+          )}
+        </Typography>
+      </Box>
 
       {/* International Expansion Toggle */}
       <Box sx={{ mb: 2, display: "flex", alignItems: "center" }}>
@@ -5354,35 +5427,37 @@ const removeLocationItems = useCallback(
         <RadioGroup
           row
           value={
-            data?.isInternationalExpansion === null
+            data?.isInternationalExpansion === null ||
+            data?.isInternationalExpansion === undefined
               ? ""
-              : data?.isInternationalExpansion
+              : data.isInternationalExpansion
           }
           sx={{ gap: 11, justifyContent: "start", ml: 15 }}
-          onChange={(e) =>
-            handleInternationalExpansionChange(e.target.value === "true")
-          }
+          onChange={(e) => handleInternationalExpansionChange(e.target.value)}
         >
-          <FormControlLabel value="true" control={<Radio />} label="Yes" />
-          <FormControlLabel value="false" control={<Radio />} label="No" />
+          <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+          <FormControlLabel value="No" control={<Radio />} label="No" />
         </RadioGroup>
-        {errors?.isInternationalExpansion && (
-          <FormHelperText error sx={{ ml: 2 }}>
-            {errors.isInternationalExpansion}
-          </FormHelperText>
-        )}
       </Box>
 
       {/* Current Outlet Locations */}
       <Divider sx={{ my: 2 }} />
-
-      <Typography
-        variant="h6"
-        fontWeight={700}
-        sx={{ mb: 0, color: "#ff9800" }}
-      >
-        Current Outlet Locations
-      </Typography>
+      <Box display="flex">
+        <Typography
+          variant="h6"
+          fontWeight={700}
+          sx={{ mb: 0, color: "#ff9800" }}
+        >
+          Current Outlet Locations
+        </Typography>
+         <Typography variant="h6" sx={{}}>
+          {errors?.currentOutletLocations && (
+            <FormHelperText error sx={{ ml: 6, mt: 1, fontSize: 14 }}>
+              {errors.currentOutletLocations}
+            </FormHelperText>
+          )}
+        </Typography>
+      </Box>
 
       <RadioGroup
         sx={{ justifyContent: "center", gap: 10 }}
@@ -5430,7 +5505,9 @@ const removeLocationItems = useCallback(
             drawerOpen={currentDrawerOpen.countries}
             sortedCountries={sortedCountries}
             searchFilters={searchFilters}
-            handleInternationalCountrySelection={handleInternationalCountrySelection}
+            handleInternationalCountrySelection={
+              handleInternationalCountrySelection
+            }
             handleSearchChange={handleSearchChange}
             toggleDrawer={toggleDrawer}
           />
@@ -5440,7 +5517,9 @@ const removeLocationItems = useCallback(
             drawerOpen={currentDrawerOpen.intStates}
             statesData={currentInternationalStates}
             searchFilters={searchFilters}
-            handleInternationalStateSelection={handleInternationalStateSelection}
+            handleInternationalStateSelection={
+              handleInternationalStateSelection
+            }
             handleSearchChange={handleSearchChange}
             toggleDrawer={toggleDrawer}
           />
@@ -5459,6 +5538,7 @@ const removeLocationItems = useCallback(
 
       {/* Expansion Locations */}
       <Divider sx={{ my: 2 }} />
+      <Box display="flex">
       <Typography
         variant="h6"
         fontWeight={700}
@@ -5466,6 +5546,14 @@ const removeLocationItems = useCallback(
       >
         Expansion Locations
       </Typography>
+         <Typography variant="h6" sx={{}}>
+          {errors?.expansionLocations && (
+            <FormHelperText error sx={{ ml: 6, mt: 1, fontSize: 14 }}>
+              {errors.expansionLocations}
+            </FormHelperText>
+          )}
+        </Typography>
+        </Box>
       <RadioGroup
         row
         value={locationType}
@@ -5512,7 +5600,9 @@ const removeLocationItems = useCallback(
             drawerOpen={drawerOpen.countries}
             sortedCountries={sortedCountries}
             searchFilters={searchFilters}
-            handleInternationalCountrySelection={handleInternationalCountrySelection}
+            handleInternationalCountrySelection={
+              handleInternationalCountrySelection
+            }
             handleSearchChange={handleSearchChange}
             toggleDrawer={toggleDrawer}
           />
@@ -5522,7 +5612,9 @@ const removeLocationItems = useCallback(
             drawerOpen={drawerOpen.intStates}
             statesData={internationalStates}
             searchFilters={searchFilters}
-            handleInternationalStateSelection={handleInternationalStateSelection}
+            handleInternationalStateSelection={
+              handleInternationalStateSelection
+            }
             handleSearchChange={handleSearchChange}
             toggleDrawer={toggleDrawer}
           />

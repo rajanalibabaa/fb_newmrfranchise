@@ -38,6 +38,10 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     onChange({ [name]: value });
+
+     if (errors[name]) {
+    errors[name] = ""; // optional: if using local state for errors
+  }
   };
   const [pincodeError, setPincodeError] = useState(null);
   const [loadingPincode, setLoadingPincode] = useState(false);
@@ -205,6 +209,9 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
   // Handle mobile number change - ensure it includes the country code
   const handleMobileNumberChange = (e) => {
     const { name, value } = e.target;
+
+
+    
     // Remove any non-digit characters
     const digitsOnly = value.replace(/\D/g, "");
 
@@ -231,6 +238,10 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
       onChange({
         [name]: officeCountryCode.dial_code + digitsOnly,
       });
+    }
+
+    if (errors[name]) {
+      errors[name] = ""; // optional: if using local state for errors
     }
   };
 
@@ -1109,6 +1120,7 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
                 city: "",
                 district: "",
               });
+                if (errors?.country) errors.country = "";
             }}
             inputValue={countryInputValue}
             onInputChange={(event, newInputValue) => {
@@ -1185,6 +1197,8 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
                 .replace(/\D/g, "")
                 .slice(0, selectedCountry === "IN" ? 6 : 10);
               onChange({ pincode: value });
+               if (errors?.pincode) errors.pincode = "";
+   
             }}
             error={!!errors.pincode || !!pincodeError}
             helperText={
