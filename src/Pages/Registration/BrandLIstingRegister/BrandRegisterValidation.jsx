@@ -89,9 +89,27 @@ const validateFranchiseDetails = (data) => {
   if (!data.brandCategories?.sub) {
     errors.subCategory = "Main category is required";
   }
-  if (!data.brandCategories?.child) {
-    errors.childCategory = "Sub category is required";
+ // Correct childCategory validation
+  if (
+    !data.brandCategories?.child ||
+    data.brandCategories.child.length === 0
+  ) {
+    errors.childCategory = "Please select at least one product tag from any category.";
   }
+
+
+
+  // Convert all arrays to one combined list of counts
+  const totalSelected = Object.values(data.franchiseTags)
+    .map((arr) => arr.length)
+    .reduce((a, b) => a + b, 0);
+
+  // If all 8 arrays empty → throw error
+  if (totalSelected === 0) {
+    errors.franchiseTags =
+      "Please select at least one service tag from any category.";
+  }
+
 
   // Establishment & Franchise Year Validation
   if (!data.establishedYear) {
@@ -197,10 +215,9 @@ const validateFranchiseDetails = (data) => {
   if (!data.consultationOrAssistance) {
     errors.consultationOrAssistance = "Please specify marketing recruitment consultation";
   }
-  if (!data.trainingSupport || data.trainingSupport.length === 0) {
-    errors.trainingSupport = "At least one training support option is required";
-  }
-
+if (!data.trainingSupport || data.trainingSupport.length === 0) {
+  errors.trainingSupport = "At least one training support option is required";
+}
 //  Brand Description Validation
   if (!data.uniqueSellingPoints || data.uniqueSellingPoints.length === 0) {
     errors.uniqueSellingPoints = "At least one unique selling point is required";

@@ -264,7 +264,7 @@ const BrandRegisterForm = () => {
   }, [formData, activeStep]);
 
   console.log("Form Data:", formData);
-  const validateUploadsDetails = (data) => {
+  const validateUploadsDetails = (data, pancardNumbers, gstNumber) => {
     const errors = {};
     if (data.brandLogo.length === 0) {
       errors.brandLogo = "Brand logo is required";
@@ -272,12 +272,21 @@ const BrandRegisterForm = () => {
 
     if (data.franchisePromotionVideo.length === 0)
       errors.franchisePromotionVideo = "Franchise promotion video is required";
+
     if (data.pancard.length === 0) errors.pancard = "PAN card is required";
-    // if (!data.pancardNumber || data.pancardNumber.trim() === "") {
-    //   errors.pancardNumber = "PAN number is required";
-    // } else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(data.pancardNumber)) {
-    //   errors.pancardNumber = "Invalid PAN format (e.g. AAAAA9999A)";
-    // }
+    if (data.gstCertificate.length === 0) errors.gstCertificate = "GST certificate is required";
+
+    // PAN number validation
+    const pancardNumber = String(pancardNumbers || "")
+      .trim()
+      .toUpperCase();
+
+    if (!pancardNumber) {
+      errors.pancardNumber = "PAN number is required";
+    } else if (pancardNumber.length !== 10) {
+      errors.pancardNumber = "PAN number must be exactly 10 characters";
+    }
+
     if (!data.exteriorOutlet || data.exteriorOutlet.length < 3) {
       errors.exteriorOutlet = `Minimum 3 exterior images required (${
         data.exteriorOutlet?.length || 0
@@ -294,12 +303,19 @@ const BrandRegisterForm = () => {
       errors.interiorOutlet = `Maximum 5 interior images allowed (${data.interiorOutlet.length} uploaded)`;
     }
 
-    if (data.gstCertificate.length === 0)
-      errors.gstCertificate = "GST certificate is required";
+    const gst = String(gstNumber || "")
+      .trim()
+      .toUpperCase();
 
-    // if (!data.gstNumber || data.gstNumber.trim() === "") {
-    //   errors.gstNumber = "GST number is required";
+    if (!gst) {
+      errors.gstNumber = "GST number is required";
+    } else if (gst.length !== 15) {
+      errors.gstNumber = "GST number must be 15 characters";
+    }
+    //  else if (!isValidGST(gst)) {
+    //   errors.gstNumber = "Invalid GST number format (Expected: 22AAAAA0000A1Z5)";
     // }
+
     return errors;
   };
 
@@ -330,7 +346,11 @@ const BrandRegisterForm = () => {
           isValid = Object.keys(errors.expansionLocationData).length === 0;
           break;
         case 3:
-          errors.uploads = validateUploadsDetails(formData.uploads || {});
+          errors.uploads = validateUploadsDetails(
+            formData.uploads,
+            formData.brandDetails.pancardNumber,
+            formData.brandDetails.gstNumber
+          );
           isValid = Object.keys(errors.uploads).length === 0;
           break;
         default:

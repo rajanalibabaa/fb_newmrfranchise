@@ -1209,7 +1209,7 @@ const BrandDetails = ({ data = {}, errors = {}, onChange }) => {
             variant="outlined"
             size="medium"
             required
-            disabled={!selectedCountry}
+            // disabled={!selectedCountry}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

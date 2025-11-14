@@ -245,7 +245,7 @@ const Uploads = ({
                   display: "flex",
                   flexDirection: "column",
                   // width: "100%", // Make it full width of the grid item
-                  width: { md: "568px" }, // Limit width on medium screens
+                  width: { md: "568px" , }, // Limit width on medium screens
                 }}
               >
                 <UploadButton
@@ -425,7 +425,6 @@ const Uploads = ({
               value={pancardNumber || ""}
               onChange={(e) => {
                 const value = e.target.value.toUpperCase();
-
                 // 🔹 Update the input value
                 onPancardNumberChange(value);
 
@@ -458,11 +457,24 @@ const Uploads = ({
               <VisuallyHiddenInput
                 type="file"
                 accept=".pdf,image/jpeg,image/png"
-                onChange={handleFileChange("pancard", {
-                  maxFiles: 1,
-                  allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
-                  maxSize: 1,
-                })}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // ✅ Auto-clear the error when a new file is chosen
+                    if (errors?.pancard) errors.pancard = "";
+
+                    // ✅ Proceed with your validation and upload logic
+                    handleFileChange("pancard", {
+                      maxFiles: 1,
+                      allowedTypes: [
+                        "application/pdf",
+                        "image/jpeg",
+                        "image/png",
+                      ],
+                      maxSize: 1,
+                    })(e);
+                  }
+                }}
               />
             </UploadButton>
             <Typography
@@ -502,7 +514,15 @@ const Uploads = ({
               label="GST Number"
               fullWidth
               value={gstNumber || ""}
-              onChange={(e) => onGstNumberChange(e.target.value.toUpperCase())} // auto-uppercase
+              onChange={(e) => {
+                const value = e.target.value.toUpperCase();
+
+                // 🔹 Update the input value
+                onGstNumberChange(value);
+
+                // 🔹 Auto-clear the error as soon as user retypes
+                if (errors?.gstNumber) errors.gstNumber = "";
+              }}
               error={!!errors.gstNumber}
               helperText={errors.gstNumber || "Format: 22AAAAA0000A1Z5"}
               sx={{ mb: 2 }}
@@ -530,11 +550,24 @@ const Uploads = ({
               <VisuallyHiddenInput
                 type="file"
                 accept=".pdf,image/jpeg,image/png"
-                onChange={handleFileChange("gstCertificate", {
-                  maxFiles: 1,
-                  allowedTypes: ["application/pdf", "image/jpeg", "image/png"],
-                  maxSize: 1,
-                })}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // ✅ Auto-clear the error when a new file is chosen
+                    if (errors?.gstCertificate) errors.gstCertificate = "";
+
+                    // ✅ Proceed with your validation and upload logic
+                    handleFileChange("gstCertificate", {
+                      maxFiles: 1,
+                      allowedTypes: [
+                        "application/pdf",
+                        "image/jpeg",
+                        "image/png",
+                      ],
+                      maxSize: 1,
+                    })(e);
+                  }
+                }}
               />
             </UploadButton>
             <Typography
@@ -628,11 +661,22 @@ const Uploads = ({
                     type="file"
                     accept="image/jpeg,image/png"
                     multiple
-                    onChange={handleFileChange("exteriorOutlet", {
-                      maxFiles: 5,
-                      allowedTypes: ["image/jpeg", "image/png"],
-                      maxSize: 5,
-                    })}
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files && files.length > 0) {
+                        // ✅ Auto-clear the error when new files are chosen
+                        if (errors?.exteriorOutlet) errors.exteriorOutlet = "";
+                        if (errors?.exteriorOutletCount)
+                          errors.exteriorOutletCount = "";
+
+                        // ✅ Proceed with your validation and upload logic
+                        handleFileChange("exteriorOutlet", {
+                          maxFiles: 5,
+                          allowedTypes: ["image/jpeg", "image/png"],
+                          maxSize: 5,
+                        })(e);
+                      }
+                    }}
                   />
                 </UploadButton>
 
@@ -758,11 +802,22 @@ const Uploads = ({
                     type="file"
                     accept="image/jpeg,image/png"
                     multiple
-                    onChange={handleFileChange("interiorOutlet", {
-                      maxFiles: 5,
-                      allowedTypes: ["image/jpeg", "image/png"],
-                      maxSize: 5,
-                    })}
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (files && files.length > 0) {
+                        // ✅ Auto-clear the error when new files are chosen
+                        if (errors?.interiorOutlet) errors.interiorOutlet = "";
+                        if (errors?.interiorOutletCount)
+                          errors.interiorOutletCount = "";
+
+                        // ✅ Proceed with your validation and upload logic
+                        handleFileChange("interiorOutlet", {
+                          maxFiles: 5,
+                          allowedTypes: ["image/jpeg", "image/png"],
+                          maxSize: 5,
+                        })(e);
+                      }
+                    }}
                   />
                 </UploadButton>
 
@@ -1070,15 +1125,24 @@ const Uploads = ({
             <VisuallyHiddenInput
               type="file"
               accept=".pdf,.doc,.docx,"
-              onChange={handleFileChange("businessPlan", {
-                maxFiles: 1,
-                allowedTypes: [
-                  "application/pdf",
-                  "application/msword",
-                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                ],
-                maxSize: 1,
-              })}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  // ✅ Auto-clear the error when a new file is chosen
+                  if (errors?.businessPlan) errors.businessPlan = "";
+
+                  // ✅ Proceed with your validation and upload logic
+                  handleFileChange("businessPlan", {
+                    maxFiles: 1,
+                    allowedTypes: [
+                      "application/pdf",
+                      "application/msword",
+                      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    ],
+                    maxSize: 1,
+                  })(e);
+                }
+              }}
             />
           </UploadButton>
           <Typography
