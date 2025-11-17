@@ -238,6 +238,7 @@ if (!data.trainingSupport || data.trainingSupport.length === 0) {
     });
   }
 
+  
   // Brand Description Rich Text Validation
   if (!data.brandDescription) {
     errors.brandDescription = "Brand description is required";
@@ -258,30 +259,30 @@ const validateExpansionLocationDetails = (data) => {
   console.log("Validating Expansion Location Details:", data);
   const errors = {};  
   
-  // // 1. Validate "Is your brand expanding internationally?" (required boolean)
-  // if (data?.isInternationalExpansion === null || data?.isInternationalExpansion === undefined) {
-  //   errors.isInternationalExpansion = "Please specify if your brand is expanding internationally";
-  // }
+  // 1. Validate "Is your brand expanding internationally?" (required boolean)
+  if (data?.isInternationalExpansion === null || data?.isInternationalExpansion === undefined) {
+    errors.isInternationalExpansion = "Please specify if your brand is expanding internationally";
+  }
 
-  // // 2. Validate current outlet locations (must have either domestic or international)
-  // const hasCurrentDomestic = 
-  //   data?.currentOutletLocations?.domestic?.locations?.length > 0;
-  // const hasCurrentInternational = 
-  //   data?.currentOutletLocations?.international?.locations?.length > 0;
+  // 2. Validate current outlet locations (must have either domestic or international)
+  const hasCurrentDomestic = 
+    data?.currentOutletLocations?.domestic?.locations?.length > 0;
+  const hasCurrentInternational = 
+    data?.currentOutletLocations?.international?.locations?.length > 0;
   
-  // if (!hasCurrentDomestic && !hasCurrentInternational) {
-  //   errors.currentOutletLocations = "Please select at least one location (India or International) also   State and City for current outlets ";
-  // }
+  if (!hasCurrentDomestic && !hasCurrentInternational) {
+    errors.currentOutletLocations = "Please select at least one location (India or International) also   State and City for current outlets ";
+  }
 
-  // // 3. Validate expansion locations (must have either domestic or international)
-  // const hasExpansionDomestic = 
-  //   data?.expansionLocations?.domestic?.locations?.length > 0;
-  // const hasExpansionInternational = 
-  //   data?.expansionLocations?.international?.locations?.length > 0;
+  // 3. Validate expansion locations (must have either domestic or international)
+  const hasExpansionDomestic = 
+    data?.expansionLocations?.domestic?.locations?.length > 0;
+  const hasExpansionInternational = 
+    data?.expansionLocations?.international?.locations?.length > 0;
   
-  // if (!hasExpansionDomestic && !hasExpansionInternational) {
-  //   errors.expansionLocations = "Please select at least one location (India or International) also State and City for expansion Locations";
-  // }
+  if (!hasExpansionDomestic && !hasExpansionInternational) {
+    errors.expansionLocations = "Please select at least one location (India or International) also State and City for expansion Locations";
+  }
 
   return errors
 
