@@ -35,8 +35,6 @@ import {
   FlashOn,
   LocalOffer,
 } from "@mui/icons-material";
-import Navbar from "../../../Navbar/NavBar";
-import Footer from "../../Footer";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircularProgress from "@mui/material/CircularProgress";
 // Keyframe animations
