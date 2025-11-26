@@ -105,7 +105,6 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
         <BrandHeader brandData={brandData} />
         <DashboardTabs
           brandData={brandData}
-          Leads={Leads}
           loading={loading}
           error={error}
           onRetry={fetchData}

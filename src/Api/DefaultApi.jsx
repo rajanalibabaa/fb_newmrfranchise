@@ -34,3 +34,21 @@ export const getApi = async (url,query) => {
     throw error;
   }
 };
+
+export const GetApiCall = async(url, params = {}) => {
+
+  // console.log("token :",token)
+
+    const res = await axios.get(url,{
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+      params
+    });
+
+    if(!res){
+        throw new Error("Error in API Call")
+    }
+    return res;
+}

@@ -6,7 +6,9 @@ export const api = {
   allBrandsApi : {
     get : {
       defaultBrands : `${API_BASE_URL}/brandlisting/getAllBrandListing`,
-      likeAndUnlikeBrands :`${API_BASE_URL}/like/favbrands/getAllLikedAndUnlikedBrand`
+      likeAndUnlikeBrands :`${API_BASE_URL}/like/favbrands/getAllLikedAndUnlikedBrand`,
+      getleadsbybrandid:`${API_BASE_URL}/getleadsbybrandid`,
+      getBrandByID:`${API_BASE_URL}/brandlisting/getBrandById`
     }
   },
 
