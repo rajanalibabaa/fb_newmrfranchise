@@ -45,7 +45,7 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import { useDispatch } from "react-redux";
 import { showLoading } from "../../../Redux/Slices/loadingSlice";
 import FranchiseDetails from "./FranchiseDetails";
-
+import MembershipPayments from "../../../Components/Footers/QuickLinks/PaymentPAge/MembershipPayment.jsx";
 
 const FORM_DATA_KEY = "brandRegistrationFormData";
 const FORM_STEP_KEY = "brandRegistrationActiveStep";
@@ -172,7 +172,7 @@ const initialFormData = {
     consultationOrAssistance: "",
     trainingSupport: "",
     uniqueSellingPoints: [],
-    franchiseTags:{
+    franchiseTags: {
       PrimaryClassifications: [],
       // productServiceTypes: [],
       TargetAudience: [],
@@ -184,7 +184,6 @@ const initialFormData = {
       SustainabilityEthics: [],
       BusinessOperations: [],
     },
-
   },
 
   expansionLocationData: {
@@ -230,7 +229,7 @@ const BrandRegisterForm = () => {
   const [formData, setFormData] = useState(() => {
     const savedData = localStorage.getItem(FORM_DATA_KEY);
     return savedData ? JSON.parse(savedData) : initialFormData;
-  }); 
+  });
 
   console.log("Initial Form Data:", formData);
 
@@ -256,19 +255,67 @@ const BrandRegisterForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  // State to show AdvertiseWithUs component instead of form
+  const [MembershipPayment, setMembershipPayment] = useState(false);
+
   useEffect(() => {
     localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
     localStorage.setItem(FORM_STEP_KEY, activeStep.toString());
   }, [formData, activeStep]);
 
   console.log("Form Data:", formData);
-  const validateUploadsDetails = (data) => {
+  const validateUploadsDetails = (data, pancardNumbers, gstNumber) => {
     const errors = {};
-    if (data.brandLogo.length === 0)
-      errors.brandLogo = "Brand logo is required";
-    if (data.pancard.length === 0) errors.pancard = "PAN card is required";
-    if (data.gstCertificate.length === 0)
-      errors.gstCertificate = "GST certificate is required";
+    // if (data.brandLogo.length === 0) {
+    //   errors.brandLogo = "Brand logo is required";
+    // }
+
+    // if (data.franchisePromotionVideo.length === 0)
+    //   errors.franchisePromotionVideo = "Franchise promotion video is required";
+
+    // if (data.pancard.length === 0) errors.pancard = "PAN card is required";
+    // if (data.gstCertificate.length === 0) errors.gstCertificate = "GST certificate is required";
+
+    // // PAN number validation
+    // const pancardNumber = String(pancardNumbers || "")
+    //   .trim()
+    //   .toUpperCase();
+
+    // if (!pancardNumber) {
+    //   errors.pancardNumber = "PAN number is required";
+    // } else if (pancardNumber.length !== 10) {
+    //   errors.pancardNumber = "PAN number must be exactly 10 characters";
+    // }
+
+    // if (!data.exteriorOutlet || data.exteriorOutlet.length < 3) {
+    //   errors.exteriorOutlet = `Minimum 3 exterior images required (${
+    //     data.exteriorOutlet?.length || 0
+    //   } uploaded)`;
+    // } else if (data.exteriorOutlet.length > 5) {
+    //   errors.exteriorOutlet = `Maximum 5 exterior images allowed (${data.exteriorOutlet.length} uploaded)`;
+    // }
+
+    // if (!data.interiorOutlet || data.interiorOutlet.length < 3) {
+    //   errors.interiorOutlet = `Minimum 3 interior images required (${
+    //     data.interiorOutlet?.length || 0
+    //   } uploaded)`;
+    // } else if (data.interiorOutlet.length > 5) {
+    //   errors.interiorOutlet = `Maximum 5 interior images allowed (${data.interiorOutlet.length} uploaded)`;
+    // }
+
+    // const gst = String(gstNumber || "")
+    //   .trim()
+    //   .toUpperCase();
+
+    // if (!gst) {
+    //   errors.gstNumber = "GST number is required";
+    // } else if (gst.length !== 15) {
+    //   errors.gstNumber = "GST number must be 15 characters";
+    // }
+    // //  else if (!isValidGST(gst)) {
+    // //   errors.gstNumber = "Invalid GST number format (Expected: 22AAAAA0000A1Z5)";
+    // // }
+
     return errors;
   };
 
@@ -276,6 +323,8 @@ const BrandRegisterForm = () => {
     (step) => {
       const errors = {};
       let isValid = true;
+
+      console.log("Validating step:", errors);
 
       switch (step) {
         case 0:
@@ -291,17 +340,21 @@ const BrandRegisterForm = () => {
           isValid = Object.keys(errors.franchiseDetails).length === 0;
           break;
         case 2:
-          errors.expansionLocationDetails = validateExpansionLocationDetails(
-            formData.expansionLocationDetails || {}
+          errors.expansionLocationData = validateExpansionLocationDetails(
+            formData.expansionLocationData || {}
           );
-          isValid = Object.keys(errors.expansionLocationDetails).length === 0;
+          isValid = Object.keys(errors.expansionLocationData).length === 0;
           break;
-        // case 3:
-        //   errors.uploads = validateUploadsDetails(formData.uploads || {});
-        //   isValid = Object.keys(errors.uploads).length === 0;
-        //   break;
-        // default:
-        //   break;
+        case 3:
+          errors.uploads = validateUploadsDetails(
+            formData.uploads,
+            formData.brandDetails.pancardNumber,
+            formData.brandDetails.gstNumber
+          );
+          isValid = Object.keys(errors.uploads).length === 0;
+          break;
+        default:
+          break;
       }
 
       setValidationErrors(errors);
@@ -335,7 +388,7 @@ const BrandRegisterForm = () => {
     navigate("/");
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (selectedMembership, selectedListing) => {
     const isValid = validateStep(activeStep);
 
     if (isValid) {
@@ -345,8 +398,6 @@ const BrandRegisterForm = () => {
 
         const formDataSend = new FormData();
 
-        console.log("sending form data",formDataSend);
-        
         // Append brand details
         formDataSend.append(
           "brandDetails",
@@ -378,6 +429,11 @@ const BrandRegisterForm = () => {
             gstNumber: formData.brandDetails.gstNumber,
             pancardNumber: formData.brandDetails.pancardNumber,
             awardText: formData.brandDetails.awardText || [], // Include award texts
+            paymentPackage: selectedMembership?.tier.toLowerCase(),
+            listingPackages: {
+              periodMonths: selectedListing?.periodMonths,
+              amount: selectedListing?.amount,
+            },
           })
         );
 
@@ -436,7 +492,9 @@ const BrandRegisterForm = () => {
             });
           }
         });
-console.log("Form data prepared for submission:", formDataSend);
+
+        console.log("sending form data", formDataSend);
+
         const response = await axios.post(
           "http://localhost:5000/api/v1/brandlisting/createBrandListing",
           formDataSend,
@@ -454,16 +512,17 @@ console.log("Form data prepared for submission:", formDataSend);
             message: "Form submitted successfully!",
             severity: "success",
           });
-          console.log('Form data submitted successfully:', response.data);
+
+          console.log("Form data submitted successfully:", response.data);
           localStorage.removeItem(FORM_DATA_KEY);
           localStorage.removeItem(FORM_STEP_KEY);
           setFormData(initialFormData);
           setActiveStep(0);
           setOpenPreview(false);
           setTimeout(() => {
-            navigate("/advertisewithus");
+            navigate("/");
           }, 1500);
-        }else{
+        } else {
           throw new Error("Submission failed. Please try again.");
         }
       } catch (error) {
@@ -479,6 +538,13 @@ console.log("Form data prepared for submission:", formDataSend);
       } finally {
         setIsSubmitting(false);
       }
+    }
+  };
+
+  const handlepakagesDetails = () => {
+    const isValid = validateStep(3); // Validate uploads step
+    if (isValid) {
+      setMembershipPayment(true);
     }
   };
 
@@ -594,13 +660,13 @@ console.log("Form data prepared for submission:", formDataSend);
             data={formData.franchiseDetails}
             errors={validationErrors.franchiseDetails}
             onChange={handleFranchiseDetailsChange}
-          />          
+          />
         );
       case 2:
         return (
           <BrandExpansionLocationDetails
             data={formData.expansionLocationData}
-            errors={validationErrors.BrandExpansionLocationDetails}
+            errors={validationErrors.expansionLocationData || {}}
             onChange={(newData) =>
               setFormData((prev) => ({
                 ...prev,
@@ -1231,272 +1297,130 @@ console.log("Form data prepared for submission:", formDataSend);
   };
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-        }}
-      >
+      {/* If MembershipPayment is true, render AdvertiseWithUs and pass handleSubmit directly */}
+      {MembershipPayment ? (
+        <MembershipPayments
+          handleSubmit={handleSubmit}
+          snackbar={snackbar}
+          handleCloseSnackbar={handleCloseSnackbar}
+          isSubmitting={isSubmitting}
+          submitSuccess={submitSuccess}
+          setSnackbar={setSnackbar}
+          formData={formData}
+          onBack={() => setMembershipPayment(false)} // Button to go back to form
+        />
+      ) : (
+        // Otherwise, render the form as normal
         <Box
           sx={{
-            flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            overflow: "hidden",
-            p: 0,
+            height: "100vh",
           }}
         >
           <Box
-            sx={{ display: "grid", gridTemplateColumns: "auto 1fr" }}
-            mb={1}
-            mt={1}
-          >
-            <Button
-              onClick={handleHomeClick}
-              sx={{
-                backgroundColor: "#7ad03a",
-                color: "white",
-                height: "40px",
-                pr: 3,
-                pl: 2,
-                py: 0,
-                mt: 2,
-
-                ml: { md: 6, xs: 3 },
-                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-                transition: "all 0.3s ease",
-                display: "flex", // Ensure flex layout
-                gap: 1, // Adds spacing (theme.spacing(1) = 8px by default)
-                alignItems: "center", // Vertically center items
-                "&:hover": {
-                  backgroundColor: "#5db024",
-                  transform: "scale(1.05)",
-                  boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.2)",
-                },
-                "&:active": {
-                  transform: "scale(0.97)",
-                },
-              }}
-            >
-              <HomeOutlinedIcon fontSize="small" /> Home
-            </Button>
-
-            {/* Stepper ==> To Navigate The Particular Page */}
-            <Stepper
-              activeStep={activeStep}
-              alternativeLabel
-              connector={<ColorlibConnector />}
-            >
-              {steps.map((label, index) => (
-                <Step key={label}>
-                  <StepLabel
-                    StepIconComponent={ColorlibStepIcon}
-                    onClick={() => setActiveStep(index)}
-                    sx={{
-                      cursor: "pointer",
-                      transition: "transform 0.3s ease, color 0.3s ease",
-                      "&:hover": {
-                        transform: "scale(1.1)",
-                        color: "primary.main", // or any custom color
-                      },
-                    }}
-                  >
-                    {label}
-                  </StepLabel>
-                </Step>
-              ))}
-            </Stepper>
-          </Box>
-
-          <Box
             sx={{
               flexGrow: 1,
-              border: "1px solid #e0e0e0",
-              borderRadius: 2,
-              mt: 0,
-              overflow: "auto",
-            }}
-            // maxHeight={"calc(100vh - 200px)"}
-          >
-            <Box sx={{ p: 2 }}>{getStepContent(activeStep)}</Box>
-          </Box>
-
-          <Box
-            sx={{
               display: "flex",
-              justifyContent: "center",
-              pt: 2,
-              pb: 2,
-              borderTop: "1px solid #e0e0e0",
+              flexDirection: "column",
+              overflow: "hidden",
+              p: 0,
             }}
           >
-            <Button
-              disabled={activeStep === 0 || isSubmitting}
-              onClick={handleBack}
-              sx={{
-                background:
-                  "linear-gradient(to bottom right,rgb(246, 175, 33), #FF9A5A)",
-                border: 0,
-                mr: 2,
-                borderRadius: "12px",
-                color: "black",
-                cursor: "pointer",
-                display: "inline-block",
-                fontFamily:
-                  '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-                fontSize: "16px",
-                fontWeight: 500,
-                lineHeight: 0,
-                outline: "transparent",
-                px: "1rem", // padding-left and padding-right
-                py: "0.2rem",
-                textAlign: "center",
-                textDecoration: "none",
-                transition: "box-shadow .2s ease-in-out",
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                touchAction: "manipulation",
-                whiteSpace: "nowrap",
-                "&:not([disabled]):focus": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(246, 175, 33), .125rem .125rem 1rem rgba(255, 154, 90, 0.5)",
-                },
-                "&:not([disabled]):hover": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(246, 175, 33), .125rem .125rem 1rem rgba(255, 154, 90, 0.5)",
-                },
-              }}
+            <Box
+              sx={{ display: "grid", gridTemplateColumns: "auto 1fr" }}
+              mb={1}
+              mt={1}
             >
-              Back
-            </Button>
-
-            <Button
-              variant="outlined"
-              onClick={handlePreviewOpen}
-              sx={{
-                backgroundColor: "#7ad03a",
-                borderRadius: "100px",
-                mr: 2,
-                color: "black",
-                fontFamily:
-                  "CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif",
-                padding: "7px 20px",
-                fontSize: "16px",
-                textTransform: "none", // Prevents uppercase transformation
-                transition: "all 250ms",
-                border: 0,
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                touchAction: "manipulation",
-                "&:hover": {
-    
-                  transform: "scale(1.05) rotate(-1deg)",
-                  backgroundColor: "#5db024", // Maintain same background on hover
-                },
-                "&:active": {
-                  transform: "scale(1) rotate(0deg)", // Reset on click
-                },
-              }}
-              disabled={isSubmitting}
-            >
-              Preview
-            </Button>
-
-            <Button
-              variant="outlined"
-              sx={{
-                backgroundColor: "#7ad03a",
-                borderRadius: "100px",
-    
-                mr: 2,
-                color: "black",
-                fontFamily:
-                  "CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif",
-                padding: "7px 20px",
-                fontSize: "16px",
-                textTransform: "none", // Prevents uppercase transformation
-                transition: "all 250ms",
-                border: 0,
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                touchAction: "manipulation",
-                "&:hover": {
-     
-                  transform: "scale(1.05) rotate(-1deg)",
-                  backgroundColor: "#5db024", // Maintain same background on hover
-                },
-                "&:active": {
-                  transform: "scale(1) rotate(0deg)", // Reset on click
-                },
-              }}
-              onClick={handleCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-
-            {activeStep === steps.length - 1 ? (
               <Button
-                variant="contained"
+                onClick={handleHomeClick}
                 sx={{
-                  background:
-                    "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
-                  border: 0,
-                  mr: 2,
-                  borderRadius: "12px",
-                  color: "#FFFFFF",
-                  cursor: "pointer",
-                  display: "inline-block",
-                  fontFamily:
-                    '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  lineHeight: 0,
-                  outline: "transparent",
-                  px: "1rem", // padding-left and padding-right
-                  textAlign: "center",
-                  textDecoration: "none",
-                  transition: "box-shadow .2s ease-in-out",
-                  userSelect: "none",
-                  WebkitUserSelect: "none",
-                  touchAction: "manipulation",
-                  whiteSpace: "nowrap",
-                  "&:not([disabled]):focus": {
-                    boxShadow:
-                      "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
+                  backgroundColor: "#7ad03a",
+                  color: "white",
+                  height: "40px",
+                  pr: 3,
+                  pl: 2,
+                  py: 0,
+                  mt: 2,
+
+                  ml: { md: 6, xs: 3 },
+                  boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                  transition: "all 0.3s ease",
+                  display: "flex", // Ensure flex layout
+                  gap: 1, // Adds spacing (theme.spacing(1) = 8px by default)
+                  alignItems: "center", // Vertically center items
+                  "&:hover": {
+                    backgroundColor: "#5db024",
+                    transform: "scale(1.05)",
+                    boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.2)",
                   },
-                  "&:not([disabled]):hover": {
-                    boxShadow:
-                      "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
+                  "&:active": {
+                    transform: "scale(0.97)",
                   },
                 }}
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                startIcon={
-                  isSubmitting ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : submitSuccess ? (
-                    <CheckCircleIcon />
-                  ) : null
-                }
               >
-                {isSubmitting
-                  ? "Submitting..."
-                  : submitSuccess
-                  ? "Submitted!"
-                  : "Submit"}
+                <HomeOutlinedIcon fontSize="small" /> Home
               </Button>
-            ) : (
+
+              {/* Stepper ==> To Navigate The Particular Page */}
+              <Stepper
+                activeStep={activeStep}
+                alternativeLabel
+                connector={<ColorlibConnector />}
+              >
+                {steps.map((label, index) => (
+                  <Step key={label}>
+                    <StepLabel
+                      StepIconComponent={ColorlibStepIcon}
+                      onClick={() => setActiveStep(index)}
+                      sx={{
+                        cursor: "pointer",
+                        transition: "transform 0.3s ease, color 0.3s ease",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                          color: "primary.main", // or any custom color
+                        },
+                      }}
+                    >
+                      {label}
+                    </StepLabel>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
+
+            <Box
+              sx={{
+                flexGrow: 1,
+                border: "1px solid #e0e0e0",
+                borderRadius: 2,
+                mt: 0,
+                overflow: "auto",
+              }}
+              // maxHeight={"calc(100vh - 200px)"}
+            >
+              <Box sx={{ p: 2 }}>{getStepContent(activeStep)}</Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                pt: 2,
+                pb: 2,
+                borderTop: "1px solid #e0e0e0",
+              }}
+            >
               <Button
-                variant="contained"
+                disabled={activeStep === 0 || isSubmitting}
+                onClick={handleBack}
                 sx={{
                   background:
                     "linear-gradient(to bottom right,rgb(246, 175, 33), #FF9A5A)",
                   border: 0,
                   mr: 2,
                   borderRadius: "12px",
-                  color: "#FFFFFF",
+                  color: "black",
                   cursor: "pointer",
                   display: "inline-block",
                   fontFamily:
@@ -1506,6 +1430,7 @@ console.log("Form data prepared for submission:", formDataSend);
                   lineHeight: 0,
                   outline: "transparent",
                   px: "1rem", // padding-left and padding-right
+                  py: "0.2rem",
                   textAlign: "center",
                   textDecoration: "none",
                   transition: "box-shadow .2s ease-in-out",
@@ -1522,106 +1447,261 @@ console.log("Form data prepared for submission:", formDataSend);
                       "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(246, 175, 33), .125rem .125rem 1rem rgba(255, 154, 90, 0.5)",
                   },
                 }}
-                onClick={handleNext}
+              >
+                Back
+              </Button>
+
+              <Button
+                variant="outlined"
+                onClick={handlePreviewOpen}
+                sx={{
+                  backgroundColor: "#7ad03a",
+                  borderRadius: "100px",
+                  mr: 2,
+                  color: "black",
+                  fontFamily:
+                    "CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif",
+                  padding: "7px 20px",
+                  fontSize: "16px",
+                  textTransform: "none", // Prevents uppercase transformation
+                  transition: "all 250ms",
+                  border: 0,
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  "&:hover": {
+                    transform: "scale(1.05) rotate(-1deg)",
+                    backgroundColor: "#5db024", // Maintain same background on hover
+                  },
+                  "&:active": {
+                    transform: "scale(1) rotate(0deg)", // Reset on click
+                  },
+                }}
                 disabled={isSubmitting}
               >
-                Next
+                Preview
               </Button>
-            )}
-          </Box>
-        </Box>
 
-        {/* Preview Dialog */}
-        <Dialog
-          open={openPreview}
-          onClose={handlePreviewClose}
-          maxWidth="lg" // Changed from "md" to "lg" for wider view
-          fullWidth
-          scroll="paper"
-          sx={{
-            "& .MuiDialog-paper": {
-              width: "90%", // Take up 90% of screen width
-              maxWidth: "1200px", // Set a maximum width
-              height: "90vh", // Take up 90% of viewport height
-            },
-          }}
-        >
-          <DialogTitle
+              <Button
+                variant="outlined"
+                sx={{
+                  backgroundColor: "#7ad03a",
+                  borderRadius: "100px",
+
+                  mr: 2,
+                  color: "black",
+                  fontFamily:
+                    "CerebriSans-Regular, -apple-system, system-ui, Roboto, sans-serif",
+                  padding: "7px 20px",
+                  fontSize: "16px",
+                  textTransform: "none", // Prevents uppercase transformation
+                  transition: "all 250ms",
+                  border: 0,
+                  userSelect: "none",
+                  WebkitUserSelect: "none",
+                  touchAction: "manipulation",
+                  "&:hover": {
+                    transform: "scale(1.05) rotate(-1deg)",
+                    backgroundColor: "#5db024", // Maintain same background on hover
+                  },
+                  "&:active": {
+                    transform: "scale(1) rotate(0deg)", // Reset on click
+                  },
+                }}
+                onClick={handleCancel}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </Button>
+
+              {activeStep === steps.length - 1 ? (
+                <Button
+                  variant="contained"
+                  sx={{
+                    background:
+                      "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
+                    border: 0,
+                    mr: 2,
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    fontFamily:
+                      '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    lineHeight: 0,
+                    outline: "transparent",
+                    px: "1rem", // padding-left and padding-right
+                    textAlign: "center",
+                    textDecoration: "none",
+                    transition: "box-shadow .2s ease-in-out",
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    touchAction: "manipulation",
+                    whiteSpace: "nowrap",
+                    "&:not([disabled]):focus": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
+                    },
+                    "&:not([disabled]):hover": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
+                    },
+                  }}
+                  onClick={handlepakagesDetails}
+                  // disabled={isSubmitting}
+                  // startIcon={
+                  //   isSubmitting ? (
+                  //     <CircularProgress size={20} color="inherit" />
+                  //   ) : submitSuccess ? (
+                  //     <CheckCircleIcon />
+                  //   ) : null
+                  // }
+                  //  {isSubmitting
+                  //   ? "Submitting..."
+                  //   : submitSuccess
+                  //   ? "Submitted!"
+                  //   : "Submit"}
+                >
+                  Go to package details
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  sx={{
+                    background:
+                      "linear-gradient(to bottom right,rgb(246, 175, 33), #FF9A5A)",
+                    border: 0,
+                    mr: 2,
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    display: "inline-block",
+                    fontFamily:
+                      '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    lineHeight: 0,
+                    outline: "transparent",
+                    px: "1rem", // padding-left and padding-right
+                    textAlign: "center",
+                    textDecoration: "none",
+                    transition: "box-shadow .2s ease-in-out",
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    touchAction: "manipulation",
+                    whiteSpace: "nowrap",
+                    "&:not([disabled]):focus": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(246, 175, 33), .125rem .125rem 1rem rgba(255, 154, 90, 0.5)",
+                    },
+                    "&:not([disabled]):hover": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(246, 175, 33), .125rem .125rem 1rem rgba(255, 154, 90, 0.5)",
+                    },
+                  }}
+                  onClick={handleNext}
+                  disabled={isSubmitting}
+                >
+                  Next
+                </Button>
+              )}
+            </Box>
+          </Box>
+
+          {/* Preview Dialog */}
+          <Dialog
+            open={openPreview}
+            onClose={handlePreviewClose}
+            maxWidth="lg" // Changed from "md" to "lg" for wider view
+            fullWidth
+            scroll="paper"
             sx={{
-              borderBottom: "1px solid #e0e0e0",
-              position: "sticky",
-              top: 0,
-              backgroundColor: "background.paper",
-              zIndex: 1,
-              color: "#f9a505",
+              "& .MuiDialog-paper": {
+                width: "90%", // Take up 90% of screen width
+                maxWidth: "1200px", // Set a maximum width
+                height: "90vh", // Take up 90% of viewport height
+              },
             }}
           >
-            Form Data Preview
-          </DialogTitle>
-          <DialogContent dividers sx={{ overflowY: "auto" }}>
-            {renderPreviewContent()}
-          </DialogContent>
-          <DialogActions
-  sx={{
-    borderTop: "1px solid #e0e0e0",
-    position: "sticky",
-    bottom: 0,
-    backgroundColor: "background.paper",
-    zIndex: 1,
-  }}
->
-  {activeStep === steps.length - 1 && (
-    <Button
-      variant="contained"
-      onClick={handleSubmit}
-      disabled={isSubmitting}
-      startIcon={
-        isSubmitting ? (
-          <CircularProgress size={20} color="inherit" />
-        ) : submitSuccess ? (
-          <CheckCircleIcon />
-        ) : null
-      }
-      sx={{
-        background: "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
-        mr: 1
-      }}
-    >
-      {isSubmitting
-        ? "Submitting..."
-        : submitSuccess
-        ? "Submitted!"
-        : "Submit from Preview"}
-    </Button>
-  )}
-  <Button
-    onClick={handlePreviewClose}
-    variant="contained"
-    color="error"
-    disabled={isSubmitting} // Disable close button during submission
-  >
-    Close
-  </Button>
-</DialogActions>
+            <DialogTitle
+              sx={{
+                borderBottom: "1px solid #e0e0e0",
+                position: "sticky",
+                top: 0,
+                backgroundColor: "background.paper",
+                zIndex: 1,
+                color: "#f9a505",
+              }}
+            >
+              Form Data Preview
+            </DialogTitle>
+            <DialogContent dividers sx={{ overflowY: "auto" }}>
+              {renderPreviewContent()}
+            </DialogContent>
+            <DialogActions
+              sx={{
+                borderTop: "1px solid #e0e0e0",
+                position: "sticky",
+                bottom: 0,
+                backgroundColor: "background.paper",
+                zIndex: 1,
+              }}
+            >
+              {activeStep === steps.length - 1 && (
+                <Button
+                  variant="contained"
+                  onClick={handlepakagesDetails}
+                  disabled={isSubmitting}
+                  startIcon={
+                    isSubmitting ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : submitSuccess ? (
+                      <CheckCircleIcon />
+                    ) : null
+                  }
+                  sx={{
+                    background:
+                      "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
+                    mr: 1,
+                  }}
+                >
+                  {isSubmitting
+                    ? "Submitting..."
+                    : submitSuccess
+                    ? "Submitted!"
+                    : "Submit from Preview"}
+                </Button>
+              )}
+              <Button
+                onClick={handlePreviewClose}
+                variant="contained"
+                color="error"
+                disabled={isSubmitting} // Disable close button during submission
+              >
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
 
-        </Dialog>
-
-        {/* Snackbar for notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={handleCloseSnackbar}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        >
-          <Alert
+          {/* Snackbar for notifications */}
+          <Snackbar
+            open={snackbar.open}
+            autoHideDuration={6000}
             onClose={handleCloseSnackbar}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Box>
+            <Alert
+              onClose={handleCloseSnackbar}
+              severity={snackbar.severity}
+              sx={{ width: "100%" }}
+            >
+              {snackbar.message}
+            </Alert>
+          </Snackbar>
+        </Box>
+      )}
       {/* <Footer /> */}
     </>
   );
