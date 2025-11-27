@@ -10,10 +10,10 @@ const PackageCard = ({ data, color = "black", background = "#dddddd4e" }) => {
         border: "1px solid #ddd",
         backgroundColor: background,
         color: color,
-        position: "relative", // ⬅ required for badge positioning
+        position: "relative", 
       }}
     >
-      {/* 🔰 Status Badge (Top Right) */}
+    
       <Box
         sx={{
           position: "absolute",
@@ -28,7 +28,7 @@ const PackageCard = ({ data, color = "black", background = "#dddddd4e" }) => {
           textTransform: "uppercase",
         }}
       >
-        {data.isActive ? "Active" : "Inactive"}
+        {data.isActive ? "Active" : "closed"}
       </Box>
 
       <CardContent sx={{ p: 1.5 }}>
@@ -62,10 +62,10 @@ const PackageCard = ({ data, color = "black", background = "#dddddd4e" }) => {
             <strong>Months:</strong> {data.totalMonths}
           </div>
           <div>
-            <strong>PM Leads:</strong> {data.perMonthLead}
+            <strong>PM Leads Commitment:</strong> {data.perMonthLead}
           </div>
           <div>
-            <strong>Total Leads:</strong> {data.totalLeads}
+            <strong>Total Leads Commitment:</strong> {data.totalLeads}
           </div>
           <div>
             <strong>Sent Percentage:</strong>{" "}

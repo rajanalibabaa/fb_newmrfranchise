@@ -24,7 +24,7 @@ const colors = {
   divider: "#ecf0f1",
 };
 
-const DashboardTabs = ({ brandData, loading, error, onRetry, onViewDetails }) => {
+const DashboardTabs = ({ brandData}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -37,7 +37,7 @@ const DashboardTabs = ({ brandData, loading, error, onRetry, onViewDetails }) =>
   const getTabCount = (tabIndex) => {
     switch (tabIndex) {
       case 0:
-        return brandData.totalLeads ? brandData.totalLeads : 0;
+        return brandData?.brandDetails?.overAllLeads ? brandData?.brandDetails?.overAllLeads : 0;
       default:
         return 0;
     }
