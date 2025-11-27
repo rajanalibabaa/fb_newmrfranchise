@@ -15,6 +15,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import img from "../../assets/Images/brandLogo.jpg";
 import Footer from "../../Components/Footers/Footer";
 import Navbar from "../../Components/Navbar/NavBar";
+// import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import SpaceDashboardIcon from "@mui/icons-material/SpaceDashboard";
+import ViewListIcon from "@mui/icons-material/ViewList";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 
 const Sidebar = () => {
   const theme = useTheme();
@@ -104,38 +110,60 @@ const Sidebar = () => {
       </Box>
 
       {/* Navigation Links */}
-      <Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
-        <RouterLink 
-          to="/brandDashboard/brandDashboard" 
-          style={navLinkStyle}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Dashboard
-        </RouterLink>
-        
-        <RouterLink 
-          to="/brandDashboard/brandlistingcontrol" 
-          style={navLinkStyle}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Brand Listing Controller
-        </RouterLink>
-       
-        <RouterLink 
-          to="/brandDashboard/brandsearchus" 
-          style={navLinkStyle}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Reach Us
-        </RouterLink>
-        <RouterLink
-          to="/brandDashboard/actionmanager"
-          style={navLinkStyle}
-          onClick={() => isMobile && setMobileOpen(false)}
-        >
-          Action Manager
-        </RouterLink>
-      </Box>
+  {/* Navigation Links */}
+<Box sx={{ flexGrow: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+  
+  <RouterLink 
+    to="/brandDashboard/brandDashboard" 
+    style={navLinkStyle}
+    onClick={() => isMobile && setMobileOpen(false)}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <SpaceDashboardIcon /> Dashboard
+    </Box>
+  </RouterLink>
+
+  <RouterLink 
+    to="/brandDashboard/brandlistingcontrol" 
+    style={navLinkStyle}
+    onClick={() => isMobile && setMobileOpen(false)}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <ViewListIcon /> Edit Your Brand Listing
+    </Box>
+  </RouterLink>
+
+  <RouterLink 
+    to="/brandDashboard/brandsearchus" 
+    style={navLinkStyle}
+    onClick={() => isMobile && setMobileOpen(false)}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <SupportAgentIcon /> Reach Us
+    </Box>
+  </RouterLink>
+
+  <RouterLink
+    to="/brandDashboard/actionmanager"
+    style={navLinkStyle}
+    onClick={() => isMobile && setMobileOpen(false)}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <ManageAccountsIcon /> Action Manager
+    </Box>
+  </RouterLink>
+
+  <RouterLink
+    to="/brandDashboard/packageupgrade"
+    style={navLinkStyle}
+    onClick={() => isMobile && setMobileOpen(false)}
+  >
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+      <TrendingUpIcon /> Package Upgrade / Renew
+    </Box>
+  </RouterLink>
+
+</Box>
 
      
     </Box>
