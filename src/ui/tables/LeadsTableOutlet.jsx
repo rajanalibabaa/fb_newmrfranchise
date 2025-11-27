@@ -7,9 +7,11 @@ import {
   TableCell,
   TableBody,
   Paper,
-  IconButton,
   CircularProgress,
   Box,
+  MenuItem,
+  Select,
+  FormControl,
   Button,
 } from "@mui/material";
 
@@ -19,6 +21,14 @@ const LeadsTableOutlet = ({
   hasMore = false,
   loading = false,
   pagination,
+  dateFilter = [],
+  selectedPackage,
+  selectedFilter,
+  selectedDateFilter,
+  leadsFilter,
+  handlePackageClick,
+  handleReset,
+  isReset,
 }) => {
   const observer = useRef();
 
@@ -39,7 +49,52 @@ const LeadsTableOutlet = ({
   );
 
   return (
-    <Paper>
+    <Paper sx={{ padding: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2, gap: 2 }}>
+        <FormControl size="small" sx={{ width: 180 }}>
+          <Select
+            value={selectedFilter}
+            onChange={(e) =>
+              handlePackageClick(selectedPackage, "match", e.target.value)
+            }
+            displayEmpty
+          >
+            <MenuItem value="" disabled>
+              Leads Match Filter
+            </MenuItem>
+            {leadsFilter.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        {selectedPackage?.isActive && (
+          <FormControl size="small" sx={{ width: 180 }}>
+            <Select
+              value={selectedDateFilter}
+              onChange={(e) =>
+                handlePackageClick(selectedPackage, "date", e.target.value)
+              }
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Date Filter
+              </MenuItem>
+              {dateFilter.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
+        <Button onClick={handleReset}>
+          {isReset ? <CircularProgress size={14} /> : "Reset"}
+        </Button>
+      </Box>
+
       <TableContainer style={{ maxHeight: "50vh", overflow: "auto" }}>
         <Table stickyHeader>
           <TableHead>
@@ -56,7 +111,7 @@ const LeadsTableOutlet = ({
             {leads?.length > 0 ? (
               leads.map((lead, index) => (
                 <TableRow
-                  key={lead.sentAt}
+                  key={lead._id || lead.sentAt || index}
                   ref={index === leads.length - 1 ? lastRowRef : null}
                 >
                   <TableCell>{lead.investorName}</TableCell>
@@ -80,11 +135,11 @@ const LeadsTableOutlet = ({
 
         <div style={{ textAlign: "center", padding: "10px" }}>
           {loading && <CircularProgress size={24} />}
-          {!hasMore && leads?.length > 0 && <p>No more investors</p>}
+
           {pagination?.totalRecords > 0 && (
             <p>
-              Showing {leads.length} of {pagination.totalRecords} investors —
-              Page {pagination.currentPage + 1} / {pagination.totalPages}
+              {pagination.totalRecords} investors — Page{" "}
+              {pagination.currentPage + 1} / {pagination.totalPages}
             </p>
           )}
         </div>

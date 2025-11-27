@@ -1,19 +1,17 @@
 import { useEffect, useState } from "react";
-import { useLocation,  } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import { Box, Typography, CircularProgress } from "@mui/material";
 import { GetApiCall } from "../../../../../Api/DefaultApi";
 import { api } from "../../../../../Api/api";
-import PackageCard from "../../../../../ui/cards/PackageCard"
-import LeadsTableOutlet from "../../../../../ui/tables/LeadsTableOutlet"
-
+import PackageCard from "../../../../../ui/cards/PackageCard";
+import LeadsTableOutlet from "../../../../../ui/tables/LeadsTableOutlet";
+import { userId } from "../../../../../Utils/autherId";
 
 const Leads = () => {
-   const { search } = useLocation();
-
+  const { search } = useLocation();
   const query = new URLSearchParams(search);
-
-  const id = query.get("id");
+  const id = query.get("id") || userId;
 
   const [brandPackage, setBrandPackage] = useState(null);
   const [leads, setLeads] = useState(null);
@@ -21,39 +19,47 @@ const Leads = () => {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
+  const [selectedFilter, setSelectedFilter] = useState("");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("");
+  const [isReset, setReset] = useState(false);
 
-    (async () => {
-      try {
-        const res = await GetApiCall(
-          `${api.allBrandsApi.get.getBrandByID}/${id}`,
-          { paymentHistory: true }
-        );
+  const fetchBrandAndLeads = async (id) => {
+  try {
+    const res = await GetApiCall(
+      `${api.allBrandsApi.get.getBrandByID}/${id}`,
+      { paymentHistory: true }
+    );
 
-        const responseData = res?.data;
-        console.log("responseData :",responseData)
-        setBrandPackage(responseData?.data || null);
+    const responseData = res?.data;
 
-        if (responseData?.statuscode === 200) {
-          const res2 = await GetApiCall(
-            `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
-            {
-              packageStartDate:
-                responseData?.data?.activePackage?.packageUpdatedTime,
-            }
-          );
+    setBrandPackage(responseData?.data || null);
+    setSelectedPackage(responseData?.data?.activePackage);
 
-          if (res2?.data?.statuscode === 200) {
-            setLeads(res2?.data?.data.leads);
-            setPagination(res2?.data?.data.pagination);
-            setHasMore(true);
-          }
+    if (responseData?.statuscode === 200) {
+      const res2 = await GetApiCall(
+        `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
+        {
+          packageStartDate:
+            responseData?.data?.activePackage?.packageUpdatedTime,
         }
-      } catch (error) {
-        console.error("Error fetching brand:", error);
+      );
+
+      if (res2?.data?.statuscode === 200) {
+        setLeads(res2?.data?.data.leads);
+        setPagination(res2?.data?.data.pagination);
+        setHasMore(true);
       }
-    })();
-  }, [id,]);
+    }
+  } catch (error) {
+    console.error("Error fetching brand:", error);
+  }
+};
+
+
+  useEffect(() => {
+  fetchBrandAndLeads(id);
+}, [id]);
+
 
   if (!brandPackage)
     return (
@@ -62,10 +68,28 @@ const Leads = () => {
       </Box>
     );
 
-  const handlePackageClick = async (pkg) => {
+  const handlePackageClick = async (pkg, type, value) => {
     setSelectedPackage(pkg);
 
+    const cheak1 = pkg?.packageUpdatedTime || pkg.packageStartTime
+    const cheak2 = selectedPackage?.packageUpdatedTime || selectedPackage.packageStartTime
+
+    if (cheak1 !== cheak2) {
+      setSelectedFilter("")
+      setSelectedDateFilter("")
+    } else {
+      if (selectedFilter) {
+        
+        setSelectedDateFilter("")
+      }
+      if (selectedDateFilter) {
+        setSelectedFilter("")
+      }
+    }
+     
+
     let queryParams = {};
+
     if (pkg.packageType === "free") {
       queryParams = {
         status: pkg?.isActive,
@@ -78,11 +102,29 @@ const Leads = () => {
         leadType: "paid",
       };
     }
+    if (type === "match") {
+      setSelectedFilter("")
+      
+      setSelectedFilter(value);
+      queryParams.filter = value;
+      queryParams.dateFilter = selectedDateFilter
+      
+    }
+    if (type === "date") {
+      setSelectedDateFilter("")
+      
+      setSelectedDateFilter(value);
+      queryParams.dateFilter = value;
+      queryParams.filter = selectedFilter;
+      
+    }
 
+    // console.log("queryParams :",queryParams)
     const res2 = await GetApiCall(
       `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
       queryParams
     );
+    // console.log("res :", res2);
 
     if (res2?.data?.statuscode === 200) {
       setLeads(res2?.data?.data?.leads);
@@ -95,16 +137,12 @@ const Leads = () => {
     if (!pagination) return;
 
     const nextPage = pagination.currentPage + 1;
-
     if (nextPage >= pagination.totalPages) {
       setHasMore(false);
       return;
     }
 
-    let queryParams = {
-      page: nextPage,
-      limit: pagination.pageSize,
-    };
+    let queryParams = { page: nextPage, limit: pagination.pageSize };
 
     if (selectedPackage) {
       if (selectedPackage?.packageType === "free") {
@@ -117,6 +155,10 @@ const Leads = () => {
         queryParams.status = selectedPackage?.isActive;
         queryParams.leadType = "paid";
       }
+    }
+
+    if (selectedFilter) {
+      queryParams.filter = selectedFilter
     }
 
     try {
@@ -133,6 +175,17 @@ const Leads = () => {
       console.error("LoadMore Error:", e);
     }
   };
+
+  const handleReset = () => {
+    setReset(true)
+    setSelectedDateFilter("")
+    setSelectedFilter("")
+    setTimeout(() => {
+      setReset(false)
+      handlePackageClick(selectedPackage)
+    }, 500);
+    
+  }
 
   return (
     <Box p={3}>
@@ -155,7 +208,7 @@ const Leads = () => {
             sx={{
               cursor: "pointer",
               border:
-                selectedPackage === brandPackage?.activePackage
+                selectedPackage?._id === brandPackage?.activePackage?._id
                   ? "2px solid #08612c"
                   : "2px solid transparent",
               borderRadius: 2,
@@ -173,11 +226,11 @@ const Leads = () => {
         {brandPackage?.oldPackageHistory?.length > 0 &&
           brandPackage?.oldPackageHistory.map((pkg, i) => (
             <Box
-              key={i}
+              key={pkg._id || i}
               sx={{
                 cursor: "pointer",
                 border:
-                  selectedPackage === pkg
+                  selectedPackage?._id === pkg._id
                     ? "2px solid #08612c"
                     : "2px solid transparent",
                 borderRadius: 2,
@@ -196,6 +249,24 @@ const Leads = () => {
             pagination={pagination}
             loadMore={loadMore}
             hasMore={hasMore}
+            leadsFilter={[
+              { label: "Category Investmentrange", value: "catInv" },
+              { label: "Category Location", value: "catLoc" },
+            ]}
+            dateFilter={[
+              { label: "Last 3 days", value: 3 },
+              { label: "Last 7 days", value: 7 },
+              { label: "Last 30 days", value: 30 },
+              { label: "All Leads", value: "all" },
+            ]}
+            selectedPackage={selectedPackage}
+            selectedFilter={selectedFilter}
+            setSelectedFilter={setSelectedFilter}
+            selectedDateFilter={selectedDateFilter}
+            setSelectedDateFilter={setSelectedDateFilter}
+            handlePackageClick={handlePackageClick}
+            handleReset={handleReset}
+            isReset={isReset}
           />
         ) : (
           <Typography

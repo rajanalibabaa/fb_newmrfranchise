@@ -52,7 +52,7 @@ const StatCard = ({ icon: Icon, title, value, borderColor }) => (
 const BrandHeader = ({ brandData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+//  console.log("===brandData=== :",brandData)
   return (
     <Card
       sx={{
