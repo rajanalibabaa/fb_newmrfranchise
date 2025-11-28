@@ -7,6 +7,7 @@ import { api } from "../../../../../Api/api";
 import PackageCard from "../../../../../ui/cards/PackageCard";
 import LeadsTableOutlet from "../../../../../ui/tables/LeadsTableOutlet";
 import { userId } from "../../../../../Utils/autherId";
+import ErrorPopup from "../../../../../ui/popup/ErrorPopup";
 
 const Leads = () => {
   const { search } = useLocation();
@@ -23,43 +24,55 @@ const Leads = () => {
   const [selectedDateFilter, setSelectedDateFilter] = useState("");
   const [isReset, setReset] = useState(false);
 
+  const [error, setError] = useState("");
+
+  const handleAxiosError = (err) => {
+    const msg =
+      err?.response?.data?.message ||
+      err?.message ||
+      "Something went wrong. Try again.";
+
+    setError(msg);
+  };
+
   const fetchBrandAndLeads = async (id) => {
-  try {
-    const res = await GetApiCall(
-      `${api.allBrandsApi.get.getBrandByID}/${id}`,
-      { paymentHistory: true }
-    );
-
-    const responseData = res?.data;
-
-    setBrandPackage(responseData?.data || null);
-    setSelectedPackage(responseData?.data?.activePackage);
-
-    if (responseData?.statuscode === 200) {
-      const res2 = await GetApiCall(
-        `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
-        {
-          packageStartDate:
-            responseData?.data?.activePackage?.packageUpdatedTime,
-        }
+    try {
+      const res = await GetApiCall(
+        `${api.allBrandsApi.get.getBrandByID}/${id}`,
+        { paymentHistory: true }
       );
 
-      if (res2?.data?.statuscode === 200) {
-        setLeads(res2?.data?.data.leads);
-        setPagination(res2?.data?.data.pagination);
-        setHasMore(true);
-      }
-    }
-  } catch (error) {
-    console.error("Error fetching brand:", error);
-  }
-};
+      const responseData = res?.data;
 
+      setBrandPackage(responseData?.data || null);
+      setSelectedPackage(responseData?.data?.activePackage);
+
+      if (responseData?.statuscode === 200) {
+        const res2 = await GetApiCall(
+          `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
+          {
+            packageStartDate:
+              responseData?.data?.activePackage?.packageUpdatedTime,
+          }
+        );
+
+        if (res2?.data?.statuscode === 200) {
+          setLeads(res2?.data?.data.leads);
+          setPagination(res2?.data?.data.pagination);
+          setHasMore(true);
+        }
+      } else {
+        setError("Server error");
+      }
+    } catch (error) {
+      console.error("Error fetching brand:", error);
+      handleAxiosError(error);
+    }
+  };
 
   useEffect(() => {
-  fetchBrandAndLeads(id);
-}, [id]);
-
+    fetchBrandAndLeads(id);
+  }, [id]);
 
   if (!brandPackage)
     return (
@@ -71,22 +84,14 @@ const Leads = () => {
   const handlePackageClick = async (pkg, type, value) => {
     setSelectedPackage(pkg);
 
-    const cheak1 = pkg?.packageUpdatedTime || pkg.packageStartTime
-    const cheak2 = selectedPackage?.packageUpdatedTime || selectedPackage.packageStartTime
+    const cheak1 = pkg?.packageUpdatedTime || pkg.packageStartTime;
+    const cheak2 =
+      selectedPackage?.packageUpdatedTime || selectedPackage.packageStartTime;
 
     if (cheak1 !== cheak2) {
-      setSelectedFilter("")
-      setSelectedDateFilter("")
-    } else {
-      if (selectedFilter) {
-        
-        setSelectedDateFilter("")
-      }
-      if (selectedDateFilter) {
-        setSelectedFilter("")
-      }
+      setSelectedFilter("");
+      setSelectedDateFilter("");
     }
-     
 
     let queryParams = {};
 
@@ -102,34 +107,37 @@ const Leads = () => {
         leadType: "paid",
       };
     }
+
     if (type === "match") {
-      setSelectedFilter("")
-      
+      setSelectedFilter("");
       setSelectedFilter(value);
       queryParams.filter = value;
-      queryParams.dateFilter = selectedDateFilter
-      
+      queryParams.dateFilter = selectedDateFilter;
     }
+
     if (type === "date") {
-      setSelectedDateFilter("")
-      
+      setSelectedDateFilter("");
       setSelectedDateFilter(value);
       queryParams.dateFilter = value;
       queryParams.filter = selectedFilter;
-      
     }
 
-    // console.log("queryParams :",queryParams)
-    const res2 = await GetApiCall(
-      `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
-      queryParams
-    );
-    // console.log("res :", res2);
+    try {
+      const res2 = await GetApiCall(
+        `${api.allBrandsApi.get.getleadsbybrandid}/${id}`,
+        queryParams
+      );
 
-    if (res2?.data?.statuscode === 200) {
-      setLeads(res2?.data?.data?.leads);
-      setPagination(res2?.data?.data?.pagination);
-      setHasMore(true);
+      if (res2?.data?.statuscode === 200) {
+        setLeads(res2?.data?.data?.leads);
+        setPagination(res2?.data?.data?.pagination);
+        setHasMore(true);
+      } else {
+        setError("Could not load leads.");
+      }
+    } catch (error) {
+      console.error("Package click error:", error);
+      handleAxiosError(error);
     }
   };
 
@@ -158,7 +166,7 @@ const Leads = () => {
     }
 
     if (selectedFilter) {
-      queryParams.filter = selectedFilter
+      queryParams.filter = selectedFilter;
     }
 
     try {
@@ -172,20 +180,21 @@ const Leads = () => {
         setPagination(res.data.data.pagination);
       }
     } catch (e) {
-      console.error("LoadMore Error:", e);
+      console.error("Load more error:", e);
+      handleAxiosError(e);
     }
   };
 
   const handleReset = () => {
-    setReset(true)
-    setSelectedDateFilter("")
-    setSelectedFilter("")
+    setReset(true);
+    setSelectedDateFilter("");
+    setSelectedFilter("");
+
     setTimeout(() => {
-      setReset(false)
-      handlePackageClick(selectedPackage)
+      setReset(false);
+      handlePackageClick(selectedPackage);
     }, 500);
-    
-  }
+  };
 
   return (
     <Box p={3}>
@@ -243,42 +252,38 @@ const Leads = () => {
       </Box>
 
       <Box mt={4}>
-        {Array.isArray(leads) && leads.length > 0 ? (
-          <LeadsTableOutlet
-            leads={leads}
-            pagination={pagination}
-            loadMore={loadMore}
-            hasMore={hasMore}
-            leadsFilter={[
-              { label: "Category Investmentrange", value: "catInv" },
-              { label: "Category Location", value: "catLoc" },
-            ]}
-            dateFilter={[
-              { label: "Last 3 days", value: 3 },
-              { label: "Last 7 days", value: 7 },
-              { label: "Last 30 days", value: 30 },
-              { label: "All Leads", value: "all" },
-            ]}
-            selectedPackage={selectedPackage}
-            selectedFilter={selectedFilter}
-            setSelectedFilter={setSelectedFilter}
-            selectedDateFilter={selectedDateFilter}
-            setSelectedDateFilter={setSelectedDateFilter}
-            handlePackageClick={handlePackageClick}
-            handleReset={handleReset}
-            isReset={isReset}
-          />
-        ) : (
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            textAlign="center"
-            mt={3}
-          >
-            No leads found
-          </Typography>
-        )}
+        <LeadsTableOutlet
+          leads={leads}
+          pagination={pagination}
+          loadMore={loadMore}
+          hasMore={hasMore}
+          leadsFilter={[
+            { label: "Category Investmentrange", value: "catInv" },
+            { label: "Category Location", value: "catLoc" },
+          ]}
+          dateFilter={[
+            { label: "Last 3 days", value: 3 },
+            { label: "Last 7 days", value: 7 },
+            { label: "Last 30 days", value: 30 },
+          ]}
+          selectedPackage={selectedPackage}
+          selectedFilter={selectedFilter}
+          setSelectedFilter={setSelectedFilter}
+          selectedDateFilter={selectedDateFilter}
+          setSelectedDateFilter={setSelectedDateFilter}
+          handlePackageClick={handlePackageClick}
+          handleReset={handleReset}
+          isReset={isReset}
+        />
       </Box>
+
+      {error && (
+        <ErrorPopup
+          message={error}
+          open={Boolean(error)}
+          onClose={() => setError("")}
+        />
+      )}
     </Box>
   );
 };

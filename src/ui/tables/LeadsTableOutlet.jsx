@@ -103,7 +103,7 @@ const LeadsTableOutlet = ({
               <TableCell sx={{ fontWeight: 800 }}>Email</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>Mobile</TableCell>
               <TableCell sx={{ fontWeight: 800 }}>Match Type</TableCell>
-              <TableCell sx={{ fontWeight: 800 }}>Sent At</TableCell>
+              <TableCell sx={{ fontWeight: 800 }}>Receive At</TableCell>
             </TableRow>
           </TableHead>
 
