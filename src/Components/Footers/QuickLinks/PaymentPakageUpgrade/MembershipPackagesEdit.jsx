@@ -20,10 +20,10 @@ import { ArrowBack, ArrowForward, Close, Home } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
 import {
   Check as CheckIcon,
-  Star as StarIcon,
-  Bolt as BoltIcon,
-  WorkspacePremium as PremiumIcon,
-  Diamond as DiamondIcon,
+  // Star as StarIcon,
+  // Bolt as BoltIcon,
+  // WorkspacePremium as PremiumIcon,
+  // Diamond as DiamondIcon,
   TrendingUp as TrendingUpIcon,
   AutoAwesome as AutoAwesomeIcon
 } from '@mui/icons-material';
@@ -33,6 +33,14 @@ import { userId } from '../../../../Utils/autherId';
 import { api } from '../../../../Api/api.jsx';
 import { GetApiCall } from '../../../../Api/DefaultApi.jsx';
 // import Navbar from '../../../Navbar/NavBar';
+
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
+import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
+import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
+import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import StarIcon from '@mui/icons-material/Star';  
+import BoltIcon from '@mui/icons-material/Bolt';
 // Animation keyframes
 const floatAnimation = keyframes`
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -67,12 +75,22 @@ const MembershipSelection = ({ }) => {
   const [error, setError] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
   const [activePackageName, setActivePackageName] = useState(null);
-  console.log("User ID in MembershipSelection:", packages);
+  const [activePackageEnddate, setActivePackageEnddate] = useState(null);
+
   const activeIndex = useMemo(() => {
     return packages.findIndex(pkg =>
       activePackageName && pkg.packageName.toLowerCase() === activePackageName.toLowerCase()
     );
   }, [activePackageName, packages]);
+
+  // Check if active package is expired
+  const isActivePackageExpired = useMemo(() => {
+    if (!activePackageEnddate) return true; // If no active package, treat as expired (enable all)
+    const endDate = new Date(activePackageEnddate);
+    const currentDate = new Date();
+    return endDate <= currentDate;
+  }, [activePackageEnddate]);
+
   useEffect(() => {
     const fetchActivePackages = async () => {
       try {
@@ -85,7 +103,10 @@ const MembershipSelection = ({ }) => {
         if (data && data.activePackage) {
            const activePackageNames = data.activePackage.packageType;
               setActivePackageName(activePackageNames);
-            console.log('Active Package Name:', activePackageName);
+              const endDate = data.activePackage.packageEndDate;
+              setActivePackageEnddate(endDate);
+            console.log('Active Package Name:', activePackageNames);
+            console.log('Active Package End Date:', endDate);
         }
  
       } catch (err) {
@@ -124,6 +145,10 @@ const MembershipSelection = ({ }) => {
           const membershipPkgs = [];
           if (packageData.packages && Array.isArray(packageData.packages)) {
             membershipPkgs.push(...packageData.packages.map(pkg => {
+              // Skip if packageName is 'free'
+              if (pkg.packageName.toLowerCase() === 'free') {
+                return null;
+              }
               // Capitalize and format display name (e.g., 'basicPro' -> 'Basic Pro')
               const displayName = pkg.packageName
                 .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -134,7 +159,7 @@ const MembershipSelection = ({ }) => {
                 packageName: pkg.packageName, // Keep original for config lookup
                 _id: pkg._id
               };
-            }));
+            }).filter(Boolean)); // Filter out null entries (free packages)
           }
           // Extract listing packages from array
           const listingPkgs = [];
@@ -163,70 +188,76 @@ const MembershipSelection = ({ }) => {
     fetchPackages();
   }, []);
   const tierConfig = {
-    'free': {
-      color: '#000000',
-      badgeColor: '#9ca3af',
-      popular: false,
-      icon: <CheckIcon />,
-      gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-      badgeGradient: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
-    },
-    'basic': {
-       color: '#000000',
-      badgeColor: '#ffffffff',
-      popular: false,
-      icon: <DiamondIcon />,
-      gradient: 'linear-gradient(135deg, #f5f5f5, #e5e5e5)',
-      badgeGradient: 'linear-gradient(135deg, #e5e5e5, #d4d4d4)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(192,192,192,0.1), transparent)',
-    },
-    'basicPro': {
-      color: '#FFD700',
-      badgeColor: '#FFD700',
-      popular: true,
-      icon: <PremiumIcon />,
-      gradient: 'linear-gradient(135deg, #bab190ff, #f0e68c)',
-      badgeGradient: 'linear-gradient(135deg, #fff8dc, #ffd700)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent)',
-    },
-    'silver': {
-      color: '#000000',
-      badgeColor: '#9ca3af',
-      popular: false,
-      icon: <DiamondIcon />,
-      gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-      badgeGradient: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
-    },
-    'gold': {
-      color: '#000000',
-      badgeColor: '#d4b01e',
-      popular: true,
-      icon: <PremiumIcon />,
-      gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-      badgeGradient: 'linear-gradient(135deg, #fef3c7, #fde68a)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
-    },
-    'platinum': {
-      color: '#000000',
-      badgeColor: '#a5b4fc',
-      popular: false,
-      icon: <StarIcon />,
-      gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-      badgeGradient: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
-    },
-    'exclusive': {
-      color: '#000000',
-      badgeColor: '#f59e0b',
-      popular: false,
-      icon: <BoltIcon />,
-      gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
-      badgeGradient: 'linear-gradient(135deg, #fef3c7, #fcd34d)',
-      shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
-    }
-  };
+  free: {
+    color: '#000000',
+    badgeColor: '#9ca3af',
+    popular: false,
+    icon: <CheckCircleIcon />,
+    gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+    badgeGradient: 'linear-gradient(135deg, #f3f4f6, #e5e7eb)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+  },
+
+  basic: {
+    color: '#000000',
+    badgeColor: '#C0C0C0',
+    popular: false,
+    icon: <WorkspacePremiumOutlinedIcon />,
+    gradient: 'linear-gradient(135deg, #f5f5f5, #e5e5e5)',
+    badgeGradient: 'linear-gradient(135deg, #e5e5e5, #d4d4d4)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(192,192,192,0.1), transparent)',
+  },
+
+  basicPro: {
+    color: '#FFD700',
+    badgeColor: '#FFD700',
+    popular: true,
+    icon: <WorkspacePremiumIcon />, // ⭐ NEW PREMIUM ICON
+    gradient: 'linear-gradient(135deg, #fff8dc, #f0e68c)',
+    badgeGradient: 'linear-gradient(135deg, #fff8dc, #ffd700)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.1), transparent)',
+  },
+
+  silver: {
+    color: '#000000',
+    badgeColor: '#9ca3af',
+    popular: false,
+    icon: <MilitaryTechIcon />,
+    gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+    badgeGradient: 'linear-gradient(135deg, #e5e7eb, #d1d5db)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+  },
+
+  gold: {
+    color: '#000000',
+    badgeColor: '#d4b01e',
+    popular: true,
+    icon: <EmojiEventsIcon />,
+    gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+    badgeGradient: 'linear-gradient(135deg, #fef3c7, #fde68a)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+  },
+
+  platinum: {
+    color: '#000000',
+    badgeColor: '#a5b4fc',
+    popular: false,
+    icon: <StarIcon />,
+    gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+    badgeGradient: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+  },
+
+  exclusive: {
+    color: '#000000',
+    badgeColor: '#f59e0b',
+    popular: false,
+    icon: <BoltIcon />,
+    gradient: 'linear-gradient(135deg, #ffffff, #f8f9fa)',
+    badgeGradient: 'linear-gradient(135deg, #fef3c7, #fcd34d)',
+    shineGradient: 'linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent)',
+  },
+};
   const listingConfig = {
     color: '#065f46',
     badgeColor: '#10b981',
@@ -545,7 +576,7 @@ const MembershipSelection = ({ }) => {
       {/* Main Content */}
       <Box>
         {/* Header Section */}
-        <Box textAlign="center" mb={8}>
+        <Box textAlign="center" mb={4}>
           <Typography
             variant="h2"
             fontWeight="bold"
@@ -556,11 +587,11 @@ const MembershipSelection = ({ }) => {
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              fontSize: { xs: '2.5rem', md: '3.5rem' },
+              fontSize: { xs: '2.1rem', md: '3rem' },
               animation: `${shimmerAnimation} 3s ease-in-out infinite`,
             }}
           >
-            Choose Your Perfect Plan
+            Choose Your Perfect Plan 
           </Typography>
           <Typography
             variant="h6"
@@ -568,7 +599,7 @@ const MembershipSelection = ({ }) => {
             sx={{
               maxWidth: 600,
               mx: 'auto',
-              fontSize: { xs: '1rem', md: '1.25rem' },
+              fontSize: { xs: '1rem', md: '1.10rem' },
               lineHeight: 1.6
             }}
           >
@@ -585,8 +616,9 @@ const MembershipSelection = ({ }) => {
             const isPopular = config.popular;
             const isHovered = hoveredCard === pkg._id;
             const isActive = activePackageName && pkg.packageName.toLowerCase() === activePackageName.toLowerCase();
-            const isDisabled = activeIndex >= 0 && index <= activeIndex;
-            console.log("Active Index:", activeIndex, "Current Index:", index, "Is Disabled:", isDisabled);
+            // Only disable if package is not expired and this is a lower/equal tier
+            const isDisabled = !isActivePackageExpired && activeIndex >= 0 && index <= activeIndex;
+            console.log("Active Index:", isActivePackageExpired);
             return (
               <Grid item xs={12} md={6} lg={4} key={pkg._id}>
                 <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
@@ -647,18 +679,18 @@ const MembershipSelection = ({ }) => {
                       }}
                     />
                     {/* Active Badge */}
-                    {isActive && (
+                    {isActive && !isActivePackageExpired  && (
                       <Box
                         sx={{
                           position: 'absolute',
-                          top: 10,
-                          left: 10,
+                          top: 7,
+                          left: 6,
                           background: 'linear-gradient(135deg, #10b981, #059669)',
                           color: 'white',
-                          px: 1,
-                          py: 0.5,
+                          px: 0.5,
+                          py: 0.4,
                           borderRadius: 3,
-                          fontSize: '0.7rem',
+                          fontSize: '0.6rem',
                           fontWeight: 'bold',
                           textTransform: 'uppercase',
                           zIndex: 2,
@@ -668,7 +700,7 @@ const MembershipSelection = ({ }) => {
                           alignItems: 'center',
                         }}
                       >
-                        <CheckIcon sx={{ fontSize: 14, mr: 0.5 }} />
+                        <CheckIcon sx={{ fontSize: 12, mr: 0.5 }} />
                         Active
                       </Box>
                     )}
@@ -677,15 +709,15 @@ const MembershipSelection = ({ }) => {
                       <Box
                         sx={{
                           position: 'absolute',
-                          top: -8,
-                          left: '50%',
+                          top: -4,
+                          left: '60%',
                           transform: 'translateX(-50%)',
                           background: config.badgeGradient,
                           color: theme.palette.getContrastText(config.badgeColor),
-                          px: 3,
-                          py: 1,
+                          px: 1,
+                          py: 0.5,
                           borderRadius: 4,
-                          fontSize: '0.75rem',
+                          fontSize: '0.60rem',
                           fontWeight: 'bold',
                           textTransform: 'uppercase',
                           letterSpacing: 1,
@@ -715,8 +747,8 @@ const MembershipSelection = ({ }) => {
                       />
                     )}
                     <CardContent sx={{
-                      p: 4,
-                      height: '100%',
+                      p: 2,
+                      height: '50%',
                       display: 'flex',
                       flexDirection: 'column',
                       position: 'relative',
@@ -727,8 +759,8 @@ const MembershipSelection = ({ }) => {
                       <Box textAlign="center">
                         <Box
                           sx={{
-                            width: 100,
-                            height: 100,
+                            width: 60,
+                            height: 60,
                             borderRadius: '50%',
                             background: config.badgeGradient,
                             display: 'flex',
@@ -759,9 +791,10 @@ const MembershipSelection = ({ }) => {
                           {config.icon}
                         </Box>
                         <Typography
-                          variant="h4"
+                          variant="h5"
                           fontWeight="bold"
                           gutterBottom
+                         
                           sx={{
                             color: config.color,
                           }}
@@ -780,7 +813,7 @@ const MembershipSelection = ({ }) => {
                           variant="h1"
                           fontWeight="bold"
                           sx={{
-                            fontSize: '3.5rem',
+                            fontSize: '2rem',
                             color: config.color,
                             textShadow: `0 4px 8px ${alpha(config.badgeColor, 0.2)}`,
                           }}
@@ -790,14 +823,14 @@ const MembershipSelection = ({ }) => {
                       </Box>
                       <Divider
                         sx={{
-                          my: 3,
+                          my: 1,
                           background: `linear-gradient(90deg, transparent, ${config.badgeColor}, transparent)`,
                           height: 2,
                           border: 'none',
                         }}
                       />
                       {/* Key Metrics with staggered animations */}
-                      <Stack spacing={2} mb={3}>
+                      <Stack spacing={0} mb={2}>
                         {[
                           { label: 'Monthly Leads:', value: pkg.perMonthLead },
                           { label: 'Total Leads:', value: pkg.totalLeads },
@@ -882,7 +915,8 @@ const MembershipSelection = ({ }) => {
                           }
                         }}
                       >
-                        {!isDisabled ? 'Upgrade' : 'Select Plan'}
+
+                        {!isDisabled  && !isActivePackageExpired ? 'Upgrade' : 'Select'}
                       </Button>
                     </CardContent>
                   </Card>
