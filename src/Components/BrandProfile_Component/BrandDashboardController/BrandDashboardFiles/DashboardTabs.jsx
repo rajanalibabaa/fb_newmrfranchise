@@ -34,14 +34,14 @@ const DashboardTabs = ({ brandData}) => {
     setTabValue(newValue);
   };
 
-  const getTabCount = (tabIndex) => {
-    switch (tabIndex) {
-      case 0:
-        return brandData?.brandDetails?.overAllLeads ? brandData?.brandDetails?.overAllLeads : 0;
-      default:
-        return 0;
-    }
-  };
+  // const getTabCount = (tabIndex) => {
+  //   switch (tabIndex) {
+  //     case 0:
+  //       return brandData?.brandDetails?.overAllLeads ? brandData?.brandDetails?.overAllLeads : 0;
+  //     default:
+  //       return 0;
+  //   }
+  // };
 
   const renderTabLabel = (label, index) => (
     <Box sx={{ 
