@@ -31,7 +31,7 @@ const LeadsTableOutlet = ({
   isReset,
 }) => {
   const observer = useRef();
-
+  console.log("selectedPackage :", selectedPackage);
   const lastRowRef = useCallback(
     (node) => {
       if (loading) return;
@@ -51,24 +51,26 @@ const LeadsTableOutlet = ({
   return (
     <Paper sx={{ padding: 2 }}>
       <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2, gap: 2 }}>
-        <FormControl size="small" sx={{ width: 180 }}>
-          <Select
-            value={selectedFilter}
-            onChange={(e) =>
-              handlePackageClick(selectedPackage, "match", e.target.value)
-            }
-            displayEmpty
-          >
-            <MenuItem value="" disabled>
-              Leads Match Filter
-            </MenuItem>
-            {leadsFilter.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
+        {selectedPackage?.packageType !== "free" && (
+          <FormControl size="small" sx={{ width: 180 }}>
+            <Select
+              value={selectedFilter}
+              onChange={(e) =>
+                handlePackageClick(selectedPackage, "match", e.target.value)
+              }
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Leads Match Filter
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {leadsFilter.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        )}
 
         {selectedPackage?.isActive && (
           <FormControl size="small" sx={{ width: 180 }}>
@@ -90,9 +92,12 @@ const LeadsTableOutlet = ({
             </Select>
           </FormControl>
         )}
-        <Button onClick={handleReset}>
-          {isReset ? <CircularProgress size={14} /> : "Reset"}
-        </Button>
+
+        {selectedPackage?.packageType !== "free" && (
+          <Button onClick={handleReset}>
+            {isReset ? <CircularProgress size={14} /> : "Reset"}
+          </Button>
+        )}
       </Box>
 
       <TableContainer style={{ maxHeight: "50vh", overflow: "auto" }}>
