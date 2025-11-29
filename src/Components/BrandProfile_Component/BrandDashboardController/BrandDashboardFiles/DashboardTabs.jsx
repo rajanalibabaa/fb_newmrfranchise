@@ -78,7 +78,7 @@ const DashboardTabs = ({ brandData}) => {
           {label}
         </Typography>
       </Box>
-      <Box
+      {/* <Box
         sx={{
           backgroundColor: "#39da39ff",
           color: "#111b14ff",
@@ -86,7 +86,7 @@ const DashboardTabs = ({ brandData}) => {
           width: isMobile ? 20 : 24,
           height: isMobile ? 20 : 24,
           display: "flex",
-          alignItems: "center",
+          alignItems: "center", 
           justifyContent: "center",
           fontSize: isMobile ? "0.65rem" : "0.75rem",
           ml: isMobile ? 0 : 0.5,
@@ -95,7 +95,7 @@ const DashboardTabs = ({ brandData}) => {
         }}
       >
         {getTabCount(index)}
-      </Box>
+      </Box> */}
     </Box>
   );
 
