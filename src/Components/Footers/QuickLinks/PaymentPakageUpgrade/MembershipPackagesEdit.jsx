@@ -926,201 +926,6 @@ const MembershipSelection = ({ }) => {
           })}
         </Grid>
         {/* Listing Packages */}
-       {listingPackages.length > 0 && (
-          <Box mb={8}>
-            <Box textAlign="center" mb={6}>
-              <Typography
-                variant="h3"
-                fontWeight="bold"
-                gutterBottom
-                sx={{
-                  color: '#000000',
-                }}
-              >
-                Listing Packages
-              </Typography>
-              <Typography variant="h6" color="text.secondary">
-                Simple listing solutions for your business
-              </Typography>
-            </Box>
-            <Grid container spacing={3} justifyContent="center">
-              {listingPackages.map((pkg, index) => {
-                const isSelected = selectedListing?._id === pkg._id;
-                const config = listingConfig;
-                const isHovered = hoveredCard === pkg._id;
-                return (
-                  <Grid item xs={12} md={8} lg={6} key={pkg._id}>
-                    <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
-                      <Card
-                        onMouseEnter={() => setHoveredCard(pkg._id)}
-                        onMouseLeave={() => setHoveredCard(null)}
-                        onClick={() => handlePlanSelect(pkg, true)}
-                        sx={{
-                          border: isSelected ? `3px solid ${config.badgeColor}` : '2px solid #e5e7eb',
-                          borderColor: isSelected ? config.badgeColor : '#e5e7eb',
-                          background: config.gradient,
-                          transition: 'all 0.4s ease',
-                          position: 'relative',
-                          overflow: 'hidden',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            transform: 'translateY(-8px) scale(1.02)',
-                            boxShadow: `0 25px 50px -12px ${alpha(config.badgeColor, 0.3)}`,
-                            borderColor: config.badgeColor,
-                          },
-                          transform: isHovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
-                          '&::before': {
-                            content: '""',
-                            position: 'absolute',
-                            top: 0,
-                            left: '-100%',
-                            width: '100%',
-                            height: '100%',
-                            background: config.shineGradient,
-                            transition: 'left 0.8s ease',
-                            zIndex: 1,
-                          },
-                          '&:hover::before': {
-                            left: '100%',
-                          }
-                        }}
-                      >
-                        {/* Selection Glow Effect */}
-                        {isSelected && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: -2,
-                              left: -2,
-                              right: -2,
-                              bottom: -2,
-                              borderRadius: 'inherit',
-                              background: `conic-gradient(from 0deg, ${config.badgeColor}, ${alpha(config.badgeColor, 0.3)}, ${config.badgeColor})`,
-                              animation: `${glowAnimation} 2s ease-in-out infinite`,
-                              zIndex: 0,
-                            }}
-                          />
-                        )}
-                        {/* Selection Indicator */}
-                        {isSelected && (
-                          <Box
-                            sx={{
-                              position: 'absolute',
-                              top: 19,
-                              right: 20,
-                              width: 24,
-                              height: 24,
-                              borderRadius: '50%',
-                              background: config.badgeGradient,
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              zIndex: 2,
-                              animation: `${pulseAnimation} 2s ease-in-out infinite`,
-                            }}
-                          >
-                            <CheckIcon sx={{ fontSize: 16, color: config.color }} />
-                          </Box>
-                        )}
-                        <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
-                          <Box mb={3}>
-                            <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ color: config.color }}>
-                              {pkg.name}
-                            </Typography>
-                          </Box>
-                          <Box
-                            sx={{
-                              background: config.badgeGradient,
-                              p: 3,
-                              borderRadius: 2,
-                              textAlign: 'center',
-                              mb: 3,
-                              position: 'relative',
-                              overflow: 'hidden',
-                              transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                              transition: 'transform 0.3s ease',
-                              '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
-                                transition: 'left 0.8s ease',
-                              },
-                              '&:hover::before': {
-                                left: '100%',
-                              }
-                            }}
-                          >
-                            <Typography variant="h2" fontWeight="bold" sx={{ color: config.color }} gutterBottom>
-                              ₹{pkg.amount}
-                            </Typography>
-                          </Box>
-                          <Stack direction="row" spacing={4} justifyContent="center">
-                            <Box textAlign="center">
-                              <Typography variant="body2" color="text.secondary">Duration</Typography>
-                              <Typography variant="h6" fontWeight="bold" sx={{ color: config.color }}>
-                                {pkg.periodMonths} Months
-                              </Typography>
-                            </Box>
-                          </Stack>
-                          {/* Select Button with enhanced effects - Added for consistency */}
-                          <Button
-                            fullWidth
-                            variant={isSelected ? "contained" : "outlined"}
-                            startIcon={isSelected ? <CheckIcon /> : <AutoAwesomeIcon />}
-                            sx={{
-                              py: 2,
-                              mt: 2,
-                              borderRadius: 3,
-                              fontSize: '1.1rem',
-                              fontWeight: 'bold',
-                              background: isSelected ? config.badgeGradient : 'transparent',
-                              border: isSelected ? 'none' : `2px solid ${config.badgeColor}`,
-                              color: isSelected ? theme.palette.getContrastText(config.badgeColor) : config.badgeColor,
-                              position: 'relative',
-                              overflow: 'hidden',
-                              transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-                              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                              boxShadow: isSelected ?
-                                `0 8px 25px ${alpha(config.badgeColor, 0.4)}` :
-                                `0 4px 15px ${alpha(config.badgeColor, 0.2)}`,
-                              '&::before': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: '-100%',
-                                width: '100%',
-                                height: '100%',
-                                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                                transition: 'left 0.8s ease',
-                              },
-                              '&:hover': {
-                                background: isSelected ? config.badgeGradient : alpha(config.badgeColor, 0.1),
-                                transform: 'scale(1.05)',
-                                boxShadow: `0 12px 35px ${alpha(config.badgeColor, 0.5)}`,
-                                '&::before': {
-                                  left: '100%',
-                                }
-                              },
-                              '&:active': {
-                                transform: 'scale(0.98)',
-                              }
-                            }}
-                          >
-                            {isSelected ? 'Selected' : 'Select Plan'}
-                          </Button>
-                        </CardContent>
-                      </Card>
-                    </Fade>
-                  </Grid>
-                );
-              })}
-            </Grid>
-          </Box>
-        )}
     
       </Box>
     </Container>
@@ -1128,3 +933,200 @@ const MembershipSelection = ({ }) => {
   );
 };
 export default MembershipSelection;
+
+  //  {listingPackages.length > 0 && (
+  //         <Box mb={8}>
+  //           <Box textAlign="center" mb={6}>
+  //             <Typography
+  //               variant="h3"
+  //               fontWeight="bold"
+  //               gutterBottom
+  //               sx={{
+  //                 color: '#000000',
+  //               }}
+  //             >
+  //               Listing Packages
+  //             </Typography>
+  //             <Typography variant="h6" color="text.secondary">
+  //               Simple listing solutions for your business
+  //             </Typography>
+  //           </Box>
+  //           <Grid container spacing={3} justifyContent="center">
+  //             {listingPackages.map((pkg, index) => {
+  //               const isSelected = selectedListing?._id === pkg._id;
+  //               const config = listingConfig;
+  //               const isHovered = hoveredCard === pkg._id;
+  //               return (
+  //                 <Grid item xs={12} md={8} lg={6} key={pkg._id}>
+  //                   <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
+  //                     <Card
+  //                       onMouseEnter={() => setHoveredCard(pkg._id)}
+  //                       onMouseLeave={() => setHoveredCard(null)}
+  //                       onClick={() => handlePlanSelect(pkg, true)}
+  //                       sx={{
+  //                         border: isSelected ? `3px solid ${config.badgeColor}` : '2px solid #e5e7eb',
+  //                         borderColor: isSelected ? config.badgeColor : '#e5e7eb',
+  //                         background: config.gradient,
+  //                         transition: 'all 0.4s ease',
+  //                         position: 'relative',
+  //                         overflow: 'hidden',
+  //                         cursor: 'pointer',
+  //                         '&:hover': {
+  //                           transform: 'translateY(-8px) scale(1.02)',
+  //                           boxShadow: `0 25px 50px -12px ${alpha(config.badgeColor, 0.3)}`,
+  //                           borderColor: config.badgeColor,
+  //                         },
+  //                         transform: isHovered ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
+  //                         '&::before': {
+  //                           content: '""',
+  //                           position: 'absolute',
+  //                           top: 0,
+  //                           left: '-100%',
+  //                           width: '100%',
+  //                           height: '100%',
+  //                           background: config.shineGradient,
+  //                           transition: 'left 0.8s ease',
+  //                           zIndex: 1,
+  //                         },
+  //                         '&:hover::before': {
+  //                           left: '100%',
+  //                         }
+  //                       }}
+  //                     >
+  //                       {/* Selection Glow Effect */}
+  //                       {isSelected && (
+  //                         <Box
+  //                           sx={{
+  //                             position: 'absolute',
+  //                             top: -2,
+  //                             left: -2,
+  //                             right: -2,
+  //                             bottom: -2,
+  //                             borderRadius: 'inherit',
+  //                             background: `conic-gradient(from 0deg, ${config.badgeColor}, ${alpha(config.badgeColor, 0.3)}, ${config.badgeColor})`,
+  //                             animation: `${glowAnimation} 2s ease-in-out infinite`,
+  //                             zIndex: 0,
+  //                           }}
+  //                         />
+  //                       )}
+  //                       {/* Selection Indicator */}
+  //                       {isSelected && (
+  //                         <Box
+  //                           sx={{
+  //                             position: 'absolute',
+  //                             top: 19,
+  //                             right: 20,
+  //                             width: 24,
+  //                             height: 24,
+  //                             borderRadius: '50%',
+  //                             background: config.badgeGradient,
+  //                             display: 'flex',
+  //                             alignItems: 'center',
+  //                             justifyContent: 'center',
+  //                             zIndex: 2,
+  //                             animation: `${pulseAnimation} 2s ease-in-out infinite`,
+  //                           }}
+  //                         >
+  //                           <CheckIcon sx={{ fontSize: 16, color: config.color }} />
+  //                         </Box>
+  //                       )}
+  //                       <CardContent sx={{ p: 4, position: 'relative', zIndex: 2 }}>
+  //                         <Box mb={3}>
+  //                           <Typography variant="h4" fontWeight="bold" gutterBottom sx={{ color: config.color }}>
+  //                             {pkg.name}
+  //                           </Typography>
+  //                         </Box>
+  //                         <Box
+  //                           sx={{
+  //                             background: config.badgeGradient,
+  //                             p: 3,
+  //                             borderRadius: 2,
+  //                             textAlign: 'center',
+  //                             mb: 3,
+  //                             position: 'relative',
+  //                             overflow: 'hidden',
+  //                             transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+  //                             transition: 'transform 0.3s ease',
+  //                             '&::before': {
+  //                               content: '""',
+  //                               position: 'absolute',
+  //                               top: 0,
+  //                               left: '-100%',
+  //                               width: '100%',
+  //                               height: '100%',
+  //                               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)',
+  //                               transition: 'left 0.8s ease',
+  //                             },
+  //                             '&:hover::before': {
+  //                               left: '100%',
+  //                             }
+  //                           }}
+  //                         >
+  //                           <Typography variant="h2" fontWeight="bold" sx={{ color: config.color }} gutterBottom>
+  //                             ₹{pkg.amount}
+  //                           </Typography>
+  //                         </Box>
+  //                         <Stack direction="row" spacing={4} justifyContent="center">
+  //                           <Box textAlign="center">
+  //                             <Typography variant="body2" color="text.secondary">Duration</Typography>
+  //                             <Typography variant="h6" fontWeight="bold" sx={{ color: config.color }}>
+  //                               {pkg.periodMonths} Months
+  //                             </Typography>
+  //                           </Box>
+  //                         </Stack>
+  //                         {/* Select Button with enhanced effects - Added for consistency */}
+  //                         <Button
+  //                           fullWidth
+  //                           variant={isSelected ? "contained" : "outlined"}
+  //                           startIcon={isSelected ? <CheckIcon /> : <AutoAwesomeIcon />}
+  //                           sx={{
+  //                             py: 2,
+  //                             mt: 2,
+  //                             borderRadius: 3,
+  //                             fontSize: '1.1rem',
+  //                             fontWeight: 'bold',
+  //                             background: isSelected ? config.badgeGradient : 'transparent',
+  //                             border: isSelected ? 'none' : `2px solid ${config.badgeColor}`,
+  //                             color: isSelected ? theme.palette.getContrastText(config.badgeColor) : config.badgeColor,
+  //                             position: 'relative',
+  //                             overflow: 'hidden',
+  //                             transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+  //                             transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+  //                             boxShadow: isSelected ?
+  //                               `0 8px 25px ${alpha(config.badgeColor, 0.4)}` :
+  //                               `0 4px 15px ${alpha(config.badgeColor, 0.2)}`,
+  //                             '&::before': {
+  //                               content: '""',
+  //                               position: 'absolute',
+  //                               top: 0,
+  //                               left: '-100%',
+  //                               width: '100%',
+  //                               height: '100%',
+  //                               background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+  //                               transition: 'left 0.8s ease',
+  //                             },
+  //                             '&:hover': {
+  //                               background: isSelected ? config.badgeGradient : alpha(config.badgeColor, 0.1),
+  //                               transform: 'scale(1.05)',
+  //                               boxShadow: `0 12px 35px ${alpha(config.badgeColor, 0.5)}`,
+  //                               '&::before': {
+  //                                 left: '100%',
+  //                               }
+  //                             },
+  //                             '&:active': {
+  //                               transform: 'scale(0.98)',
+  //                             }
+  //                           }}
+  //                         >
+  //                           {isSelected ? 'Selected' : 'Select Plan'}
+  //                         </Button>
+  //                       </CardContent>
+  //                     </Card>
+  //                   </Fade>
+  //                 </Grid>
+  //               );
+  //             })}
+  //           </Grid>
+  //         </Box>
+  //       )}
+    
