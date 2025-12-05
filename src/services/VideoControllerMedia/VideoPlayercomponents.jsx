@@ -257,7 +257,7 @@ export const VideoPlayer = ({
 
       {/* Bottom controls */}
       {showControls && (
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 1, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: 0 }}>
           {/* <IconButton onClick={togglePlayPause} sx={{ color: 'white' }}>{isPlaying ? <Pause /> : <PlayArrow />}</IconButton> */}
           <IconButton onClick={toggleMute} sx={{ color: 'white' }}>{isMuted ? <VolumeOff /> : <VolumeUp />}</IconButton>
           <Box sx={{ color: 'white', fontSize: '0.75rem' }}>

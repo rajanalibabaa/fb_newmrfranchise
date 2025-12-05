@@ -437,9 +437,9 @@ const scrollToSection = (ref) => {
                   sx={{ mb: 0, mr: 0 }}
                 />
 
-                {filters.subcat === subCategory && (
+                {/* {filters.subcat === subCategory && (
                   <Collapse in={filters.subcat === subCategory}>
-                    <Accordion
+                   <Accordion
                       expanded={expandedSections.subCategory}
                       disableGutters
                       elevation={0}
@@ -457,7 +457,7 @@ const scrollToSection = (ref) => {
                           "& .MuiAccordionSummary-content": { my: "2px" },
                         }}
                       />
-
+         
                       <AccordionDetails sx={{ pt: 0, px: 1 }}>
                         {loadingChildCategories ? (
                           <Box sx={{ p: 2 }}>
@@ -469,7 +469,7 @@ const scrollToSection = (ref) => {
                             onChange={(e) => onFilterChange("childcat", e.target.value)}
                           >
                             {/* 🔤 Sort child categories alphabetically */}
-                            {[...childCategories]
+                         {/* {[...childCategories]
                               .sort((a, b) => a.localeCompare(b))
                               .map((childCategory) => (
                                 <FormControlLabel
@@ -492,13 +492,13 @@ const scrollToSection = (ref) => {
                                   }
                                   sx={{ mb: 0, mr: 0 }}
                                 />
-                              ))}
-                          </RadioGroup>
+                              ))}  */}
+                           {/* </RadioGroup>
                         )}
                       </AccordionDetails>
-                    </Accordion>
+                    </Accordion> 
                   </Collapse>
-                )}
+                )} */} 
               </Box>
             ))}
         </RadioGroup>
