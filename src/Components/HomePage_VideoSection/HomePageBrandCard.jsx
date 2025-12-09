@@ -323,7 +323,7 @@ const HomePageBrandCard = React.memo(
                 {brandName}
               </Typography>
 
-              {category?.child && (
+              {category?.sub && (
                 <Box sx={{ mb: 2 }}>
                   <Stack
                     direction="row"
@@ -332,7 +332,7 @@ const HomePageBrandCard = React.memo(
                     alignItems="center"
                   >
                     <Chip
-                      label={category.child}
+                      label={category.sub}
                       size="small"
                       sx={{
                         bgcolor: "rgba(255, 152, 0, 0.1)",
