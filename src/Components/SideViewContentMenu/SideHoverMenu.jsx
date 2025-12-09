@@ -24,21 +24,22 @@ import { categories } from "../../Pages/Registration/BrandLIstingRegister/BrandC
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
-import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData.jsx"; // Import for fetching subcategories
-import { setFilter, fetchFilteredBrands } from "../../Redux/Slices/filterBrandSlice"; // Import filter actions
+import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData.jsx";
+import { setFilter, fetchFilteredBrands } from "../../Redux/Slices/filterBrandSlice";
 
 // Memoized brand card component with optimized props
 const BrandCard = React.memo(
   ({ brand, onClick, isMobile }) => {
-
-
-    console.log("brandcard", brand)
     const brandName = brand.brandname || "Unknown";
     const brandLogo = brand.logo || "";
     const initial = brandName[0]?.toUpperCase() || "B";
 
     return (
-      <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+      <motion.div 
+        whileHover={{ y: -4 }} 
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+      >
         <Paper
           onClick={onClick}
           elevation={2}
@@ -109,7 +110,6 @@ const BrandCard = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if brand ID changes or mobile status changes
     return (
       prevProps.brand.uuid === nextProps.brand.uuid &&
       prevProps.isMobile === nextProps.isMobile
@@ -141,16 +141,10 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
     brands, 
     loading, 
     error, 
-    pagination,
-    filters 
+    pagination
   } = useSelector((state) => state.filterBrands);
 
-
-  console.log("brands:" ,brands)
-
   const { 
-    subCategories: filterSubCategories,
-    childCategories: filterChildCategories,
     loading: filterLoading 
   } = useSelector((state) => state.filterDropdown);
 
@@ -158,7 +152,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
-  // Handle category hover - fetch subcategories for that category
+  // Handle category hover - only fetch subcategories
   const handleCategoryHover = useCallback(
     async (index, categoryName) => {
       if (activeCategory !== index) {
@@ -169,7 +163,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
         setActiveSubCategory(null);
         setAvailableChildCategories([]);
         
-        // Reset brand filters but keep the main category
+        // Clear brand filters
         dispatch(setFilter({ filterName: "subcat", value: null }));
         dispatch(setFilter({ filterName: "childcat", value: null }));
         
@@ -189,31 +183,19 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
     [activeCategory, dispatch]
   );
 
-  // Handle subcategory hover - fetch child categories and brands
+  // Handle subcategory hover - fetch brands
   const handleSubCategoryHover = useCallback(
     async (subCategoryName) => {
       if (activeSubCategory !== subCategoryName) {
-        setActiveSubCategory(subCategoryName);
         setIsTransitioning(true);
+        setActiveSubCategory(subCategoryName);
         
         // Set the subcategory filter
         dispatch(setFilter({ filterName: "subcat", value: subCategoryName }));
         dispatch(setFilter({ filterName: "childcat", value: null }));
         
-        // Fetch child categories for this subcategory
+        // Fetch brands for this subcategory
         try {
-          const result = await dispatch(fetchFilterOptions({ 
-            main: categories[activeCategory]?.name || "Food & Beverages",
-            sub: subCategoryName 
-          }));
-
-          console.log("result",result)
-          
-          if (result.payload) {
-            setAvailableChildCategories(result.payload || []);
-          }
-          
-          // Fetch brands for this subcategory
           await dispatch(fetchFilteredBrands({
             maincat: categories[activeCategory]?.name || "Food & Beverages",
             subcat: subCategoryName,
@@ -221,8 +203,18 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
             limit: 30
           }));
           
+          // Fetch child categories for this subcategory
+          const result = await dispatch(fetchFilterOptions({ 
+            main: categories[activeCategory]?.name || "Food & Beverages",
+            sub: subCategoryName 
+          }));
+          
+          if (result.payload) {
+            setAvailableChildCategories(result.payload || []);
+          }
+          
         } catch (error) {
-          console.error("Failed to fetch data:", error);
+          console.error("Failed to fetch brands:", error);
         } finally {
           setIsTransitioning(false);
         }
@@ -232,7 +224,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
   );
 
   // Handle child category selection
-  const handleChildCategoryHover = useCallback(
+  const handleChildCategoryClick = useCallback(
     async (childCategoryName) => {
       setIsTransitioning(true);
       
@@ -268,14 +260,16 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
   const handleLoadMore = useCallback(() => {
     if (pagination.hasNext) {
       dispatch(fetchFilteredBrands({
-        ...filters,
+        maincat: categories[activeCategory]?.name || "Food & Beverages",
+        subcat: activeSubCategory,
+        childcat: null,
         page: pagination.currentPage + 1,
         limit: pagination.limit
       }));
     }
-  }, [pagination, filters, dispatch]);
+  }, [pagination, activeCategory, activeSubCategory, dispatch]);
 
-  // Clear brands when drawer closes
+  // Clear data when drawer closes
   useEffect(() => {
     if (!hoverCategory) {
       setActiveCategory(null);
@@ -283,26 +277,10 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
       setMobileTabValue(0);
       setAvailableSubCategories([]);
       setAvailableChildCategories([]);
-      // Reset filters
       dispatch(setFilter({ filterName: "subcat", value: null }));
       dispatch(setFilter({ filterName: "childcat", value: null }));
     }
   }, [hoverCategory, dispatch]);
-
-  // Fetch initial subcategories when category is selected
-  useEffect(() => {
-    if (activeCategory !== null && hoverCategory) {
-      const categoryName = categories[activeCategory]?.name;
-      if (categoryName) {
-        dispatch(fetchFilterOptions({ main: categoryName }))
-          .then((result) => {
-            if (result.payload) {
-              setAvailableSubCategories(result.payload.subcat || []);
-            }
-          });
-      }
-    }
-  }, [activeCategory, hoverCategory, dispatch]);
 
   // Memoized mobile tab content
   const getMobileTabContent = useMemo(() => {
@@ -425,8 +403,37 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
     theme.shadows,
   ]);
 
-  // Optimized brands grid rendering with skeleton loading
-  const renderBrandsGrid = useMemo(() => {
+  // Content when only category is selected (no subcategory hovered)
+  const renderCategoryContent = useMemo(() => {
+    return (
+      <Fade in={true} timeout={500}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            color: "text.secondary",
+            textAlign: "center",
+            p: 3,
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            {categories[activeCategory]?.name || "Select Category"}
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 4, maxWidth: 400 }}>
+            Hover over a subcategory to see available brands
+          </Typography>
+          
+       
+        </Box>
+      </Fade>
+    );
+  }, [activeCategory, availableSubCategories]);
+
+  // Content when subcategory is selected (show brands)
+  const renderBrandsContent = useMemo(() => {
     // Show loading state during transitions or initial load
     if (isTransitioning || (loading && brands.length === 0)) {
       return (
@@ -471,11 +478,6 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
     }
 
     if (brands.length > 0) {
-      // Determine current category name for display
-      const currentCategoryName = activeCategory !== null 
-        ? categories[activeCategory]?.name 
-        : filters.maincat || "Popular Brands";
-
       return (
         <>
           <Box
@@ -496,9 +498,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
                 WebkitTextFillColor: "transparent",
               }}
             >
-              {currentCategoryName}
-              {activeSubCategory && ` - ${activeSubCategory}`}
-              {filters.childcat && ` - ${filters.childcat}`}
+              {categories[activeCategory]?.name || "Category"} - {activeSubCategory}
             </Typography>
             <Chip
               label={`${brands.length} brands`}
@@ -509,7 +509,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
             />
           </Box>
 
-       
+   
           <Grid container spacing={isMobile ? 1 : 2}>
             {brands.map((brand, index) => {
               const uniqueKey = brand?.uuid
@@ -567,7 +567,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
       );
     }
 
-    // Empty state
+    // Empty state for subcategory
     return (
       <Fade in={true}>
         <Box
@@ -583,16 +583,10 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
           }}
         >
           <Typography variant="h6" gutterBottom>
-            {activeSubCategory 
-              ? `No brands found for "${activeSubCategory}"`
-              : "Find Your Dream Franchise Brands"}
+            No brands found for "{activeSubCategory}"
           </Typography>
           <Typography variant="body2">
-            {isMobile
-              ? "Select a category to see brands"
-              : activeSubCategory
-              ? "Try selecting a different subcategory"
-              : "Select a subcategory to see related brands"}
+            Try selecting a different subcategory
           </Typography>
         </Box>
       </Fade>
@@ -603,15 +597,49 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
     error,
     isMobile,
     pagination,
-    filters,
     activeCategory,
     activeSubCategory,
     availableChildCategories,
     handleLoadMore,
     handleBrandClick,
-    handleChildCategoryHover,
+    handleChildCategoryClick,
     isTransitioning,
   ]);
+
+  // Determine what to render in the brands section
+  const renderMainContent = useMemo(() => {
+    if (activeSubCategory) {
+      return renderBrandsContent;
+    } else if (activeCategory !== null) {
+      return renderCategoryContent;
+    } else {
+      return (
+        <Fade in={true}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+              color: "text.secondary",
+              textAlign: "center",
+              p: 3,
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              Welcome!
+            </Typography>
+            <Typography variant="body1" sx={{ maxWidth: 400 }}>
+              {isMobile
+                ? "Select a category to explore subcategories"
+                : "Hover over a category to see available subcategories"}
+            </Typography>
+          </Box>
+        </Fade>
+      );
+    }
+  }, [activeCategory, activeSubCategory, renderBrandsContent, renderCategoryContent, isMobile]);
 
   return (
     <Drawer
@@ -621,12 +649,13 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
       PaperProps={{
         sx: {
           height: isMobile ? "85vh" : isTablet ? "65vh" : 500,
-          background: "rgba(255,255,255,0.7)",
+          background: "rgba(255,255,255,0.95)",
           backdropFilter: "blur(12px)",
           boxShadow: "0 8px 32px 0 rgba(60,72,88,0.18)",
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
           border: "1.5px solid rgba(255,255,255,0.25)",
+          overflow: "hidden",
         },
       }}
       SlideProps={{ timeout: 300 }}
@@ -687,7 +716,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
             {/* Categories Column - Fixed */}
             <Box
               sx={{
-                width: 240,
+                width: 300,
                 borderRight: `1px solid ${theme.palette.divider}`,
                 overflowY: "auto",
                 px: 2,
@@ -696,12 +725,23 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
                   "linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)",
               }}
             >
+
+                        <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  mb={2}
+                  color="text.secondary"
+                >
+                 Industry
+                </Typography>
               {categories.map((category, index) => (
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
+
+             
                   <Box
                     onMouseEnter={() => handleCategoryHover(index, category.name)}
                     sx={{
@@ -735,7 +775,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
             {activeCategory !== null && (
               <Box
                 sx={{
-                  width: 260,
+                  width: 400,
                   borderRight: `1px solid ${theme.palette.divider}`,
                   overflowY: "auto",
                   px: 2,
@@ -750,7 +790,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
                   mb={2}
                   color="text.secondary"
                 >
-                  {categories[activeCategory]?.name || "Select Category"}
+                  Category - {categories[activeCategory]?.name || "Select Category"}
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
                 
@@ -819,7 +859,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
           </Box>
         )}
 
-        {/* Brands Grid - Common for both mobile and desktop */}
+        {/* Main Content Area - Shows either category info or brands */}
         <Box
           sx={{
             flex: 1,
@@ -828,9 +868,10 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
             py: 2,
             bgcolor: "background.paper",
             borderTop: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+            position: "relative",
           }}
         >
-          {renderBrandsGrid}
+          {renderMainContent}
         </Box>
       </Box>
     </Drawer>

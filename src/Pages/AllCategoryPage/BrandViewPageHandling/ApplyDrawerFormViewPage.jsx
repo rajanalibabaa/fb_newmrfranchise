@@ -79,7 +79,7 @@ const ApplyDrawer = ({
                 Brand Category:{" "}
                 {
                   selectedBrand[0]?.brandfranchisedetails?.franchiseDetails
-                    ?.brandCategories?.child
+                    ?.brandCategories?.sub
                 }
               </Typography>
             </Typography>
