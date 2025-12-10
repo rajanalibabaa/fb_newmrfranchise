@@ -374,7 +374,7 @@ const TopInvestVdocardround = () => {
                       ? str.replace(new RegExp(`(.{${n}})`, "g"), "$1\u200B")
                       : str || "";
 
-                  const category = brand.brandCategories?.child;
+                  const category = brand.brandCategories?.sub;
 
                   if (Array.isArray(category)) {
                     return category.map(c => insertZeroWidth(String(c), 30)).join(", ");

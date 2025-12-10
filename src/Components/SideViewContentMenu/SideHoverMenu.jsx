@@ -16,7 +16,6 @@ import {
   Paper,
   Fade,
   Grow,
-  Slide,
   Button,
   Skeleton,
 } from "@mui/material";
@@ -24,23 +23,23 @@ import CloseIcon from "@mui/icons-material/Close";
 import { categories } from "../../Pages/Registration/BrandLIstingRegister/BrandCategories";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchBrandsByChildCategory,
-  clearBrands,
-  prefetchBrands,
-} from "../../Redux/Slices/SideMenuHoverBrandSlices.jsx";
-import debounce  from "lodash/debounce";
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
+import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData.jsx";
+import { setFilter, fetchFilteredBrands } from "../../Redux/Slices/filterBrandSlice";
 
 // Memoized brand card component with optimized props
 const BrandCard = React.memo(
   ({ brand, onClick, isMobile }) => {
     const brandName = brand.brandname || "Unknown";
     const brandLogo = brand.logo || "";
-    const initial = brandName[0] || "B";
+    const initial = brandName[0]?.toUpperCase() || "B";
 
     return (
-      <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
+      <motion.div 
+        whileHover={{ y: -4 }} 
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+      >
         <Paper
           onClick={onClick}
           elevation={2}
@@ -111,9 +110,8 @@ const BrandCard = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if brand ID changes or mobile status changes
     return (
-      prevProps.brand._id === nextProps.brand._id &&
+      prevProps.brand.uuid === nextProps.brand.uuid &&
       prevProps.isMobile === nextProps.isMobile
     );
   }
@@ -134,181 +132,153 @@ const SideViewContent = ({ hoverCategory, onHoverLeave }) => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSubCategory, setActiveSubCategory] = useState(null);
   const [mobileTabValue, setMobileTabValue] = useState(0);
-  const [hoveredChild, setHoveredChild] = useState(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [availableSubCategories, setAvailableSubCategories] = useState([]);
+  const [availableChildCategories, setAvailableChildCategories] = useState([]);
 
-  // Memoized selector for Redux state
-  const { brands, loading, error, pagination, currentCategory } = useSelector(
-    (state) => ({
-      brands: state.brandCategory.brands,
-      loading: state.brandCategory.loading,
-      error: state.brandCategory.error,
-      pagination: state.brandCategory.pagination,
-      currentCategory: state.brandCategory.currentCategory,
-    }),
-    (prev, next) =>
-      prev.brands.length === next.brands.length &&
-      prev.loading === next.loading &&
-      prev.error === next.error &&
-      prev.pagination.currentPage === next.pagination.currentPage &&
-      prev.currentCategory === next.currentCategory
-  );
+  // Selectors for Redux state
+  const { 
+    brands, 
+    loading, 
+    error, 
+    pagination
+  } = useSelector((state) => state.filterBrands);
+
+  const { 
+    loading: filterLoading 
+  } = useSelector((state) => state.filterDropdown);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
-  // Faster debounced hover handler with 100ms delay
-  const debouncedHandleSubChildHover = useMemo(
-    () =>
-      debounce((children, subCategory) => {
-        const childName =
-          typeof children === "string" ? children : children.name;
-        if (subCategory && childName) {
-          setHoveredChild(childName);
-          setIsTransitioning(true);
-          dispatch(
-            fetchBrandsByChildCategory({
-              subCategory,
-              childCategory: childName,
-              page: 1,
-              limit: 30,
-            })
-          ).finally(() => {
-            setIsTransitioning(false);
-          });
-        }
-      }, 100), // Reduced from 150ms to 100ms
-    [dispatch]
-  );
-
-  // Immediate category change handler
+  // Handle category hover - only fetch subcategories
   const handleCategoryHover = useCallback(
-    (index) => {
+    async (index, categoryName) => {
       if (activeCategory !== index) {
         setIsTransitioning(true);
-        dispatch(clearBrands());
+        
+        // Clear existing data
         setActiveCategory(index);
-        setHoveredChild(null);
-
         setActiveSubCategory(null);
-        // Don't wait for state updates to complete
-        setIsTransitioning(false);
+        setAvailableChildCategories([]);
+        
+        // Clear brand filters
+        dispatch(setFilter({ filterName: "subcat", value: null }));
+        dispatch(setFilter({ filterName: "childcat", value: null }));
+        
+        // Fetch subcategories for the selected category
+        try {
+          const result = await dispatch(fetchFilterOptions({ main: categoryName }));
+          if (result.payload) {
+            setAvailableSubCategories(result.payload.subcat || []);
+          }
+        } catch (error) {
+          console.error("Failed to fetch subcategories:", error);
+        } finally {
+          setIsTransitioning(false);
+        }
       }
     },
     [activeCategory, dispatch]
   );
 
-  // Immediate subcategory change handler
-const handleSubCategoryHover = useCallback(
-(subCategory) => {
-if (activeSubCategory?.name !== subCategory.name) {
-// Show subchild column immediately
-setActiveSubCategory(subCategory);
+  // Handle subcategory hover - fetch brands
+  const handleSubCategoryHover = useCallback(
+    async (subCategoryName) => {
+      if (activeSubCategory !== subCategoryName) {
+        setIsTransitioning(true);
+        setActiveSubCategory(subCategoryName);
+        
+        // Set the subcategory filter
+        dispatch(setFilter({ filterName: "subcat", value: subCategoryName }));
+        dispatch(setFilter({ filterName: "childcat", value: null }));
+        
+        // Fetch brands for this subcategory
+        try {
+          await dispatch(fetchFilteredBrands({
+            maincat: categories[activeCategory]?.name || "Food & Beverages",
+            subcat: subCategoryName,
+            page: 1,
+            limit: 30
+          }));
+          
+          // Fetch child categories for this subcategory
+          const result = await dispatch(fetchFilterOptions({ 
+            main: categories[activeCategory]?.name || "Food & Beverages",
+            sub: subCategoryName 
+          }));
+          
+          if (result.payload) {
+            setAvailableChildCategories(result.payload || []);
+          }
+          
+        } catch (error) {
+          console.error("Failed to fetch brands:", error);
+        } finally {
+          setIsTransitioning(false);
+        }
+      }
+    },
+    [activeCategory, activeSubCategory, dispatch]
+  );
 
-  // Auto-pick first child and load its brands
-  const firstChild = subCategory?.children?.[0];
-  if (firstChild) {
-    const childName =
-      typeof firstChild === "string" ? firstChild : firstChild.name;
-
-    setHoveredChild(childName);
-    setIsTransitioning(true);
-    dispatch(clearBrands());
-
-    dispatch(
-      fetchBrandsByChildCategory({
-        subCategory: subCategory.name,
-        childCategory: childName,
-        page: 1,
-        limit: 30,
-      })
-    ).finally(() => setIsTransitioning(false));
-  } else {
-    // No children → clear brands
-    setHoveredChild(null);
-    dispatch(clearBrands());
-  }
-}
-},
-[activeSubCategory, dispatch]
-);
-
-  // Prefetch adjacent categories when a subcategory is selected
-  useEffect(() => {
-    if (activeSubCategory?.children) {
-      const subCategoryName = activeSubCategory.name;
-      // Prefetch first 3 child categories
-      activeSubCategory.children.slice(0, 3).forEach((child) => {
-        const childName = typeof child === "string" ? child : child.name;
-        dispatch(
-          prefetchBrands({
-            subCategory: subCategoryName,
-            childCategory: childName,
-          })
-        );
-      });
-    }
-  }, [activeSubCategory, dispatch]);
-
-  // Clean up debounce on unmount
-  useEffect(() => {
-    return () => {
-      debouncedHandleSubChildHover.cancel();
-    };
-  }, [debouncedHandleSubChildHover]);
+  // Handle child category selection
+  const handleChildCategoryClick = useCallback(
+    async (childCategoryName) => {
+      setIsTransitioning(true);
+      
+      // Set the child category filter
+      dispatch(setFilter({ filterName: "childcat", value: childCategoryName }));
+      
+      // Fetch brands for this child category
+      try {
+        await dispatch(fetchFilteredBrands({
+          maincat: categories[activeCategory]?.name || "Food & Beverages",
+          subcat: activeSubCategory,
+          childcat: childCategoryName,
+          page: 1,
+          limit: 30
+        }));
+      } catch (error) {
+        console.error("Failed to fetch brands:", error);
+      } finally {
+        setIsTransitioning(false);
+      }
+    },
+    [activeCategory, activeSubCategory, dispatch]
+  );
 
   const handleBrandClick = useCallback((brand) => {
     dispatch(openBrandDialog(brand));
-  }, []);
+  }, [dispatch]);
 
   const handleMobileTabChange = useCallback((event, newValue) => {
     setMobileTabValue(newValue);
   }, []);
 
-  // Immediate child category hover handler
-  const handleSubChildHover = useCallback(
-    (children) => {
-      const subCategory = activeSubCategory?.name;
-      const childName = typeof children === "string" ? children : children.name;
-
-      // Immediate visual feedback
-      setHoveredChild(childName);
-      setIsTransitioning(true);
-      dispatch(clearBrands());
-
-      // Debounced API call
-      debouncedHandleSubChildHover(children, subCategory);
-    },
-    [activeSubCategory, debouncedHandleSubChildHover, dispatch]
-  );
-
   const handleLoadMore = useCallback(() => {
     if (pagination.hasNext) {
-      const subCategory = activeSubCategory?.name;
-      const childCategory = currentCategory;
-
-      if (subCategory && childCategory) {
-        dispatch(
-          fetchBrandsByChildCategory({
-            subCategory,
-            childCategory,
-            page: pagination.currentPage + 1,
-            limit: pagination.limit,
-          })
-        );
-      }
+      dispatch(fetchFilteredBrands({
+        maincat: categories[activeCategory]?.name || "Food & Beverages",
+        subcat: activeSubCategory,
+        childcat: null,
+        page: pagination.currentPage + 1,
+        limit: pagination.limit
+      }));
     }
-  }, [activeSubCategory, currentCategory, pagination, dispatch]);
+  }, [pagination, activeCategory, activeSubCategory, dispatch]);
 
-  // Clear brands when drawer closes
+  // Clear data when drawer closes
   useEffect(() => {
     if (!hoverCategory) {
-      dispatch(clearBrands());
       setActiveCategory(null);
       setActiveSubCategory(null);
       setMobileTabValue(0);
-      setHoveredChild(null);
+      setAvailableSubCategories([]);
+      setAvailableChildCategories([]);
+      dispatch(setFilter({ filterName: "subcat", value: null }));
+      dispatch(setFilter({ filterName: "childcat", value: null }));
     }
   }, [hoverCategory, dispatch]);
 
@@ -325,8 +295,7 @@ setActiveSubCategory(subCategory);
           >
             <Box
               onClick={() => {
-                setActiveCategory(index);
-                setActiveSubCategory(null);
+                handleCategoryHover(index, category.name);
                 setMobileTabValue(1);
               }}
               sx={{
@@ -377,152 +346,94 @@ setActiveSubCategory(subCategory);
             </Typography>
           </Box>
         </motion.div>
-        {activeCategory !== null &&
-          categories[activeCategory].children?.map((subCategory, idx) => (
-            <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
-              <motion.div whileHover={{ scale: 1.02 }}>
-                <Box
-                  onClick={() => {
-                    setActiveSubCategory(subCategory);
-                    setMobileTabValue(2);
-                  }}
-                  sx={{
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    py: 1.5,
-                    px: 1.5,
-                    borderRadius: 2,
-                    gap: 1.5,
-                    mb: 1,
+        {availableSubCategories.map((subCategory, idx) => (
+          <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
+            <motion.div whileHover={{ scale: 1.02 }}>
+              <Box
+                onClick={() => handleSubCategoryHover(subCategory)}
+                sx={{
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  py: 1.5,
+                  px: 1.5,
+                  borderRadius: 2,
+                  gap: 1.5,
+                  mb: 1,
+                  bgcolor:
+                    activeSubCategory === subCategory
+                      ? "primary.light"
+                      : "background.paper",
+                  color:
+                    activeSubCategory === subCategory
+                      ? "primary.contrastText"
+                      : "text.primary",
+                  boxShadow: theme.shadows[1],
+                  transition: "all 0.3s ease",
+                  "&:hover": {
                     bgcolor:
-                      activeSubCategory?.name === subCategory.name
-                        ? "primary.light"
-                        : "background.paper",
-                    color:
-                      activeSubCategory?.name === subCategory.name
-                        ? "primary.contrastText"
-                        : "text.primary",
-                    boxShadow: theme.shadows[1],
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      bgcolor:
-                        activeSubCategory?.name === subCategory.name
-                          ? "primary.main"
-                          : "action.hover",
-                    },
-                  }}
+                      activeSubCategory === subCategory
+                        ? "primary.main"
+                        : "action.hover",
+                  },
+                }}
+              >
+                <Typography
+                  fontWeight={
+                    activeSubCategory === subCategory ? "bold" : "medium"
+                  }
                 >
-                  {subCategory.icon && (
-                    <Box
-                      component={subCategory.icon}
-                      sx={{
-                        fontSize: 22,
-                        color:
-                          activeSubCategory?.name === subCategory.name
-                            ? "primary.contrastText"
-                            : "primary.main",
-                      }}
-                    />
-                  )}
-                  <Typography
-                    fontWeight={
-                      activeSubCategory?.name === subCategory.name
-                        ? "bold"
-                        : "medium"
-                    }
-                  >
-                    {subCategory.name}
-                  </Typography>
-                </Box>
-              </motion.div>
-            </Grow>
-          ))}
-      </Box>,
-      // Child Categories Tab
-      <Box sx={{ p: 2 }}>
-        <motion.div whileHover={{ x: -5 }} whileTap={{ scale: 0.98 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mb: 2,
-              cursor: "pointer",
-              p: 1,
-              borderRadius: 1,
-              "&:hover": { bgcolor: "action.hover" },
-            }}
-            onClick={() => setMobileTabValue(1)}
-          >
-            <IconButton size="small" sx={{ mr: 1 }}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-            <Typography variant="body2" color="text.secondary">
-              Back to Subcategories
-            </Typography>
-          </Box>
-        </motion.div>
-        {activeSubCategory?.children?.map((children, idx) => {
-          const name = typeof children === "string" ? children : children.name;
-          const Icon = typeof children === "object" ? children.icon : null;
-          const isHovered = hoveredChild === name;
-
-          return (
-            <Slide in={true} direction="up" timeout={(idx + 1) * 100} key={idx}>
-              <motion.div whileHover={{ scale: 1.02 }}>
-                <Box
-                  onClick={() => handleSubChildHover(children)}
-                  onMouseEnter={() => handleSubChildHover(children)}
-                  sx={{
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    py: 1.5,
-                    px: 1.5,
-                    borderRadius: 2,
-                    gap: 1.5,
-                    mb: 1,
-                    bgcolor: isHovered ? "orange" : "background.paper",
-                    color: isHovered ? "primary.contrastText" : "text.primary",
-                    boxShadow: theme.shadows[1],
-                    transition: "all 0.3s ease",
-                    "&:hover": {
-                      bgcolor: "orange",
-                      boxShadow: theme.shadows[2],
-                    },
-                  }}
-                >
-                  {Icon && (
-                    <Box
-                      component={Icon}
-                      sx={{
-                        fontSize: 20,
-                        color: isHovered
-                          ? "primary.contrastText"
-                          : "primary.main",
-                      }}
-                    />
-                  )}
-                  <Typography fontWeight="medium">{name}</Typography>
-                </Box>
-              </motion.div>
-            </Slide>
-          );
-        })}
+                  {subCategory}
+                </Typography>
+              </Box>
+            </motion.div>
+          </Grow>
+        ))}
       </Box>,
     ];
 
-    return () => tabContents[mobileTabValue] || null;
+    return tabContents[mobileTabValue] || null;
   }, [
     mobileTabValue,
     activeCategory,
     activeSubCategory,
-    handleSubChildHover,
-    hoveredChild,
+    availableSubCategories,
+    handleCategoryHover,
+    handleSubCategoryHover,
+    theme.shadows,
   ]);
 
-  // Optimized brands grid rendering with skeleton loading
-  const renderBrandsGrid = useMemo(() => {
+  // Content when only category is selected (no subcategory hovered)
+  const renderCategoryContent = useMemo(() => {
+    return (
+      <Fade in={true} timeout={500}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            height: "100%",
+            color: "text.secondary",
+            textAlign: "center",
+            p: 3,
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold" gutterBottom>
+            {categories[activeCategory]?.name || "Select Category"}
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 4, maxWidth: 400 }}>
+            Hover over a subcategory to see available brands
+          </Typography>
+          
+       
+        </Box>
+      </Fade>
+    );
+  }, [activeCategory, availableSubCategories]);
+
+  // Content when subcategory is selected (show brands)
+  const renderBrandsContent = useMemo(() => {
     // Show loading state during transitions or initial load
     if (isTransitioning || (loading && brands.length === 0)) {
       return (
@@ -544,6 +455,7 @@ setActiveSubCategory(subCategory);
         </Box>
       );
     }
+    
     if (error) {
       return (
         <Box
@@ -561,35 +473,6 @@ setActiveSubCategory(subCategory);
           <Typography variant="h6" gutterBottom>
             Oops! Brands Under Updating Process
           </Typography>
-          {/* <Typography variant="body2" sx={{ mb: 2 }}>
-            {error || "Failed to load brands. Please try again later."}
-          </Typography> */}
-          {/* <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Chip
-              label="Retry"
-              onClick={() => {
-                const subCategory = activeSubCategory?.name;
-                const childCategory = currentCategory;
-                if (subCategory && childCategory) {
-                  dispatch(
-                    fetchBrandsByChildCategory({
-                      subCategory,
-                      childCategory,
-                      page: 1,
-                      limit: 30,
-                    })
-                  );
-                }
-              }}
-              color="primary"
-              sx={{
-                px: 3,
-                py: 1,
-                fontSize: "0.9rem",
-                fontWeight: "bold",
-              }}
-            />
-          </motion.div> */}
         </Box>
       );
     }
@@ -615,7 +498,7 @@ setActiveSubCategory(subCategory);
                 WebkitTextFillColor: "transparent",
               }}
             >
-              {currentCategory || "Popular Brands"}
+              {categories[activeCategory]?.name || "Category"} - {activeSubCategory}
             </Typography>
             <Chip
               label={`${brands.length} brands`}
@@ -626,11 +509,11 @@ setActiveSubCategory(subCategory);
             />
           </Box>
 
+   
           <Grid container spacing={isMobile ? 1 : 2}>
             {brands.map((brand, index) => {
-              // Create a unique key that handles missing/duplicate IDs
-              const uniqueKey = brand?._id
-                ? `brand-${brand._id}-${index}`
+              const uniqueKey = brand?.uuid
+                ? `brand-${brand.uuid}-${index}`
                 : `brand-fallback-${index}`;
 
               return (
@@ -660,6 +543,7 @@ setActiveSubCategory(subCategory);
               </>
             )}
           </Grid>
+          
           {pagination.hasNext && (
             <Box sx={{ display: "flex", justifyContent: "center", mt: 3 }}>
               <Button
@@ -683,6 +567,7 @@ setActiveSubCategory(subCategory);
       );
     }
 
+    // Empty state for subcategory
     return (
       <Fade in={true}>
         <Box
@@ -698,12 +583,10 @@ setActiveSubCategory(subCategory);
           }}
         >
           <Typography variant="h6" gutterBottom>
-            Find Your Dream Franchise Brands
+            No brands found for "{activeSubCategory}"
           </Typography>
           <Typography variant="body2">
-            {isMobile
-              ? "Select a category to see brands"
-              : "Select a subcategory to see related brands"}
+            Try selecting a different subcategory
           </Typography>
         </Box>
       </Fade>
@@ -714,11 +597,50 @@ setActiveSubCategory(subCategory);
     error,
     isMobile,
     pagination,
-    currentCategory,
+    activeCategory,
+    activeSubCategory,
+    availableChildCategories,
     handleLoadMore,
     handleBrandClick,
+    handleChildCategoryClick,
     isTransitioning,
   ]);
+
+  // Determine what to render in the brands section
+  const renderMainContent = useMemo(() => {
+    if (activeSubCategory) {
+      return renderBrandsContent;
+    } else if (activeCategory !== null) {
+      return renderCategoryContent;
+    } else {
+      return (
+        <Fade in={true}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+              color: "text.secondary",
+              textAlign: "center",
+              p: 3,
+            }}
+          >
+            <Typography variant="h4" fontWeight="bold" gutterBottom>
+              Welcome!
+            </Typography>
+            <Typography variant="body1" sx={{ maxWidth: 400 }}>
+              {isMobile
+                ? "Select a category to explore subcategories"
+                : "Hover over a category to see available subcategories"}
+            </Typography>
+          </Box>
+        </Fade>
+      );
+    }
+  }, [activeCategory, activeSubCategory, renderBrandsContent, renderCategoryContent, isMobile]);
+
   return (
     <Drawer
       anchor="top"
@@ -727,12 +649,13 @@ setActiveSubCategory(subCategory);
       PaperProps={{
         sx: {
           height: isMobile ? "85vh" : isTablet ? "65vh" : 500,
-          background: "rgba(255,255,255,0.7)",
+          background: "rgba(255,255,255,0.95)",
           backdropFilter: "blur(12px)",
           boxShadow: "0 8px 32px 0 rgba(60,72,88,0.18)",
           borderBottomLeftRadius: 24,
           borderBottomRightRadius: 24,
           border: "1.5px solid rgba(255,255,255,0.25)",
+          overflow: "hidden",
         },
       }}
       SlideProps={{ timeout: 300 }}
@@ -783,16 +706,6 @@ setActiveSubCategory(subCategory);
                   minHeight: 48,
                 }}
               />
-              <Tab
-                label="Child Categories"
-                disabled={activeSubCategory === null}
-                sx={{
-                  fontSize: "0.8rem",
-                  fontWeight: "bold",
-                  textTransform: "none",
-                  minHeight: 48,
-                }}
-              />
             </Tabs>
           </AppBar>
         )}
@@ -803,7 +716,7 @@ setActiveSubCategory(subCategory);
             {/* Categories Column - Fixed */}
             <Box
               sx={{
-                width: 240,
+                width: 300,
                 borderRight: `1px solid ${theme.palette.divider}`,
                 overflowY: "auto",
                 px: 2,
@@ -812,14 +725,25 @@ setActiveSubCategory(subCategory);
                   "linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)",
               }}
             >
+
+                        <Typography
+                  variant="h6"
+                  fontWeight="bold"
+                  mb={2}
+                  color="text.secondary"
+                >
+                 Industry
+                </Typography>
               {categories.map((category, index) => (
                 <motion.div
                   key={index}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
+
+             
                   <Box
-                    onMouseEnter={() => handleCategoryHover(index)}
+                    onMouseEnter={() => handleCategoryHover(index, category.name)}
                     sx={{
                       cursor: "pointer",
                       py: 1.5,
@@ -851,7 +775,7 @@ setActiveSubCategory(subCategory);
             {activeCategory !== null && (
               <Box
                 sx={{
-                  width: 260,
+                  width: 400,
                   borderRight: `1px solid ${theme.palette.divider}`,
                   overflowY: "auto",
                   px: 2,
@@ -866,17 +790,16 @@ setActiveSubCategory(subCategory);
                   mb={2}
                   color="text.secondary"
                 >
-                  {categories[activeCategory].name}
+                  Category - {categories[activeCategory]?.name || "Select Category"}
                 </Typography>
                 <Divider sx={{ mb: 2 }} />
-                {categories[activeCategory].children?.map(
-                  (subCategory, idx) => (
+                
+                {availableSubCategories.length > 0 ? (
+                  availableSubCategories.map((subCategory, idx) => (
                     <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
                       <motion.div whileHover={{ scale: 1.02 }}>
                         <Box
-                          onMouseEnter={() =>
-                            handleSubCategoryHover(subCategory)
-                          }
+                          onMouseEnter={() => handleSubCategoryHover(subCategory)}
                           sx={{
                             cursor: "pointer",
                             display: "flex",
@@ -887,130 +810,41 @@ setActiveSubCategory(subCategory);
                             gap: 1.5,
                             mb: 1.5,
                             bgcolor:
-                              activeSubCategory?.name === subCategory.name
+                              activeSubCategory === subCategory
                                 ? "orange"
                                 : "background.paper",
                             color:
-                              activeSubCategory?.name === subCategory.name
+                              activeSubCategory === subCategory
                                 ? "primary.contrastText"
                                 : "text.primary",
                             boxShadow: theme.shadows[1],
                             transition: "all 0.3s ease",
                             "&:hover": {
                               bgcolor:
-                                activeSubCategory?.name === subCategory.name
+                                activeSubCategory === subCategory
                                   ? "orange"
                                   : "action.hover",
                             },
                           }}
                         >
-                          {subCategory.icon && (
-                            <Box
-                              component={subCategory.icon}
-                              sx={{
-                                fontSize: 22,
-                                color:
-                                  activeSubCategory?.name === subCategory.name
-                                    ? "primary.contrastText"
-                                    : "primary.main",
-                              }}
-                            />
-                          )}
                           <Typography
                             fontWeight={
-                              activeSubCategory?.name === subCategory.name
+                              activeSubCategory === subCategory
                                 ? "bold"
                                 : "medium"
                             }
                           >
-                            {subCategory.name}
+                            {subCategory}
                           </Typography>
                         </Box>
                       </motion.div>
                     </Grow>
-                  )
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary" textAlign="center">
+                    No subcategories available
+                  </Typography>
                 )}
-              </Box>
-            )}
-
-            {/* Child Categories Column */}
-            {activeSubCategory && (
-              <Box
-                sx={{
-                  width: 280,
-                  borderRight: `1px solid ${theme.palette.divider}`,
-                  overflowY: "auto",
-                  px: 2,
-                  py: 2,
-                  background:
-                    "linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)",
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  fontWeight="bold"
-                  mb={2}
-                  color="text.secondary"
-                >
-                  {activeSubCategory.name}
-                </Typography>
-                <Divider sx={{ mb: 2 }} />
-                {activeSubCategory?.children?.map((children, idx) => {
-                  const name =
-                    typeof children === "string" ? children : children.name;
-                  const Icon =
-                    typeof children === "object" ? children.icon : null;
-                  const isHovered = hoveredChild === name;
-
-                  return (
-                    <Slide
-                      in={true}
-                      direction="up"
-                      timeout={(idx + 1) * 100}
-                      key={idx}
-                    >
-                      <motion.div whileHover={{ scale: 1.02 }}>
-                        <Box
-                          onClick={() => handleSubChildHover(children)}
-                          onMouseEnter={() => handleSubChildHover(children)}
-                          sx={{
-                            cursor: "pointer",
-                            display: "flex",
-                            alignItems: "center",
-                            py: 1.5,
-                            px: 2,
-                            borderRadius: 2,
-                            gap: 1.5,
-                            mb: 1.5,
-                            bgcolor: isHovered ? "orange" : "background.paper",
-                            color: isHovered
-                              ? "primary.contrastText"
-                              : "text.primary",
-                            boxShadow: theme.shadows[1],
-                            transition: "all 0.2s ease",
-                            "&:hover": {
-                              bgcolor: "orange",
-                              boxShadow: theme.shadows[2],
-                            },
-                          }}
-                        >
-                          {Icon && (
-                            <Box
-                              component={Icon}
-                              sx={{
-                                fontSize: 20,
-                                color: isHovered
-                                  ? "primary.contrastText"
-                                  : "primary.main",
-                              }}
-                            />
-                          )}
-                          <Typography fontWeight="medium">{name}</Typography>
-                        </Box>
-                      </motion.div>
-                    </Slide>
-                  );
-                })}
               </Box>
             )}
           </>
@@ -1021,11 +855,11 @@ setActiveSubCategory(subCategory);
           <Box
             sx={{ flex: 1, overflowY: "auto", bgcolor: "background.default" }}
           >
-            {getMobileTabContent()}
+            {getMobileTabContent}
           </Box>
         )}
 
-        {/* Brands Grid - Common for both mobile and desktop */}
+        {/* Main Content Area - Shows either category info or brands */}
         <Box
           sx={{
             flex: 1,
@@ -1034,9 +868,10 @@ setActiveSubCategory(subCategory);
             py: 2,
             bgcolor: "background.paper",
             borderTop: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+            position: "relative",
           }}
         >
-          {renderBrandsGrid}
+          {renderMainContent}
         </Box>
       </Box>
     </Drawer>

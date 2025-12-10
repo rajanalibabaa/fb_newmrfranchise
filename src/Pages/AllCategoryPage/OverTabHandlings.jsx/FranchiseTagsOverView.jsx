@@ -30,7 +30,7 @@ const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
       <Typography
         variant="h6" fontWeight={700} sx={{ mb: 2, color: "#7ad03a" }}
       >
-        Brand Overview Tags
+        Service Tags
       </Typography>
       <Divider sx={{ mb: 2 }} />
 

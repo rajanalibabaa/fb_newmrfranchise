@@ -440,7 +440,7 @@ const BrandHeader = ({
   variant="body1"
   sx={{ fontWeight: "bold" }}
 >
-  Brand Category Tags :
+  Menu Tags :
   <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
     {(() => {
       const childCategories = brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.child;

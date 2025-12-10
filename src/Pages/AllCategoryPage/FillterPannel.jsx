@@ -437,9 +437,9 @@ const scrollToSection = (ref) => {
                   sx={{ mb: 0, mr: 0 }}
                 />
 
-                {filters.subcat === subCategory && (
+                {/* {filters.subcat === subCategory && (
                   <Collapse in={filters.subcat === subCategory}>
-                    <Accordion
+                   <Accordion
                       expanded={expandedSections.subCategory}
                       disableGutters
                       elevation={0}
@@ -457,7 +457,7 @@ const scrollToSection = (ref) => {
                           "& .MuiAccordionSummary-content": { my: "2px" },
                         }}
                       />
-
+         
                       <AccordionDetails sx={{ pt: 0, px: 1 }}>
                         {loadingChildCategories ? (
                           <Box sx={{ p: 2 }}>
@@ -469,7 +469,7 @@ const scrollToSection = (ref) => {
                             onChange={(e) => onFilterChange("childcat", e.target.value)}
                           >
                             {/* 🔤 Sort child categories alphabetically */}
-                            {[...childCategories]
+                         {/* {[...childCategories]
                               .sort((a, b) => a.localeCompare(b))
                               .map((childCategory) => (
                                 <FormControlLabel
@@ -492,13 +492,13 @@ const scrollToSection = (ref) => {
                                   }
                                   sx={{ mb: 0, mr: 0 }}
                                 />
-                              ))}
-                          </RadioGroup>
+                              ))}  */}
+                           {/* </RadioGroup>
                         )}
                       </AccordionDetails>
-                    </Accordion>
+                    </Accordion> 
                   </Collapse>
-                )}
+                )} */} 
               </Box>
             ))}
         </RadioGroup>
@@ -963,96 +963,7 @@ const scrollToSection = (ref) => {
                               />
 
                               {/* Optional: Nested Cities under each District */}
-                              {filters.district === district && (
-                                <Collapse in={filters.district === district}>
-                                  <Box
-                                    sx={{
-                                      borderLeft: "2px dashed #c8e6c9",
-                                      ml: 3,
-                                      pl: 2,
-                                      mt: 0.5,
-                                    }}
-                                  >
-                                    <Typography
-                                      variant="body2"
-                                      sx={{
-                                        fontWeight: "bold",
-                                        fontSize: "0.75rem",
-                                        color: "#4caf50",
-                                        mb: 0.5,
-                                      }}
-                                    >
-                                      Cities
-                                    </Typography>
-
-                                    {loadingCities ? (
-                                      <Box sx={{ p: 2 }}>
-                                        <CircularProgress
-                                          size={18}
-                                          sx={{ color: "#ff9800" }}
-                                        />
-                                      </Box>
-                                    ) : (
-                                      <RadioGroup
-                                        value={filters.city || ""}
-                                        onChange={(e) =>
-                                          onFilterChange("city", e.target.value)
-                                        }
-                                      >
-                                        <FormControlLabel
-                                          value=""
-                                          control={
-                                            <Radio
-                                              size="small"
-                                              sx={{
-                                                color: "#ff9800",
-                                                "&.Mui-checked": {
-                                                  color: "#4caf50",
-                                                },
-                                                padding: "6px",
-                                              }}
-                                            />
-                                          }
-                                          label={
-                                            <Typography fontSize="0.8125rem">
-                                              All Cities
-                                            </Typography>
-                                          }
-                                          sx={{ mb: 0, mr: 0 }}
-                                        />
-
-                                        {/* 🔠 Sorted Cities */}
-                                        {[...filteredCities]
-                                          .sort((a, b) => a.localeCompare(b))
-                                          .map((city) => (
-                                            <FormControlLabel
-                                              key={`city-${city}`}
-                                              value={city}
-                                              control={
-                                                <Radio
-                                                  size="small"
-                                                  sx={{
-                                                    color: "#ff9800",
-                                                    "&.Mui-checked": {
-                                                      color: "#4caf50",
-                                                    },
-                                                    padding: "6px",
-                                                  }}
-                                                />
-                                              }
-                                              label={
-                                                <Typography fontSize="0.8125rem">
-                                                  {city}
-                                                </Typography>
-                                              }
-                                              sx={{ mb: 0, mr: 0 }}
-                                            />
-                                          ))}
-                                      </RadioGroup>
-                                    )}
-                                  </Box>
-                                </Collapse>
-                              )}
+                          
                             </Box>
                           ))}
                       </RadioGroup>
