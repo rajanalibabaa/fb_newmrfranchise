@@ -67,7 +67,7 @@ const OverviewTab = ({ brand }) => {
     const number = Number(value);
     return isNaN(number) ? "N/A" : `₹${number.toLocaleString("en-IN")}`;
   };
-
+console.log("brand",brand)
   const hasData = (sectionData) => {
     if (Array.isArray(sectionData)) {
       return sectionData.length > 0;
@@ -78,7 +78,8 @@ const OverviewTab = ({ brand }) => {
   const franchiseDetails = brand?.[0]?.brandfranchisedetails?.franchiseDetails || {};
   const expansionLocationData = brand?.[0]?.brandexpansionlocationdatas || {};
   const uploads = brand?.[0]?.uploads || {};
-const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchiseTags || {};
+const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories.serviceTags || {};
+
 
   return (
     <Box ref={overviewRef}>
@@ -91,9 +92,10 @@ const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchi
           formatCurrency={formatCurrency}
         />
       )}
-      {hasData(FranchiseTags) && (
+      {hasData(serviceTags) && (
         <FranchiseTagsOverView 
-        franchiseTagsDetails={FranchiseTags}
+
+        serviceTags={serviceTags}
         />
       )}
      
