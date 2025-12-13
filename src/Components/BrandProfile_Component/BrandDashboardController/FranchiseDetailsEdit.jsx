@@ -1,4 +1,4 @@
-import React, { useState, useEffect,  } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   Chip,
@@ -12,7 +12,7 @@ import {
   InputAdornment,
   Grid,
   Drawer,
-  AppBar,   
+  AppBar,
   Toolbar,
   Typography,
   Box,
@@ -41,11 +41,11 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  CircularProgress,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { Delete as DeleteIcon, Edit as EditIcon, InfoOutlined,Category, ExpandMore, ExpandLess } from "@mui/icons-material";
-import categories from "../../../Pages/Registration/BrandLIstingRegister/BrandCategories";
+import { Delete as DeleteIcon, Edit as EditIcon, InfoOutlined, ExpandMore, ExpandLess } from "@mui/icons-material";
+import AddIcon from '@mui/icons-material/Add';
+
 const FranchiseDetailsEdit = ({
   data = {},
   errors = {},
@@ -69,6 +69,17 @@ const FranchiseDetailsEdit = ({
     { value: "Lakhs", label: "Lakhs" },
     { value: "No Fee", label: "No Fee" },
   ];
+
+
+  console.log("")
+
+  // State for API data
+  const [industries, setIndustries] = useState([]);
+  const [industryData, setIndustryData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingIndustryDetails, setLoadingIndustryDetails] = useState(false);
+  
+  // State for FICO model
   const [currentFicoModel, setCurrentFicoModel] = useState({
     investmentRange: "",
     areaRequired: "",
@@ -92,7 +103,6 @@ const FranchiseDetailsEdit = ({
     marginOnSales: "",
     agreementPeriod: "",
   });
-    const [editIndex, setEditIndex] = useState(null);
 
   const [noFees, setNoFees] = useState({
     franchiseFee: false,
@@ -103,18 +113,105 @@ const FranchiseDetailsEdit = ({
     royaltyFee: false,
     roi: false,
   });
+
+  const [editIndex, setEditIndex] = useState(null);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [currentUSP, setCurrentUSP] = useState("");
+  
+  // States for product and service tags
   const [showSelectedBar, setShowSelectedBar] = useState(false);
-const [selectedServiceTags, setSelectedServiceTags] = useState(
-  data.serviceTags ? (Array.isArray(data.serviceTags) ? data.serviceTags : data.serviceTags.split(" | ").filter(Boolean)) : []
-);
-const [drawerOpen, setDrawerOpen] = useState(false);
-const [showSelectedServiceTags, setShowSelectedServiceTags] = useState(false);
-const [serviceTagDrawerOpen, setServiceTagDrawerOpen] = useState(false);
-const [tempSelectedChild, setTempSelectedChild] = useState([]);
-const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]); 
- const franchiseTypes = [
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [serviceTagDrawerOpen, setServiceTagDrawerOpen] = useState(false);
+  const [tempProductTags, setTempProductTags] = useState([]);
+  const [tempServiceTags, setTempServiceTags] = useState([]);
+  const [showSelectedServiceTags, setShowSelectedServiceTags] = useState(false);
+  
+  // Service tag groups will be populated from API data
+  const [serviceTagGroups, setServiceTagGroups] = useState({});
+  
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+
+  // Fetch industries on component mount
+  useEffect(() => {
+    fetchIndustries();
+    fetchIndustryDetails();
+  }, []);
+
+  // Fetch industries list
+  const fetchIndustries = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('http://localhost:5000/api/v1/admin/getIndustryByIndustryName');
+      const result = await response.json();
+   
+      if (result.success && result.data.Industry) {
+        setIndustries(result.data.Industry);
+      }
+    } catch (error) {
+      console.error('Error fetching industries:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch industry details when an industry is selected
+  const fetchIndustryDetails = async (industryName) => {
+    // if (!industryName) return;
+    const  industry =  industryName || data.brandCategories.main
+    console.log("industry",industry)
+ 
+    try {
+      setLoadingIndustryDetails(true);
+      const response = await fetch(
+        `http://localhost:5000/api/v1/admin/getIndustryByIndustryName?industry=${encodeURIComponent(industry)}`
+      );
+      const result = await response.json();
+   
+      if (result.success && result.data) {
+        setIndustryData(result.data);
+        
+        // Update service tag groups
+        if (result.data.serviceTags) {
+          const groups = {};
+          result.data.serviceTags.forEach((serviceTagGroup) => {
+            groups[serviceTagGroup.parent] = serviceTagGroup.tags;
+          });
+          setServiceTagGroups(groups);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching industry details:', error);
+    } finally {
+      setLoadingIndustryDetails(false);
+    }
+  };
+
+  // Initialize selected category from data
+  const [selectedCategory, setSelectedCategory] = useState({
+    groupId: data.brandCategories?.groupId || "",
+    main: data.brandCategories?.main || "",
+    sub: data.brandCategories?.sub || "",
+    productTags: data.brandCategories?.productTags || [],
+    serviceTags: data.brandCategories?.serviceTags || [],
+  });
+
+  // Calculate totals for display
+  const totalProductTags = selectedCategory.productTags.reduce((acc, curr) => acc + curr.tags.length, 0);
+  const totalServiceTags = selectedCategory.serviceTags.reduce((acc, curr) => acc + curr.tags.length, 0);
+
+  // Update service tag groups when industry data changes
+  useEffect(() => {
+    if (industryData && industryData.serviceTags) {
+      const groups = {};
+      industryData.serviceTags.forEach((serviceTagGroup) => {
+        groups[serviceTagGroup.parent] = serviceTagGroup.tags;
+      });
+      setServiceTagGroups(groups);
+    }
+  }, [industryData]);
+
+  // Franchise types and models
+  const franchiseTypes = [
     "Single Unit",
     "Multi Unit",
     "Master Franchise",
@@ -123,6 +220,7 @@ const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]);
     "District Franchise",
     "State Franchise",
   ];
+
   const franchiseModels = [
     "FOFO",
     "FOCO",
@@ -132,6 +230,7 @@ const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]);
     "SHOP IN SHOP",
     "CLOUD KITCHEN",
   ];
+
   const investmentRanges = [
     { label: "Below ₹50K", value: "Below - 50k" },
     { label: "₹50K - ₹2 Lakhs", value: "Rs. 50k - 2 Lakhs" },
@@ -146,171 +245,9 @@ const [tempSelectedServiceTags, setTempSelectedServiceTags] = useState([]);
     { label: "Above ₹5 Crores", value: "Rs. 5 Crores - above" },
   ];
 
-  const PrimaryClassifications = ["Pure Vegetarian","Pure Non-Vegetarian","Pure Vegan","Eggless","Jain Food","Mixed (Veg & Non-Veg)","Plant-Based","Organic","Gluten-Free","Dairy-Free","Nut-Free","Low-Carb","Keto-Friendly","Paleo-Friendly","Low-Calorie","High-Protein","Diabetic-Friendly","Halal","Kosher"]
-const TargetAudience=["Family-Friendly","Kids Menu","Senior Citizen Discount","Student Discount","Women Only (e.g., women-only cafes)","Men Only (e.g., men-only bars)","Unisex","All Age Groups"]
-const ServiceModel=["Dine-In","Takeaway","Home Delivery","Drive-Thru","Buffet","Self-Service","Counter Service","Table Service","Food Truck","Kiosk","Cloud Kitchen"]
-const PricingValue=["Budget","Affordable","Mid-Range","Premium","Luxury","Value for Money",]
-const AmbienceExperience=["Casual Dining","Fine Dining","Quick Bite","Romantic","Family","Business Meetings","Party Venue","Themed Restaurant","Outdoor Seating","Rooftop","Garden","Beachfront"]
-const FeaturesAmenities=["Live Music","Sports Screening","Free Wi-Fi","Parking Available","Valet Parking","Kid's Play Area","Pet-Friendly","Wheelchair Accessible","Air Conditioning","Smoking Area","Non-Smoking"]
-const TechnologyIntegration=["Online Ordering","Mobile App","QR Code Menu","Digital Payments","Self-Order Kiosks","Contactless Delivery"]
-const SustainabilityEthics  =["Organic Ingredients","Locally Sourced","Sustainable Sourcing","Eco-Friendly Packaging","Waste Reduction","Energy Efficient","Social Responsibility"]
-// const productServiceType = ["North Indian","South Indian","Punjab","Bengali","Gujarati","Italian","Chinese","Thai","Japanese","Korean","French","Mexican","Burgers","Sandwiches","Pizza","Tacos","Biryani","Wraps","Curry","Tandoori","Kebabs","Tea","Juices","Coffee","Smoothies",  ]
-const BusinessOperation= ["Franchise Opportunity","Company-Owned","Chain","Single Unit","Multi-Unit","Area Development","Master Franchise"]
-
-const serviceTagGroups = {
-  "Primary Classification": PrimaryClassifications,
-  // "Product / Service Types": productServiceType,
-  "Target Audience": TargetAudience,
-  "Service Model": ServiceModel,
-  "Pricing Value": PricingValue,
-  "Ambience & Experience": AmbienceExperience,
-  "Features & Amenities": FeaturesAmenities,
-  "Technology Integration": TechnologyIntegration,
-  "Sustainability & Ethics": SustainabilityEthics,
-  "Business Operations": BusinessOperation,
-};
-  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
-
-const [currentTags, setCurrentTags] = useState({
-  PrimaryClassifications: [],
-  // ProductServiceTypes: [], // Changed from productServiceTypes
-  TargetAudience: [],
-  ServiceModel: [],
-  PricingValue: [],
-  AmbienceExperience: [],
-  FeaturesAmenities: [],
-  TechnologyIntegration: [],
-  SustainabilityEthics: [],
-  BusinessOperations: [],
-});
-useEffect(() => {
-  console.log("🔍 FranchiseDetailsEdit - Data changed:", {
-    hasFranchiseTags: !!data.franchiseTags,
-    franchiseTags: data.franchiseTags,
-    hasFico: !!data.fico,
-    fico: data.fico,
-    ficoLength: data.fico?.length
-  });
-}, [data]);
-
-useEffect(() => {
-  if (data.franchiseTags) {
-    console.log("🔍 DEBUG - Raw franchiseTags from props:", data.franchiseTags);
-    
-    setCurrentTags({
-      PrimaryClassifications: Array.isArray(data.franchiseTags.PrimaryClassifications) 
-        ? data.franchiseTags.PrimaryClassifications 
-        : [],
-      // ProductServiceTypes: Array.isArray(data.franchiseTags.ProductServiceTypes) 
-      //   ? data.franchiseTags.ProductServiceTypes 
-      //   : [],
-      TargetAudience: Array.isArray(data.franchiseTags.TargetAudience) 
-        ? data.franchiseTags.TargetAudience 
-        : [],
-      ServiceModel: Array.isArray(data.franchiseTags.ServiceModel) 
-        ? data.franchiseTags.ServiceModel 
-        : [],
-      PricingValue: Array.isArray(data.franchiseTags.PricingValue) 
-        ? data.franchiseTags.PricingValue 
-        : [],
-      AmbienceExperience: Array.isArray(data.franchiseTags.AmbienceExperience) 
-        ? data.franchiseTags.AmbienceExperience 
-        : [],
-      FeaturesAmenities: Array.isArray(data.franchiseTags.FeaturesAmenities) 
-        ? data.franchiseTags.FeaturesAmenities 
-        : [],
-      TechnologyIntegration: Array.isArray(data.franchiseTags.TechnologyIntegration) 
-        ? data.franchiseTags.TechnologyIntegration 
-        : [],
-      SustainabilityEthics: Array.isArray(data.franchiseTags.SustainabilityEthics) 
-        ? data.franchiseTags.SustainabilityEthics 
-        : [],
-      BusinessOperations: Array.isArray(data.franchiseTags.BusinessOperations) 
-        ? data.franchiseTags.BusinessOperations 
-        : [],
-    });
-  } else {
-    console.log("❌ DEBUG - No franchiseTags in data:", data);
-  }
-}, [data.franchiseTags]);
-
-
-const handleOpenDrawer = () => {
-  console.log("✅ handleOpenDrawer triggered!");
-  if (!selectedCategory.sub || !selectedCategory.main) return;
-  setTempSelectedChild(selectedCategory.child || []);
-  setDrawerOpen(true);
-};
-
-
-const handleChildToggle = (child) => {
-  setTempSelectedChild((prevSelected) => {
-    let next = prevSelected.includes(child)
-      ? prevSelected.filter((item) => item !== child)
-      : [...prevSelected, child];
-
-    // ✅ Remove duplicates in case something slipped through
-    return Array.from(new Set(next));
-  });
-};
-
-const handleDone = () => {
-  // ✅ Remove duplicates before saving
-  const uniqueTags = Array.from(new Set(tempSelectedChild));
-
-  const newCategory = {
-    ...selectedCategory,
-    child: uniqueTags,
-  };
-
-  setSelectedCategory(newCategory);
-
-  // Save cleanly back to parent
-  onObjectChange("brandCategories", {
-    ...newCategory,
-    child: uniqueTags.join(" - "), // or join(" | ") if your backend expects that
-  });
-
-  setDrawerOpen(false);
-};
-useEffect(() => {
-  if (data.brandCategories) {
-    setSelectedCategory({
-      groupId: data.brandCategories?.groupId || "",
-      main: data.brandCategories?.main || "",
-      sub: data.brandCategories?.sub || "",
-      child: parseChildCategories(data.brandCategories?.child),
-    });
-  }
-}, [data.brandCategories]);
-  // Handle tag change (FIXED)
-const handleTagChange = (tagType) => (e) => {
-  const { target: { value } } = e;
-  console.log(`🔄 Updating ${tagType} with:`, value);
-  console.log(`📊 Before update - currentTags:`, currentTags);
-  
-  // Update local state first
-  const updatedTags = {
-    ...currentTags,
-    [tagType]: value,
-  };
-  
-  console.log(`📈 After update - updatedTags:`, updatedTags);
-  setCurrentTags(updatedTags);
-  
-  // Update the main form data - pass the ENTIRE updated franchiseTags object
-  console.log("📤 Sending updated franchiseTags to parent:", updatedTags);
-  onObjectChange("franchiseTags", updatedTags);
-};
-
   const aidFinancingOptions = ["Yes", "No"];
-  const agreementPeriods = [
-    "1 Year",
-    "3 Years",
-    "5 Years",
-    "7 Years",
-    "10 Years",
-  ];
+
+  // Load edit data when editIndex changes
   useEffect(() => {
     if (editIndex !== null && data.fico && data.fico[editIndex]) {
       const model = data.fico[editIndex];
@@ -375,26 +312,7 @@ const handleTagChange = (tagType) => (e) => {
     }
   }, [editIndex, data.fico]);
 
-//   const [selectedServiceTags, setSelectedServiceTags] = useState(
-//   data.serviceTags ? (Array.isArray(data.serviceTags) ? data.serviceTags : data.serviceTags.split(" | ").filter(Boolean)) : []
-// );
-
-// Add this useEffect to sync selectedServiceTags when data changes
-useEffect(() => {
-  if (data.franchiseTags) {
-    const allTags = Object.values(data.franchiseTags).flat().filter(Boolean);
-    setSelectedServiceTags(allTags);
-    setTempSelectedServiceTags(allTags);
-  }
-}, [data.franchiseTags]);
-
-  // Add this useEffect after your other useEffects
-useEffect(() => {
-  console.log("🔍 FranchiseDetailsEdit - Received data:", data);
-  console.log("🔍 FranchiseDetailsEdit - FICO data:", data.fico);
-  console.log("🔍 FranchiseDetailsEdit - isEditing:", isEditing);
-}, [data, data.fico, isEditing]);
-
+  // Handlers for form fields
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "companyOwnedOutlets" || name === "franchiseOutlets") {
@@ -413,6 +331,7 @@ useEffect(() => {
       onChange(name, value);
     }
   };
+
   const handleFicoChange = (e) => {
     const { name, value } = e.target;
     if (noFees[name]) {
@@ -439,6 +358,7 @@ useEffect(() => {
       return updated;
     });
   };
+
   const handleFeeUnitChange = (field) => (e) => {
     const { value } = e.target;
     if (value === "No Fee") {
@@ -472,6 +392,7 @@ useEffect(() => {
       }));
     }
   };
+
   const handleNoFeeToggle = (field) => (event) => {
     const checked = event.target.checked;
     setNoFees((prev) => ({
@@ -508,6 +429,8 @@ useEffect(() => {
       };
     });
   };
+
+  // Validate FICO model
   const validateFicoModel = () => {
     const requiredFields = [
       "investmentRange",
@@ -561,71 +484,84 @@ useEffect(() => {
     }
     return null;
   };
- const handleAddOrUpdateFicoModel = () => {
-  const validationError = validateFicoModel();
-  if (validationError) {
-    alert(validationError);
-    return;
-  }
-  
-  const formattedFicoModel = {
-    ...currentFicoModel,
-    franchiseFee: noFees.franchiseFee
-      ? "No Fee"
-      : currentFicoModel.franchiseFee && currentFicoModel.franchiseFeeUnit !== "select"
-      ? `${currentFicoModel.franchiseFee}${currentFicoModel.franchiseFeeUnit}`
-      : "",
-    royaltyFee: noFees.royaltyFee
-      ? "No Fee"
-      : currentFicoModel.royaltyFee && currentFicoModel.royaltyFeeUnit !== "select"
-      ? `${currentFicoModel.royaltyFee}${currentFicoModel.royaltyFeeUnit}`
-      : "",
-    interiorCost: noFees.interiorCost
-      ? "No Fee"
-      : currentFicoModel.interiorCost && currentFicoModel.interiorCostUnit !== "select"
-      ? `${currentFicoModel.interiorCost}${currentFicoModel.interiorCostUnit}`
-      : "",
-    stockInvestment: noFees.stockInvestment
-      ? "No Fee"
-      : currentFicoModel.stockInvestment && currentFicoModel.stockInvestmentUnit !== "select"
-      ? `${currentFicoModel.stockInvestment}${currentFicoModel.stockInvestmentUnit}`
-      : "",
-    otherCost: noFees.otherCost
-      ? "No Fee"
-      : currentFicoModel.otherCost && currentFicoModel.otherCostUnit !== "select"
-      ? `${currentFicoModel.otherCost}${currentFicoModel.otherCostUnit}`
-      : "",
-    requireWorkingCapital: noFees.requireWorkingCapital
-      ? "No Fee"
-      : currentFicoModel.requireWorkingCapital && currentFicoModel.requireWorkingCapitalUnit !== "select"
-      ? `${currentFicoModel.requireWorkingCapital}${currentFicoModel.requireWorkingCapitalUnit}`
-      : "",
-    roi: noFees.roi ? "No Fee" : currentFicoModel.roi,
-    payBackPeriod: noFees.roi ? "No Fee" : currentFicoModel.payBackPeriod,
+
+  // Add or update FICO model
+  const handleAddOrUpdateFicoModel = () => {
+    const validationError = validateFicoModel();
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+    
+    const formattedFicoModel = {
+      ...currentFicoModel,
+      franchiseFee: noFees.franchiseFee
+        ? "No Fee"
+        : `${currentFicoModel.franchiseFee}${
+            currentFicoModel.franchiseFeeUnit === "No Fee"
+              ? ""
+              : currentFicoModel.franchiseFeeUnit
+          }`,
+      royaltyFee: noFees.royaltyFee
+        ? "No Fee"
+        : `${currentFicoModel.royaltyFee}${
+            currentFicoModel.royaltyFeeUnit === "No Fee"
+              ? ""
+              : currentFicoModel.royaltyFeeUnit
+          }`,
+      interiorCost: noFees.interiorCost
+        ? "No Fee"
+        : `${currentFicoModel.interiorCost}${
+            currentFicoModel.interiorCostUnit === "No Fee"
+              ? ""
+              : currentFicoModel.interiorCostUnit
+          }`,
+      stockInvestment: noFees.stockInvestment
+        ? "No Fee"
+        : `${currentFicoModel.stockInvestment}${
+            currentFicoModel.stockInvestmentUnit === "No Fee"
+              ? ""
+              : currentFicoModel.stockInvestmentUnit
+          }`,
+      otherCost: noFees.otherCost
+        ? "No Fee"
+        : `${currentFicoModel.otherCost}${
+            currentFicoModel.otherCostUnit === "No Fee"
+              ? ""
+              : currentFicoModel.otherCostUnit
+          }`,
+      requireWorkingCapital: noFees.requireWorkingCapital
+        ? "No Fee"
+        : `${currentFicoModel.requireWorkingCapital}${
+            currentFicoModel.requireWorkingCapitalUnit === "No Fee"
+              ? ""
+              : currentFicoModel.requireWorkingCapitalUnit
+          }`,
+      roi: noFees.roi ? "No Fee" : currentFicoModel.roi,
+      payBackPeriod: noFees.roi ? "No Fee" : currentFicoModel.payBackPeriod,
+    };
+    
+    let updatedFico;
+    if (editIndex !== null) {
+      updatedFico = [...(data.fico || [])];
+      updatedFico[editIndex] = formattedFicoModel;
+    } else {
+      updatedFico = [...(data.fico || []), formattedFicoModel];
+    }
+    
+    onArrayChange("fico", updatedFico);
+    resetFicoForm();
   };
-
-  console.log("💾 Saving FICO model:", formattedFicoModel);
-
-  let updatedFico;
-  if (editIndex !== null) {
-    updatedFico = [...(data.fico || [])];
-    updatedFico[editIndex] = formattedFicoModel;
-  } else {
-    updatedFico = [...(data.fico || []), formattedFicoModel];
-  }
-  
-  console.log("💾 Updated FICO array:", updatedFico);
-  onArrayChange("fico", updatedFico);
-  resetFicoForm();
-};
 
   const handleEditFicoModel = (index) => {
     setEditIndex(index);
   };
+
   const handleDeleteFicoModel = (index) => {
     setDeleteIndex(index);
     setConfirmDeleteOpen(true);
   };
+
   const confirmDelete = () => {
     const updatedFico = [...(data.fico || [])];
     updatedFico.splice(deleteIndex, 1);
@@ -633,189 +569,173 @@ useEffect(() => {
     setConfirmDeleteOpen(false);
     setDeleteIndex(null);
   };
-const resetFicoForm = () => {
-  setCurrentFicoModel({
-    investmentRange: "",
-    areaRequired: "",
-    franchiseModel: "",
-    franchiseType: "",
-    franchiseFee: "",
-    franchiseFeeUnit: "select",
-    royaltyFee: "",
-    royaltyFeeUnit: "select",
-    interiorCost: "",
-    interiorCostUnit: "select",
-    stockInvestment: "",
-    stockInvestmentUnit: "select",
-    otherCost: "",
-    otherCostUnit: "select",
-    roi: "",
-    payBackPeriod: "",
-    breakEven: "",
-    requireWorkingCapital: "",
-    requireWorkingCapitalUnit: "select",
-    marginOnSales: "",
-    agreementPeriod: "",
-  });
-  setNoFees({
-    franchiseFee: false,
-    interiorCost: false,
-    stockInvestment: false,
-    otherCost: false,
-    requireWorkingCapital: false,
-    royaltyFee: false,
-    roi: false,
-  });
-  setEditIndex(null); 
-};
+
+  const resetFicoForm = () => {
+    setCurrentFicoModel({
+      investmentRange: "",
+      areaRequired: "",
+      franchiseModel: "",
+      franchiseType: "",
+      franchiseFee: "",
+      franchiseFeeUnit: "select",
+      royaltyFee: "",
+      royaltyFeeUnit: "select",
+      interiorCost: "",
+      interiorCostUnit: "select",
+      stockInvestment: "",
+      stockInvestmentUnit: "select",
+      otherCost: "",
+      otherCostUnit: "select",
+      roi: "",
+      payBackPeriod: "",
+      breakEven: "",
+      requireWorkingCapital: "",
+      requireWorkingCapitalUnit: "select",
+      marginOnSales: "",
+      agreementPeriod: "",
+    });
+    setNoFees({
+      franchiseFee: false,
+      interiorCost: false,
+      stockInvestment: false,
+      otherCost: false,
+      requireWorkingCapital: false,
+      royaltyFee: false,
+      roi: false,
+    });
+    setEditIndex(null);
+  };
+
   const handleCancelEdit = () => {
     resetFicoForm();
     setEditIndex(null);
   };
-  const parseChildCategories = (childData) => {
-  if (!childData) return [];
-  
-  if (Array.isArray(childData)) {
-    return Array.from(new Set(childData));
-  }
-  
-  // Handle string with mixed delimiters " - " and " | "
-  if (typeof childData === 'string') {
-    // First split by " | " then by " - " and flatten
-    const categories = childData
-      .split(' | ')
-      .flatMap(segment => segment.split(' - '))
-      .map(tag => tag.trim())
-      .filter(Boolean);
-    
-    return Array.from(new Set(categories));
-  }
-  
-  return [];
-};
-const [selectedCategory, setSelectedCategory] = useState({
-  groupId: data.brandCategories?.groupId || "",
-  main: data.brandCategories?.main || "",
-  sub: data.brandCategories?.sub || "",
-  child: parseChildCategories(data.brandCategories?.child),
-});
- 
-const handleOpenServiceTagDrawer = () => {
-  const tagsObj = data.franchiseTags || {};
-  
-  // Flatten all arrays into one list
-  const allSelected = Object.values(tagsObj).flat().filter(Boolean);
-  
-  setTempSelectedServiceTags(allSelected);
-  setServiceTagDrawerOpen(true);
-};
 
-const handleServiceTagToggle = (tag) => {
-  setTempSelectedServiceTags((prev) =>
-    prev.includes(tag) ? prev.filter((x) => x !== tag) : [...prev, tag]
-  );
-};
-
-const handleServiceTagDone = () => {
-  const updatedTags = {};
-
-  // Group tags by which category they belong to
-  Object.entries(serviceTagGroups).forEach(([groupLabel, options]) => {
-    // Map group labels to property names correctly
-    let propertyName;
-    switch(groupLabel) {
-      case "Primary Classification":
-        propertyName = "PrimaryClassifications";
-        break;
-      // case "Target Audience":
-      //   propertyName = "TargetAudience";
-      //   break;
-      case "Service Model":
-        propertyName = "ServiceModel";
-        break;
-      case "Pricing Value":
-        propertyName = "PricingValue";
-        break;
-      case "Ambience & Experience":
-        propertyName = "AmbienceExperience";
-        break;
-      case "Features & Amenities":
-        propertyName = "FeaturesAmenities";
-        break;
-      case "Technology Integration":
-        propertyName = "TechnologyIntegration";
-        break;
-      case "Sustainability & Ethics":
-        propertyName = "SustainabilityEthics";
-        break;
-      // case "Business Operations":
-      //   propertyName = "BusinessOperations";
-      //   break;
-      default:
-        propertyName = groupLabel.replace(/[^a-zA-Z]/g, "");
-    }
-    
-    updatedTags[propertyName] = options.filter((opt) => tempSelectedServiceTags.includes(opt));
-  });
-
-  // Save to parent
-  onObjectChange("franchiseTags", updatedTags);
-
-  // Update local state
-  setCurrentTags(updatedTags);
-  
-  // Update selectedServiceTags for display - use the actual selected tags
-  setSelectedServiceTags(tempSelectedServiceTags);
-  
-  setServiceTagDrawerOpen(false);
-};
-
-
+  // Handlers for brand categories
   const handleMainCategoryChange = (e) => {
     const mainCategory = e.target.value;
+    
+    // Fetch industry details when an industry is selected
+    fetchIndustryDetails(mainCategory);
+    
     const newCategory = {
       groupId: "",
       main: mainCategory,
       sub: "",
-      child: [],
+      productTags: [],
+      serviceTags: [],
     };
     setSelectedCategory(newCategory);
     onObjectChange("brandCategories", newCategory);
   };
+
+  
   const handleSubCategoryChange = (e) => {
     const subCategory = e.target.value;
-    const group = categories
-      .find((cat) => cat.name === selectedCategory.main)
-      ?.children?.find((sub) => sub.name === subCategory);
+    
     const newCategory = {
-      groupId: group?.groupId || "",
+      groupId: "",
       main: selectedCategory.main,
       sub: subCategory,
-      child: [],
+      productTags: selectedCategory.productTags,
+      serviceTags: selectedCategory.serviceTags,
     };
     setSelectedCategory(newCategory);
     onObjectChange("brandCategories", newCategory);
   };
-  const handleChildCategoryChange = (e) => {
-    const {
-      target: { value },
-    } = e;
-    const newChild = typeof value === "string" ? value.split(" - ") : value;
+
+  // Drawer handlers for product tags
+  const handleOpenDrawer = () => {
+    if (!selectedCategory.sub || !selectedCategory.main) return;
+    setTempProductTags(selectedCategory.productTags || []);
+    setDrawerOpen(true);
+  };
+
+  const handleChildToggle = (parent, child) => {
+    setTempProductTags((prev) => {
+      let newPrev = [...prev];
+      let group = newPrev.find((g) => g.parent === parent);
+      let newTags;
+      if (group) {
+        newTags = [...group.tags];
+        const idx = newTags.indexOf(child);
+        if (idx > -1) {
+          newTags.splice(idx, 1);
+        } else {
+          newTags.push(child);
+        }
+        const groupIndex = newPrev.findIndex((g) => g.parent === parent);
+        newPrev[groupIndex] = { ...group, tags: newTags };
+      } else {
+        newTags = [child];
+        newPrev.push({ parent, tags: newTags });
+      }
+      if (newTags.length === 0 && group) {
+        newPrev = newPrev.filter((g) => g.parent !== parent);
+      }
+      return newPrev;
+    });
+  };
+
+  const handleDone = () => {
+    const updatedProductTags = tempProductTags.filter((g) => g.tags.length > 0);
     const newCategory = {
       ...selectedCategory,
-      child: newChild,
+      productTags: updatedProductTags,
     };
     setSelectedCategory(newCategory);
-    // Send as string to backend
-    const toSend = {
-      ...newCategory,
-      child: newChild.join(" - "),
-    };
-    onObjectChange("brandCategories", toSend);
+    onObjectChange("brandCategories", newCategory);
+    setDrawerOpen(false);
   };
+
+  // Drawer handlers for service tags
+  const handleOpenServiceTagDrawer = () => {
+    setTempServiceTags(selectedCategory.serviceTags || []);
+    setServiceTagDrawerOpen(true);
+  };
+
+  const handleServiceTagToggle = (parent, tag) => {
+    setTempServiceTags((prev) => {
+      let newPrev = [...prev];
+      let group = newPrev.find((g) => g.parent === parent);
+      let newTags;
+      if (group) {
+        newTags = [...group.tags];
+        const idx = newTags.indexOf(tag);
+        if (idx > -1) {
+          newTags.splice(idx, 1);
+        } else {
+          newTags.push(tag);
+        }
+        const groupIndex = newPrev.findIndex((g) => g.parent === parent);
+        newPrev[groupIndex] = { ...group, tags: newTags };
+      } else {
+        newTags = [tag];
+        newPrev.push({ parent, tags: newTags });
+      }
+      if (newTags.length === 0 && group) {
+        newPrev = newPrev.filter((g) => g.parent !== parent);
+      }
+      return newPrev;
+    });
+  };
+
+  const handleServiceTagDone = () => {
+    const updatedServiceTags = tempServiceTags.filter((g) => g.tags.length > 0);
+    const newCategory = {
+      ...selectedCategory,
+      serviceTags: updatedServiceTags,
+    };
+    setSelectedCategory(newCategory);
+    onObjectChange("brandCategories", newCategory);
+    setServiceTagDrawerOpen(false);
+  };
+
+  // Handlers for USP and description
   const handleDescriptionChange = (e) => {
     onChange("brandDescription", e.target.value);
   };
+
   const handleAddUSP = () => {
     const trimmedUSP = currentUSP.trim();
     if (!trimmedUSP) return;
@@ -829,11 +749,13 @@ const handleServiceTagDone = () => {
     onArrayChange("uniqueSellingPoints", updatedUSPs);
     setCurrentUSP("");
   };
+
   const handleRemoveUSP = (index) => {
     const updatedUSPs = [...(data.uniqueSellingPoints || [])];
     updatedUSPs.splice(index, 1);
     onArrayChange("uniqueSellingPoints", updatedUSPs);
   };
+
   const handleTrainingSupportChange = (option, checked) => {
     const newValue = checked
       ? [...(data.trainingSupport || []), option]
@@ -841,17 +763,11 @@ const handleServiceTagDone = () => {
     onArrayChange("trainingSupport", newValue);
   };
 
-const formatCurrency = (value) => {
-  if (!value || value === "No Fee" || value === "select") return value || "N/A";
-  
-  // If value already contains the unit, return as is
-  if (typeof value === 'string' && (value.includes('Lakhs') || value.includes('Thousands') || value.includes('%'))) {
-    return value;
-  }
-  
-  // Otherwise, add .Rs suffix
-  return `${value}.Rs`;
-};
+  const formatCurrency = (value) => {
+    if (!value) return "";
+    return value !== "No Fee" ? `${value}.Rs` : value;
+  };
+
   return (
     <Box sx={{ pr: 1, mr: { sm: 0, md: 10 }, ml: { sm: 0, md: 10 } }}>
       {/* Delete Confirmation Dialog */}
@@ -871,1101 +787,448 @@ const formatCurrency = (value) => {
         </DialogActions>
       </Dialog>
 
-{/* Brand Categories Section - Sub-child dropdown shows items in grid (3 columns) */}
-<Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
-  Brand Categories
-</Typography>
-
-<Box
-  sx={{
-    display: "grid",
-    gridTemplateColumns: "repeat(4, minmax(240px, 1fr))", 
-    gap: 2,
-    mb: 4,
-    width: "100%",
-    minWidth: "100%",
-    overflow: "hidden",
-  }}
->
-  {/* Industries */}
-  <FormControl fullWidth size="medium">
-    <InputLabel id="industries-label">Industries</InputLabel>
-    <Select
-      labelId="industries-label"
-      id="industries-select"
-      value={selectedCategory.main || ""}
-      label="Industries"
-      onChange={handleMainCategoryChange}
-      disabled={!isEditing}
-      sx={{
-        minHeight: 56,
-        "& .MuiSelect-select": {
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis", // ✅ truncate long text
-        },
-      }}
-      MenuProps={{
-        PaperProps: { sx: { maxHeight: 320, width: 400 } }, 
-      }}
-      renderValue={(selected) => (
-        <Box
-          sx={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {selected}
-        </Box>
-      )}
-    >
-      {categories.map((category) => (
-        <MenuItem key={category.name} value={category.name}>
-          {category.name}
-        </MenuItem>
-      ))}
-    </Select>
-    {errors.mainCategory && (
-      <FormHelperText error>{errors.mainCategory}</FormHelperText>
-    )}
-  </FormControl>
-
-  {/* Main Category */}
-  <FormControl fullWidth size="medium">
-    <InputLabel id="main-cat-label">Main Category</InputLabel>
-    <Select
-      labelId="main-cat-label"
-      id="main-cat-select"
-      value={selectedCategory.sub || ""}
-      label="Main Category"
-      onChange={handleSubCategoryChange}
-      disabled={!isEditing || !selectedCategory.main}
-      sx={{
-        minHeight: 56,
-        "& .MuiSelect-select": {
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-        },
-      }}
-      MenuProps={{
-        PaperProps: { sx: { maxHeight: 320, width: 400 } },
-      }}
-      renderValue={(selected) => (
-        <Box
-          sx={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-          }}
-        >
-          {selected}
-        </Box>
-      )}
-    >
-      {selectedCategory.main &&
-        categories
-          .find((cat) => cat.name === selectedCategory.main)
-          ?.children?.map((subCategory) => (
-            <MenuItem key={subCategory.name} value={subCategory.name}>
-              {subCategory.name}
-            </MenuItem>
-          ))}
-    </Select>
-    {errors.subCategory && (
-      <FormHelperText error>{errors.subCategory}</FormHelperText>
-    )}
-  </FormControl>
-
-  {/* Product Tag */}
-  <FormControl fullWidth size="medium">
-    <TextField
-      id="sub-cat-field"
-      value={
-        selectedCategory.child?.length
-          ? `${selectedCategory.child.length} tag(s) selected`
-          : "Select Product Tags"
-      }
-      placeholder="Select Product Tags"
-      onClick={handleOpenDrawer}
-      disabled={!isEditing}
-      InputProps={{
-        readOnly: true,
-        sx: {
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-          cursor: isEditing ? "pointer" : "default",
-          userSelect: "none",
-        },
-      }}
-      sx={{ minHeight: 56 }}
-    />
-  </FormControl>
-
-  {/* Service Tag */}
-  <FormControl fullWidth size="medium">
-    <TextField
-      id="service-tag-field"
-      variant="outlined"
-      value={
-        selectedServiceTags.length
-          ? `${selectedServiceTags.length} tag(s) selected`
-          : "Select Service Tags"
-      }
-      placeholder="Select Service Tags"
-      onClick={handleOpenServiceTagDrawer}
-      disabled={!isEditing || !selectedCategory.sub}
-      InputProps={{
-        readOnly: true,
-        sx: {
-          overflow: "hidden",
-          whiteSpace: "nowrap",
-          textOverflow: "ellipsis",
-          cursor: isEditing ? "pointer" : "default",
-          userSelect: "none",
-        },
-      }}
-      sx={{ minHeight: 56 }}
-    />
-  </FormControl>
-</Box>
-
-
-{!!selectedCategory.child?.length && (
-  <Box sx={{ mt: 2, width: "100%" }}>
-    <Box
-      onClick={() => setShowSelectedBar((v) => !v)}
-      sx={{
-        px: 2,
-        py: 1,
-        mb: 3,
-        bgcolor: "grey.100",
-        borderRadius: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        cursor: "pointer",
-        userSelect: "none",
-      }}
-    >
-      <Typography variant="subtitle1" fontWeight={700}>
-        View Selected Product Tags
+      {/* Brand Categories Section */}
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
+        Brand Categories
       </Typography>
-      {showSelectedBar ? <ExpandLess /> : <ExpandMore />}
-    </Box>
-
-    <Collapse in={showSelectedBar}>
-      <Box sx={{ px: 2, py: 2, borderRadius: 1 }}>
-        {/* ✅ Group by subcategory */}
-        {(() => {
-          const mainCat = categories.find(
-            (cat) => cat.name === selectedCategory.main
-          );
-          if (!mainCat || !mainCat.children) return null;
-
-          // Find subcategories with selected child tags
-          const grouped = mainCat.children
-            .map((sub) => {
-              const matchingChildren = sub.children?.filter((child) =>
-                selectedCategory.child.includes(child)
-              );
-              if (matchingChildren?.length) {
-                return { subName: sub.name, tags: matchingChildren };
-              }
-              return null;
-            })
-            .filter(Boolean);
-
-          // Render grouped chips
-          return grouped.length > 0 ? (
-            grouped.map(({ subName, tags }) => (
-              <Box key={subName} sx={{ mb: 3 }}>
-                <Typography
-                  variant="subtitle1"
-                  fontWeight={600}
-                  sx={{ color: "#ff9800", mb: 1 }}
-                >
-                  {subName}
-                </Typography>
-                <Stack direction="row" flexWrap="wrap" gap={1}>
-                  {tags.map((tag) => (
-                    <Chip key={tag} label={tag} size="small" />
-                  ))}
-                </Stack>
-              </Box>
-            ))
-          ) : (
-            <Typography sx={{ color: "text.secondary", fontStyle: "italic" }}>
-              No product tags selected for this category.
-            </Typography>
-          );
-        })()}
-      </Box>
-    </Collapse>
-  </Box>
-)}
-
-{/* View Selected Service Tags Section */}
-{!!selectedServiceTags.length && (
-  <Box sx={{ mt: 2, width: '100%' }}>
-    <Box
-      onClick={() => setShowSelectedServiceTags((v) => !v)}
-      sx={{
-        px: 2,
-        py: 1,
-        mb: 3,
-        bgcolor: 'grey.100',
-        borderRadius: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        cursor: 'pointer',
-        userSelect: 'none',
-      }}
-    >
-      <Typography variant="subtitle1" fontWeight={700}>
-        View Selected Service Tags 
-      </Typography>
-      {showSelectedServiceTags ? <ExpandLess /> : <ExpandMore />}
-    </Box>
-
-    <Collapse in={showSelectedServiceTags}>
-      <Box sx={{ px: 2, py: 2 }}>
-        {/* Group service tags by category */}
-        {Object.entries(serviceTagGroups).map(([groupLabel, options]) => {
-          const selectedInGroup = options.filter(opt => 
-            selectedServiceTags.includes(opt) // Changed from tempSelectedServiceTags
-          );
-          
-          if (selectedInGroup.length === 0) return null;
-          
-          return (
-            <Box key={groupLabel} sx={{ mb: 2 }}>
-              <Typography 
-                variant="subtitle2" 
-                fontWeight={600} 
-                sx={{ color: '#ff9800', mb: 1 }}
-              >
-                {groupLabel}:
-              </Typography>
-              <Stack direction="row" flexWrap="wrap" gap={1}>
-                {selectedInGroup.map((tag) => (
-                  <Chip
-                    key={tag}
-                    label={tag}
-                    size="small"
-                    variant="outlined"
-                  />
-                ))}
-              </Stack>
-            </Box>
-          );
-        })}
-      </Box>
-    </Collapse>
-  </Box>
-)}
-
-{/* Drawer for Service tags */}
-<Drawer
-  anchor="top"
-  open={serviceTagDrawerOpen}
-  onClose={() => setServiceTagDrawerOpen(false)}
-  PaperProps={{ sx: { height: "95vh" } }}
->
-  <AppBar position="sticky" color="default" elevation={1}>
-    <Toolbar sx={{ justifyContent: "space-between" }}>
-      <Typography variant="h6" sx={{ color: "#ff9800" }}>
-        All Service Tags
-      </Typography>
-      <IconButton onClick={() => setServiceTagDrawerOpen(false)}>
-        <CloseIcon />
-      </IconButton>
-    </Toolbar>
-  </AppBar>
-
-  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
-    {Object.entries(serviceTagGroups).map(([groupLabel, options]) => (
-      <Box key={groupLabel} sx={{ mb: 3 }}>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: 700, mb: 1, color: "#ff9800" }}
-        >
-          {groupLabel}
-        </Typography>
-
-       <Grid container spacing={1}>
-  {options.map((opt) => (
-    <Grid item xs={12} sm={6} md={3} key={opt}>
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={tempSelectedServiceTags.includes(opt)}
-            onChange={() => handleServiceTagToggle(opt)}
-            color="primary"
-          />
-        }
-        label={
-          <Typography variant="body2">
-            {opt}
-          </Typography>
-        }
-        sx={{
-          width: '100%',
-          margin: 0,
-          '& .MuiFormControlLabel-label': {
-            width: '100%',
-          }
-        }}
-      />
-    </Grid>
-  ))}
-</Grid>
-      </Box>
-    ))}
-  </Box>
-
-  <Box
-    sx={{
-      position: "sticky",
-      bottom: 0,
-      p: 2,
-      bgcolor: "background.paper",
-      borderTop: "1px solid rgba(0,0,0,0.12)",
-      display: "flex",
-      justifyContent: "space-between",
-    }}
-  >
-    <Typography>{tempSelectedServiceTags.length} tag(s) selected</Typography>
-    <Box>
-      <Button
-        onClick={() => setServiceTagDrawerOpen(false)}
-        sx={{ mr: 2 }}
-        variant="outlined"
-      >
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        onClick={handleServiceTagDone}
-        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
-      >
-        Done
-      </Button>
-    </Box>
-  </Box>
-</Drawer>
-
-{/*Drawer for product tags */}
-<Drawer
-  anchor="top"
-  open={drawerOpen}
-  onClose={() => setDrawerOpen(false)}
-  PaperProps={{ sx: { height: "95vh" } }}
->
-  <AppBar position="sticky" color="default" elevation={1}>
-    <Toolbar sx={{ justifyContent: "space-between" }}>
-      <Typography variant="h6" sx={{ color: "#ff9800" }}>
-        Select Product Tags - All Categories
-      </Typography>
-      <IconButton onClick={() => setDrawerOpen(false)}>
-        <CloseIcon />
-      </IconButton>
-    </Toolbar>
-  </AppBar>
-
-  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
-    {/* Show ALL categories and their children */}
-    {categories.map((category) => (
-      <Box key={category.name} sx={{ mb: 4 }}>
-        <Typography
-          variant="h6"
-          sx={{ 
-            fontWeight: 700, 
-            mb: 2, 
-            color: "#ff9800",
-            borderBottom: "2px solid #ff9800",
-            pb: 1
-          }}
-        >
-          {category.name}
-        </Typography>
-        
-        {category.children?.map((subCategory) => (
-          <Box key={subCategory.name} sx={{ mb: 3, ml: 2 }}>
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 600, mb: 1, color: "text.primary" }}
-            >
-              {subCategory.name}
-            </Typography>
-            
-            <Grid container spacing={1}>
-              {subCategory.children?.map((child) => (
-                <Grid item xs={12} sm={6} md={3} key={child}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={tempSelectedChild.includes(child)}
-                        onChange={() => handleChildToggle(child)}
-                        color="primary"
-                      />
-                    }
-                    label={
-                      <Typography variant="body2">
-                        {child}
-                      </Typography>
-                    }
-                    sx={{
-                      width: '100%',
-                      margin: 0,
-                      '& .MuiFormControlLabel-label': {
-                        width: '100%',
-                      }
-                    }}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-        ))}
-      </Box>
-    ))}
-  </Box>
-
-  <Box
-    sx={{
-      position: "sticky",
-      bottom: 0,
-      p: 2,
-      bgcolor: "background.paper",
-      borderTop: "1px solid rgba(0,0,0,0.12)",
-      display: "flex",
-      justifyContent: "space-between",
-    }}
-  >
-    <Typography>{tempSelectedChild.length} tag(s) selected</Typography>
-    <Box>
-      <Button
-        onClick={() => setDrawerOpen(false)}
-        sx={{ mr: 2 }}
-        variant="outlined"
-      >
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        onClick={handleDone}
-        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
-      >
-        Done
-      </Button>
-    </Box>
-  </Box>
-</Drawer>
-
-
-
- {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
-        Franchise Tags
-      </Typography>
-
       <Grid
         container
         spacing={2}
         sx={{
+          mt: 3,
           display: "grid",
-          gridTemplateColumns: { md: "repeat(3, 1fr)", xs: "1fr" },
+          gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
           gap: 2,
-          mb: 4,
-          mt: 2,
+          mb: 2,
         }}
       >
-        {/* Primary Classification */}
-        {/* <Grid item xs={12}>
-          <FormControl
-            fullWidth
-            error={!!errors.PrimaryClassifications}
-            required
-            size="medium"
-          >
-            <InputLabel>Primary Classification</InputLabel>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth size="medium" error={Boolean(errors.mainCategory)}>
+            <InputLabel id="industries-label">Industries</InputLabel>
             <Select
-              multiple
-              value={currentTags.PrimaryClassifications || []}
-              onChange={handleTagChange('PrimaryClassifications')}
-              name="PrimaryClassifications"
-              label="Primary Classification"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
+              labelId="industries-label"
+              id="industries-select"
+              value={selectedCategory.main || ""}
+              label="Industries"
+              onChange={handleMainCategoryChange}
+              sx={{ minHeight: 56 }}
               MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                    width: 500,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '10px',
-                    padding: '10px',
-                  },
-                },
+                PaperProps: { sx: { maxHeight: 320 } },
               }}
+              disabled={!isEditing || loading}
             >
-              {PrimaryClassifications.map((classification) => (
-                <MenuItem key={classification} value={classification}>
-                  <Checkbox
-                    checked={(currentTags.PrimaryClassifications || []).indexOf(classification) > -1}
-                  />
-                  <ListItemText primary={classification} />
-                </MenuItem>
-              ))}
+              {loading ? (
+                <MenuItem value="" disabled>Loading industries...</MenuItem>
+              ) : (
+                industries.map((industry) => (
+                  <MenuItem key={industry} value={industry}>
+                    {industry}
+                  </MenuItem>
+                ))
+              )}
             </Select>
-            {errors.PrimaryClassifications && (
-              <FormHelperText error>
-                {errors.PrimaryClassifications}
-              </FormHelperText>
+            {errors.mainCategory && (
+              <FormHelperText error>{errors.mainCategory}</FormHelperText>
             )}
           </FormControl>
-        </Grid> */}
-
-        {/* Product/Service Types */}
-       {/* Product/Service Types - FIXED */}
-{/* <Grid item>
-  <FormControl
-    fullWidth
-    error={!!errors.ProductServiceTypes}
-    required
-    size="medium"
-  >
-    <InputLabel>Product/Service Types</InputLabel>
-    <Select
-      multiple
-      value={currentTags.ProductServiceTypes || []} // Changed from productServiceTypes
-      onChange={handleTagChange('ProductServiceTypes')} // Changed from productServiceTypes
-      name="ProductServiceTypes" // Changed from productServiceTypes
-      label="Product/Service Types"
-      renderValue={(selected) => selected.join(', ')}
-      disabled={!isEditing}
-      MenuProps={{
-        PaperProps: {
-          style: {
-            maxHeight: 400,
-            width: 400,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            columnGap: '8px',
-            padding: '8px',
-          },
-        },
-      }}
-    >
-      {productServiceType.map((type) => (
-        <MenuItem key={type} value={type}>
-          <Checkbox
-            checked={(currentTags.ProductServiceTypes || []).indexOf(type) > -1} // Changed from productServiceTypes
-          />
-          <ListItemText primary={type} />
-        </MenuItem>
-      ))}
-    </Select>
-    {errors.ProductServiceTypes && ( // Changed from productServiceTypes
-      <FormHelperText error>{errors.ProductServiceTypes}</FormHelperText> // Changed from productServiceTypes
-    )}
-  </FormControl>
-</Grid> */}
-
-        {/* Target Audience */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.TargetAudience}
-            required
-            size="medium"
-          >
-            <InputLabel>Target Audience</InputLabel>
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <FormControl fullWidth size="medium" error={Boolean(errors.subCategory)}>
+            <InputLabel id="main-cat-label">Main Category</InputLabel>
             <Select
-              multiple
-              value={currentTags.TargetAudience || []}
-              onChange={handleTagChange('TargetAudience')}
-              name="TargetAudience"
-              label="Target Audience"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
+              labelId="main-cat-label"
+              id="main-cat-select"
+              value={selectedCategory.sub || ""}
+              label="Main Category"
+              onChange={handleSubCategoryChange}
+              disabled={!isEditing || !selectedCategory.main || loadingIndustryDetails}
+              sx={{ minHeight: 56 }}
               MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                    width: 350,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
+                PaperProps: { sx: { maxHeight: 320 } },
               }}
             >
-              {TargetAudience.map((audience) => (
-                <MenuItem key={audience} value={audience}>
-                  <Checkbox
-                    checked={(currentTags.TargetAudience || []).indexOf(audience) > -1}
-                  />
-                  <ListItemText primary={audience} />
-                </MenuItem>
-              ))}
+              {loadingIndustryDetails ? (
+                <MenuItem value="" disabled>Loading categories...</MenuItem>
+              ) : (
+                industryData?.categories?.map((category) => (
+                  <MenuItem key={category} value={category}>
+                    {category}
+                  </MenuItem>
+                ))
+              )}
             </Select>
-            {errors.TargetAudience && (
-              <FormHelperText error>{errors.TargetAudience}</FormHelperText>
+            {errors.subCategory && (
+              <FormHelperText error>{errors.subCategory}</FormHelperText>
             )}
           </FormControl>
-        </Grid> */}
-
-        {/* Service Model */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.ServiceModel}
-            required
-            size="medium"
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <Button
+            id="sub-cat-button"
+            variant="outlined"
+            onClick={handleOpenDrawer}
+            disabled={!isEditing || !selectedCategory.sub}
+            error={Boolean(errors.productTags)}
+            sx={{
+              height: 56,
+              color: errors.productTags ? "error.main" : "#ff9800",
+              borderColor: errors.productTags ? "error.main" : "inherit",
+              width: "100%",
+              justifyContent: "flex-start",
+              textTransform: "none",
+            }}
           >
-            <InputLabel>Service Model</InputLabel>
-            <Select
-              multiple
-              value={currentTags.ServiceModel || []}
-              onChange={handleTagChange('ServiceModel')}
-              name="ServiceModel"
-              label="Service Model"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                    width: 350,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {ServiceModel.map((model) => (
-                <MenuItem key={model} value={model}>
-                  <Checkbox
-                    checked={(currentTags.ServiceModel || []).indexOf(model) > -1}
-                  />
-                  <ListItemText primary={model} />
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.ServiceModel && (
-              <FormHelperText error>{errors.ServiceModel}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
-
-        {/* Pricing Value */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.PricingValue}
-            required
-            size="medium"
+            <AddIcon sx={{ mr: 1 }} /> {totalProductTags
+              ? `${totalProductTags} Tags selected`
+              : " Select Product Tags"}
+          </Button>
+          {errors.productTags && (
+            <FormHelperText error>{errors.productTags}</FormHelperText>
+          )}
+        </Grid>
+        <Grid item xs={12} md={3}>
+          <Button
+            id="service-tag-button"
+            variant="outlined"
+            onClick={handleOpenServiceTagDrawer}
+            disabled={!isEditing || !selectedCategory.sub}
+            error={Boolean(errors.serviceTags)}
+            sx={{
+              color: errors.serviceTags ? "error.main" : "#ff9800",
+              borderColor: errors.serviceTags ? "error.main" : "inherit",
+              height: 56,
+              width: "100%",
+              justifyContent: "flex-start",
+              textTransform: "none",
+            }}
           >
-            <InputLabel>Pricing Value</InputLabel>
-            <Select
-              multiple
-              value={currentTags.PricingValue || []}
-              onChange={handleTagChange('PricingValue')}
-              name="PricingValue"
-              label="Pricing Value"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 300,
-                    width: 250,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {PricingValue.map((price) => (
-                <MenuItem key={price} value={price}>
-                  <Checkbox
-                    checked={(currentTags.PricingValue || []).indexOf(price) > -1}
-                  />
-                  <ListItemText primary={price} />
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.PricingValue && (
-              <FormHelperText error>{errors.PricingValue}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
+            <AddIcon sx={{ mr: 1 }} /> {totalServiceTags
+              ? `${totalServiceTags} Tags selected`
+              : "Select Service Tags"}
+          </Button>
+          {errors.serviceTags && (
+            <FormHelperText error>{errors.serviceTags}</FormHelperText>
+          )}
+        </Grid>
+      </Grid>
 
-        {/* Ambience Experience */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.AmbienceExperience}
-            required
-            size="medium"
+      {/* View Selected Product Tags Section */}
+      {!!totalProductTags && (
+        <Box sx={{ mt: 2, width: "100%" }}>
+          <Box
+            onClick={() => setShowSelectedBar((v) => !v)}
+            sx={{
+              px: 2,
+              py: 1,
+              mb: 3,
+              bgcolor: "grey.100",
+              borderRadius: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              userSelect: "none",
+            }}
           >
-            <InputLabel>Ambience & Experience</InputLabel>
-            <Select
-              multiple
-              value={currentTags.AmbienceExperience || []}
-              onChange={handleTagChange('AmbienceExperience')}
-              name="AmbienceExperience"
-              label="Ambience & Experience"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                    width: 380,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {AmbienceExperience.map((ambience) => (
-                <MenuItem key={ambience} value={ambience}>
-                  <Checkbox
-                    checked={(currentTags.AmbienceExperience || []).indexOf(ambience) > -1}
-                  />
-                  <ListItemText primary={ambience} />
-                </MenuItem>
+            <Typography variant="subtitle1" fontWeight={700}>
+              View Selected Product Tags
+            </Typography>
+            {showSelectedBar ? <ExpandLess /> : <ExpandMore />}
+          </Box>
+          <Collapse in={showSelectedBar}>
+            <Box sx={{ px: 2, py: 2 }}>
+              {selectedCategory.productTags.map(({ parent, tags }) => (
+                tags.length > 0 && (
+                  <Box key={parent} sx={{ mb: 2 }}>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={600}
+                      sx={{ color: "#ff9800", mb: 1 }}
+                    >
+                      {parent}:
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                      {tags.map((tag) => (
+                        <Chip
+                          key={tag}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                )
               ))}
-            </Select>
-            {errors.AmbienceExperience && (
-              <FormHelperText error>{errors.AmbienceExperience}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
+            </Box>
+          </Collapse>
+        </Box>
+      )}
 
-        {/* Features & Amenities */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.FeaturesAmenities}
-            required
-            size="medium"
+      {/* View Selected Service Tags Section */}
+      {!!totalServiceTags && (
+        <Box sx={{ mt: 2, width: "100%" }}>
+          <Box
+            onClick={() => setShowSelectedServiceTags((v) => !v)}
+            sx={{
+              px: 2,
+              py: 1,
+              mb: 3,
+              bgcolor: "grey.100",
+              borderRadius: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              cursor: "pointer",
+              userSelect: "none",
+            }}
           >
-            <InputLabel>Features & Amenities</InputLabel>
-            <Select
-              multiple
-              value={currentTags.FeaturesAmenities || []}
-              onChange={handleTagChange('FeaturesAmenities')}
-              name="FeaturesAmenities"
-              label="Features & Amenities"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 400,
-                    width: 350,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {FeaturesAmenities.map((feature) => (
-                <MenuItem key={feature} value={feature}>
-                  <Checkbox
-                    checked={(currentTags.FeaturesAmenities || []).indexOf(feature) > -1}
-                  />
-                  <ListItemText primary={feature} />
-                </MenuItem>
+            <Typography variant="subtitle1" fontWeight={700}>
+              View Selected Service Tags
+            </Typography>
+            {showSelectedServiceTags ? <ExpandLess /> : <ExpandMore />}
+          </Box>
+          <Collapse in={showSelectedServiceTags}>
+            <Box sx={{ px: 2, py: 2 }}>
+              {selectedCategory.serviceTags.map(({ parent, tags }) => (
+                tags.length > 0 && (
+                  <Box key={parent} sx={{ mb: 2 }}>
+                    <Typography
+                      variant="subtitle2"
+                      fontWeight={600}
+                      sx={{ color: "#ff9800", mb: 1 }}
+                    >
+                      {parent}:
+                    </Typography>
+                    <Stack direction="row" flexWrap="wrap" gap={1}>
+                      {tags.map((tag) => (
+                        <Chip
+                          key={tag}
+                          label={tag}
+                          size="small"
+                          variant="outlined"
+                        />
+                      ))}
+                    </Stack>
+                  </Box>
+                )
               ))}
-            </Select>
-            {errors.FeaturesAmenities && (
-              <FormHelperText error>{errors.FeaturesAmenities}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
+            </Box>
+          </Collapse>
+        </Box>
+      )}
 
-        {/* Technology Integration */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.TechnologyIntegration}
-            required
-            size="medium"
-          >
-            <InputLabel>Technology Integration</InputLabel>
-            <Select
-              multiple
-              value={currentTags.TechnologyIntegration || []}
-              onChange={handleTagChange('TechnologyIntegration')}
-              name="TechnologyIntegration"
-              label="Technology Integration"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 300,
-                    width: 320,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {TechnologyIntegration.map((tech) => (
-                <MenuItem key={tech} value={tech}>
-                  <Checkbox
-                    checked={(currentTags.TechnologyIntegration || []).indexOf(tech) > -1}
-                  />
-                  <ListItemText primary={tech} />
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.TechnologyIntegration && (
-              <FormHelperText error>{errors.TechnologyIntegration}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
-
-        {/* Sustainability & Ethics */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.SustainabilityEthics}
-            required
-            size="medium"
-          >
-            <InputLabel>Sustainability & Ethics</InputLabel>
-            <Select
-              multiple
-              value={currentTags.SustainabilityEthics || []}
-              onChange={handleTagChange('SustainabilityEthics')}
-              name="SustainabilityEthics"
-              label="Sustainability & Ethics"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 350,
-                    width: 320,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {SustainabilityEthics.map((sustainability) => (
-                <MenuItem key={sustainability} value={sustainability}>
-                  <Checkbox
-                    checked={(currentTags.SustainabilityEthics || []).indexOf(sustainability) > -1}
-                  />
-                  <ListItemText primary={sustainability} />
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.SustainabilityEthics && (
-              <FormHelperText error>{errors.SustainabilityEthics}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
-
-        {/* Business Operations */}
-        {/* <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.BusinessOperations}
-            required
-            size="medium"
-          >
-            <InputLabel>Business Operations</InputLabel>
-            <Select
-              multiple
-              value={currentTags.BusinessOperations || []}
-              onChange={handleTagChange('BusinessOperations')}
-              name="BusinessOperations"
-              label="Business Operations"
-              renderValue={(selected) => selected.join(', ')}
-              disabled={!isEditing}
-              MenuProps={{
-                PaperProps: {
-                  style: {
-                    maxHeight: 300,
-                    width: 280,
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(2, 1fr)',
-                    columnGap: '8px',
-                    padding: '8px',
-                  },
-                },
-              }}
-            >
-              {BusinessOperation.map((operation) => (
-                <MenuItem key={operation} value={operation}>
-                  <Checkbox
-                    checked={(currentTags.BusinessOperations || []).indexOf(operation) > -1}
-                  />
-                  <ListItemText primary={operation} />
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.BusinessOperations && (
-              <FormHelperText error>{errors.BusinessOperations}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
-      {/* </Grid> */} 
-{/* Display saved Franchise Tags */}
-{/* <Box sx={{ mt: 4 }}>
-  <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-    Saved Franchise Tags
-  </Typography>
-  <Box 
-    sx={{ 
-      width: "100%", 
-      overflowX: "auto", 
-      margin: "0 auto",
-      border: "1px solid #e0e0e0",
-      borderRadius: 1
-    }}
-  >
-    <TableContainer>
-      <Table
-        stickyHeader
-        aria-label="saved franchise tags"
-        size="medium"
-        sx={{
-          minWidth: 1200,
-          "& th, & td": {
-            padding: "12px 16px",
-            fontSize: "0.875rem",
-            whiteSpace: "nowrap",
-            borderRight: "1px solid #e0e0e0",
-          },
-          "& th:last-child, & td:last-child": {
-            borderRight: "none",
-          },
-        }}
+      {/* Drawer for Product Tags */}
+      <Drawer
+        anchor="top"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{ sx: { height: "95vh" } }}
       >
-        <TableHead>
-          <TableRow>
-            {[
-              "Primary Classification",
-              "Product/Service Types", 
-              "Target Audience",
-              "Service Model",
-              "Pricing Value",
-              "Ambience & Experience",
-              "Features & Amenities",
-              "Technology Integration",
-              "Sustainability & Ethics",
-              "Business Operations",
-            ].map((label, i) => (
-              <TableCell
-                key={i}
+        <AppBar position="sticky" color="default" elevation={1}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+            <Typography variant="h6" sx={{ color: "#ff9800" }}>
+              All Product Tags - Browse All Categories
+            </Typography>
+            <IconButton onClick={() => setDrawerOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
+          {industryData && industryData.productTags ? (
+            <Box sx={{ mb: 4 }}>
+              <Typography
+                variant="h6"
                 sx={{
-                  fontWeight: "bold",
-                  backgroundColor: "#f5f5f5",
-                  position: "sticky",
-                  top: 0,
-                  zIndex: 1,
+                  fontWeight: 700,
+                  mb: 2,
+                  color: "#ff9800",
+                  borderBottom: "2px solid #ff9800",
+                  pb: 1,
                 }}
               >
-                {label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-     <TableBody>
-  {Object.values(currentTags).some(tagArray => tagArray.length > 0) ? (
-    <TableRow hover>
-      <TableCell>
-        {Array.isArray(currentTags.PrimaryClassifications) && currentTags.PrimaryClassifications.length > 0 
-          ? [...new Set(currentTags.PrimaryClassifications)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.ProductServiceTypes) && currentTags.ProductServiceTypes.length > 0 // Changed
-          ? [...new Set(currentTags.ProductServiceTypes)].join(', ') // Changed
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.TargetAudience) && currentTags.TargetAudience.length > 0 
-          ? [...new Set(currentTags.TargetAudience)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.ServiceModel) && currentTags.ServiceModel.length > 0 
-          ? [...new Set(currentTags.ServiceModel)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.PricingValue) && currentTags.PricingValue.length > 0 
-          ? [...new Set(currentTags.PricingValue)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.AmbienceExperience) && currentTags.AmbienceExperience.length > 0 
-          ? [...new Set(currentTags.AmbienceExperience)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.FeaturesAmenities) && currentTags.FeaturesAmenities.length > 0 
-          ? [...new Set(currentTags.FeaturesAmenities)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.TechnologyIntegration) && currentTags.TechnologyIntegration.length > 0 
-          ? [...new Set(currentTags.TechnologyIntegration)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.SustainabilityEthics) && currentTags.SustainabilityEthics.length > 0 
-          ? [...new Set(currentTags.SustainabilityEthics)].join(', ')
-          : "None selected"}
-      </TableCell>
-      <TableCell>
-        {Array.isArray(currentTags.BusinessOperations) && currentTags.BusinessOperations.length > 0 
-          ? [...new Set(currentTags.BusinessOperations)].join(', ')
-          : "None selected"}
-      </TableCell>
-    </TableRow>
-  ) : (
-    <TableRow>
-      <TableCell colSpan={10} align="center" sx={{ py: 4, color: 'text.secondary', fontStyle: 'italic' }}>
-        No franchise tags added yet. {isEditing && "Use the form above to add franchise tags."}
-      </TableCell>
-    </TableRow>
-  )}
-</TableBody>
+                {selectedCategory.main} - {selectedCategory.sub}
+              </Typography>
+              {industryData.productTags
+                .filter(pt => pt.parent)
+                .map((productTagGroup) => (
+                  <Box key={productTagGroup.parent} sx={{ mb: 3, ml: 2 }}>
+                    <Typography
+                      variant="subtitle1"
+                      sx={{
+                        fontWeight: 600,
+                        mb: 1,
+                        color: "text.primary",
+                        borderBottom: "1px solid #e0e0e0",
+                        pb: 0.5,
+                      }}
+                    >
+                      {productTagGroup.parent}
+                    </Typography>
+                    <Grid container spacing={1} sx={{ ml: 1 }}>
+                      {productTagGroup.tags?.map((tag) => {
+                        const isChecked = tempProductTags.find(g => g.parent === productTagGroup.parent)?.tags.includes(tag) || false;
+                        return (
+                          <Grid item xs={12} sm={6} md={4} lg={3} key={tag}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  checked={isChecked}
+                                  onChange={() => handleChildToggle(productTagGroup.parent, tag)}
+                                  color="primary"
+                                />
+                              }
+                              label={tag}
+                              sx={{
+                                width: "100%",
+                                "& .MuiFormControlLabel-label": {
+                                  fontSize: "0.9rem",
+                                },
+                              }}
+                            />
+                          </Grid>
+                        );
+                      })}
+                    </Grid>
+                  </Box>
+                ))}
+            </Box>
+          ) : (
+            <Typography sx={{ textAlign: 'center', py: 4 }}>
+              No product tags available. Please select a main category first.
+            </Typography>
+          )}
+        </Box>
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            p: 2,
+            bgcolor: "background.paper",
+            borderTop: "1px solid rgba(0,0,0,0.12)",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="body1" fontWeight={500}>
+            {tempProductTags.reduce((acc, g) => acc + g.tags.length, 0)} tag(s) selected
+          </Typography>
+          <Box>
+            <Button
+              onClick={() => setDrawerOpen(false)}
+              sx={{ mr: 2 }}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleDone}
+              sx={{ backgroundColor: "#ff9800", color: "#fff" }}
+            >
+              Done
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
 
-      </Table>
-    </TableContainer>
-  </Box>
-</Box> */}
+      {/* Drawer for Service Tags */}
+      <Drawer
+        anchor="top"
+        open={serviceTagDrawerOpen}
+        onClose={() => setServiceTagDrawerOpen(false)}
+        PaperProps={{ sx: { height: "95vh" } }}
+      >
+        <AppBar position="sticky" color="default" elevation={1}>
+          <Toolbar sx={{ justifyContent: "space-between" }}>
+            <Typography variant="h6" sx={{ color: "#ff9800" }}>
+              All Service Tags
+            </Typography>
+            <IconButton onClick={() => setServiceTagDrawerOpen(false)}>
+              <CloseIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+        <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
+          {Object.entries(serviceTagGroups).length > 0 ? (
+            Object.entries(serviceTagGroups).map(([groupLabel, options]) => (
+              <Box key={groupLabel} sx={{ mb: 3 }}>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 700, mb: 1, color: "#ff9800" }}
+                >
+                  {groupLabel}
+                </Typography>
+                <Grid container spacing={1}>
+                  {options.map((opt) => {
+                    const isChecked = tempServiceTags.find(g => g.parent === groupLabel)?.tags.includes(opt) || false;
+                    return (
+                      <Grid item xs={12} sm={6} md={3} key={opt}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={isChecked}
+                              onChange={() => handleServiceTagToggle(groupLabel, opt)}
+                              color="primary"
+                            />
+                          }
+                          label={<Typography variant="body2">{opt}</Typography>}
+                          sx={{
+                            width: "100%",
+                            margin: 0,
+                            "& .MuiFormControlLabel-label": {
+                              width: "100%",
+                            },
+                          }}
+                        />
+                      </Grid>
+                    );
+                  })}
+                </Grid>
+              </Box>
+            ))
+          ) : (
+            <Typography sx={{ textAlign: 'center', py: 4 }}>
+              No service tags available. Please select an industry first.
+            </Typography>
+          )}
+        </Box>
+        <Box
+          sx={{
+            position: "sticky",
+            bottom: 0,
+            p: 2,
+            bgcolor: "background.paper",
+            borderTop: "1px solid rgba(0,0,0,0.12)",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography>
+            {tempServiceTags.reduce((acc, g) => acc + g.tags.length, 0)} tag(s) selected
+          </Typography>
+          <Box>
+            <Button
+              onClick={() => setServiceTagDrawerOpen(false)}
+              sx={{ mr: 2 }}
+              variant="outlined"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleServiceTagDone}
+              sx={{ backgroundColor: "#ff9800", color: "#fff" }}
+            >
+              Done
+            </Button>
+          </Box>
+        </Box>
+      </Drawer>
 
-
+      {/* Establishment & Franchise year Details */}
       <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
         Establishment & Franchise year Details
       </Typography>
@@ -2116,6 +1379,7 @@ const formatCurrency = (value) => {
           />
         </Grid>
       </Grid>
+
       {/* Franchise Network */}
       <Typography variant="h6" fontWeight={700} sx={{ color: "#ff9800" }}>
         Franchise Network
@@ -2174,895 +1438,692 @@ const formatCurrency = (value) => {
           />
         </Grid>
       </Grid>
-    {/* Franchise Details Section */}
-<Typography variant="h6" fontWeight={700} sx={{ mt: 2, color: "#ff9800" }}>
-  Franchise Business Models
-</Typography>
-{errors.fico && typeof errors.fico === "string" && (
-  <Typography color="error" sx={{ mb: 2 }}>
-    {errors.fico}
-  </Typography>
-)}
-{/* Current FICO Model Form - Only show when editing */}
-<Box sx={{ mb: 4 }}>
-  {/* {isEditing && ( */}
-    {/* <> */}
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          display: "grid",
-          gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
-          gap: 2,
-          mb: 2,
-          mt: 2,
-        }}
-      >
-        {/* Column 1 - Franchise Model */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.franchiseModel}
-            required
-            size="medium"
-          >
-            <InputLabel>Franchise Model</InputLabel>
-            <Select
-              value={currentFicoModel.franchiseModel}
-              onChange={handleFicoChange}
-              name="franchiseModel"
-              label="Franchise Model"
-            >
-              {franchiseModels.map((model) => (
-                <MenuItem key={model} value={model}>
-                  {model}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.franchiseModel && (
-              <FormHelperText error>{errors.franchiseModel}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
 
-        {/* Column 2 - Franchise Type */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.franchiseType}
-            required
-            size="medium"
-          >
-            <InputLabel>Franchise Type</InputLabel>
-            <Select
-              value={currentFicoModel.franchiseType}
-              onChange={handleFicoChange}
-              name="franchiseType"
-              label="Franchise Type*"
-            >
-              {franchiseTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.franchiseType && (
-              <FormHelperText error>{errors.franchiseType}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 3 - Investment Range */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.investmentRange}
-            required
-            size="medium"
-          >
-            <InputLabel>Investment Range</InputLabel>
-            <Select
-              value={currentFicoModel.investmentRange}
-              onChange={handleFicoChange}
-              name="investmentRange"
-              label="Investment Range*"
-            >
-              {investmentRanges.map((range) => (
-                <MenuItem key={range.value} value={range.value}>
-                  {range.label}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.investmentRange && (
-              <FormHelperText error>{errors.investmentRange}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 4 - Area Required */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            size="medium"
-            required
-            error={!!errors.areaRequired}
-          >
-            <InputLabel>Area Required</InputLabel>
-            <Select
-              label="Area Required"
-              name="areaRequired"
-              value={currentFicoModel.areaRequired || ""}
-              onChange={handleFicoChange}
-              endAdornment={
-                <InputAdornment position="end" sx={{ mr: 2 }}>
-                  Sq.Ft
-                </InputAdornment>
-              }
-            >
-              <MenuItem value="No Space Required">
-                No Space Required
-              </MenuItem>
-              <MenuItem value="100 - 200 Sq. Ft.">100-200 Sq. Ft.</MenuItem>
-              <MenuItem value="200 - 500 Sq. Ft.">200-500 Sq. Ft.</MenuItem>
-              <MenuItem value="500 - 1,000 Sq. Ft.">
-                500-1,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="1,000 - 2,000 Sq. Ft.">
-                1,000-2,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="2,000 - 3,000 Sq. Ft.">
-                2,000-3,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="3,000 - 5,000 Sq. Ft.">
-                3,000-5,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="5,000 - 7,000 Sq. Ft.">
-                5,000-7,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="7,000 - 10,000 Sq. Ft.">
-                7,000-10,000 Sq. Ft.
-              </MenuItem>
-              <MenuItem value="10,000 - 15,000 Sq. Ft.">
-                10,000-15,000 Sq. Ft.
-              </MenuItem>
-            </Select>
-            {errors.areaRequired && (
-              <FormHelperText error>{errors.areaRequired}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 5 - Agreement Period */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            error={!!errors.agreementPeriod}
-            required
-            size="medium"
-          >
-            <InputLabel>Agreement Period </InputLabel>
-            <Select
-              label="Agreement Period "
-              name="agreementPeriod"
-              value={currentFicoModel.agreementPeriod || ""}
-              onChange={handleFicoChange}
-              renderValue={(selected) => (selected ? `${selected} ` : "")}
-              endAdornment={
-                <InputAdornment position="end" sx={{ mr: 2 }}>
-                  Years
-                </InputAdornment>
-              }
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    width: 250,
-                    maxHeight: 300,
-                    "& .MuiList-root": {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(5, 1fr)",
-                      gap: "4px",
-                      padding: "4px",
-                    },
-                  },
-                },
-              }}
-            >
-              {Array.from({ length: 50 }, (_, i) => i + 1).map((year) => (
-                <MenuItem
-                  key={year}
-                  value={year}
-                  sx={{
-                    minWidth: 0,
-                    padding: "6px 4px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {year}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.agreementPeriod && (
-              <FormHelperText error>{errors.agreementPeriod}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 6 - Franchise Fee */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Franchise Fee"
-              name="franchiseFee"
-              value={currentFicoModel.franchiseFee}
-              onChange={handleFicoChange}
-              error={!!errors.franchiseFee}
-              helperText={errors.franchiseFee}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.franchiseFeeUnit}
-                      onChange={handleFeeUnitChange("franchiseFee")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {otherFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.franchiseFee,
-              }}
-              required
-              disabled={noFees.franchiseFee}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 7 - Interior Cost */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Interior Cost"
-              name="interiorCost"
-              value={currentFicoModel.interiorCost}
-              onChange={handleFicoChange}
-              error={!!errors.interiorCost}
-              helperText={errors.interiorCost}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.interiorCostUnit}
-                      onChange={handleFeeUnitChange("interiorCost")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {otherFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.interiorCost,
-              }}
-              required
-              disabled={noFees.interiorCost}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 8 - Stock Investment */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Stock Investment"
-              name="stockInvestment"
-              value={currentFicoModel.stockInvestment}
-              onChange={handleFicoChange}
-              error={!!errors.stockInvestment}
-              helperText={errors.stockInvestment}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.stockInvestmentUnit}
-                      onChange={handleFeeUnitChange("stockInvestment")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {otherFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.stockInvestment,
-              }}
-              required
-              disabled={noFees.stockInvestment}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 9 - Other Cost */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Required Additional Cost"
-              name="otherCost"
-              value={currentFicoModel.otherCost}
-              onChange={handleFicoChange}
-              error={!!errors.otherCost}
-              helperText={errors.otherCost}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.otherCostUnit}
-                      onChange={handleFeeUnitChange("otherCost")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {otherFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.otherCost,
-              }}
-              required
-              disabled={noFees.otherCost}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 10 - Required Investment Capital */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Annual Working Capital"
-              name="requireWorkingCapital"
-              value={currentFicoModel.requireWorkingCapital}
-              onChange={handleFicoChange}
-              error={!!errors.requireWorkingCapital}
-              helperText={errors.requireWorkingCapital}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.requireWorkingCapitalUnit}
-                      onChange={handleFeeUnitChange("requireWorkingCapital")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {otherFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.requireWorkingCapital,
-              }}
-              required
-              disabled={noFees.requireWorkingCapital}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 11 - Royalty Fee */}
-        <Grid item>
-          <FormControl fullWidth>
-            <TextField
-              fullWidth
-              size="medium"
-              label="Royalty Fee"
-              name="royaltyFee"
-              value={currentFicoModel.royaltyFee}
-              onChange={handleFicoChange}
-              error={!!errors.royaltyFee}
-              helperText={errors.royaltyFee}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Select
-                      value={currentFicoModel.royaltyFeeUnit}
-                      onChange={handleFeeUnitChange("royaltyFee")}
-                      sx={{
-                        "& .MuiSelect-select": {
-                          padding: "8px 8px",
-                          fontSize: "0.875rem",
-                        },
-                        "& .MuiOutlinedInput-notchedOutline": {
-                          border: "none",
-                        },
-                      }}
-                    >
-                      {royaltyFeeUnits.map((unit) => (
-                        <MenuItem key={unit.value} value={unit.value}>
-                          {unit.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </InputAdornment>
-                ),
-                readOnly: noFees.royaltyFee,
-              }}
-              required
-              disabled={noFees.royaltyFee}
-            />
-          </FormControl>
-        </Grid>
-
-        {/* Column 12 - Break Even */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            size="medium"
-            required
-            error={!!errors.breakEven}
-          >
-            <InputLabel>Break Even (months)</InputLabel>
-            <Select
-              label="Break Even (months)*"
-              name="breakEven"
-              value={currentFicoModel.breakEven || ""}
-              onChange={handleFicoChange}
-            >
-              <MenuItem value="0 to 6 Months">0 to 6 Months</MenuItem>
-              <MenuItem value="6 to 12 Months">6 to 12 Months</MenuItem>
-              <MenuItem value="12 to 18 Months">12 to 18 Months</MenuItem>
-              <MenuItem value="18 to 24 Months">18 to 24 Months</MenuItem>
-              <MenuItem value="24 to 36 Months">24 to 36 Months</MenuItem>
-              <MenuItem value="36 to 48 Months">36 to 48 Months</MenuItem>
-              <MenuItem value="48 to 60 Months">48 to 60 Months</MenuItem>
-            </Select>
-            {errors.breakEven && (
-              <FormHelperText error>{errors.breakEven}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 13 - ROI */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            size="medium"
-            required
-            error={!!errors.roi}
-          >
-            <InputLabel>ROI (%)</InputLabel>
-            <Select
-              label="ROI (%)"
-              name="roi"
-              value={currentFicoModel.roi || ""}
-              onChange={handleFicoChange}
-              renderValue={(selected) => (selected ? `${selected} %` : "")}
-              disabled={noFees.roi}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    width: 390,
-                    maxHeight: 300,
-                    "& .MuiList-root": {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(10, 1fr)",
-                      gap: "4px",
-                      padding: "4px",
-                    },
-                  },
-                },
-              }}
-            >
-              {Array.from({ length: 99 }, (_, i) => (
-                <MenuItem
-                  key={i + 1}
-                  value={`${i + 1}`}
-                  sx={{
-                    minWidth: 0,
-                    padding: "6px 4px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {i + 1}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.roi && (
-              <FormHelperText error>{errors.roi}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-
-        {/* Column 14 - PayBack Period */}
-        <Grid item>
-          <TextField
-            fullWidth
-            size="medium"
-            label="PayBack Period"
-            name="payBackPeriod"
-            value={currentFicoModel.payBackPeriod}
-            onChange={handleFicoChange}
-            error={!!errors.payBackPeriod}
-            helperText={errors.payBackPeriod}
-            InputProps={{
-              readOnly: true,
-            }}
-            required
-            disabled={noFees.roi}
-          />
-        </Grid>
-
-        {/* Column 15 - Margin on Sales */}
-        <Grid item>
-          <FormControl
-            fullWidth
-            size="medium"
-            required
-            error={!!errors.marginOnSales}
-          >
-            <InputLabel>MarginOnSales (%)</InputLabel>
-            <Select
-              label="Margin ON Sales (%)"
-              name="marginOnSales"
-              value={currentFicoModel.marginOnSales || ""}
-              onChange={handleFicoChange}
-              renderValue={(selected) => (selected ? `${selected} %` : "")}
-              MenuProps={{
-                PaperProps: {
-                  sx: {
-                    width: 390,
-                    maxHeight: 300,
-                    "& .MuiList-root": {
-                      display: "grid",
-                      gridTemplateColumns: "repeat(10, 1fr)",
-                      gap: "4px",
-                      padding: "4px",
-                    },
-                  },
-                },
-              }}
-            >
-              {Array.from({ length: 99 }, (_, i) => (
-                <MenuItem
-                  key={i + 1}
-                  value={`${i + 1}`}
-                  sx={{
-                    minWidth: 0,
-                    padding: "6px 4px",
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  {i + 1}
-                </MenuItem>
-              ))}
-            </Select>
-            {errors.marginOnSales && (
-              <FormHelperText error>{errors.marginOnSales}</FormHelperText>
-            )}
-          </FormControl>
-        </Grid>
-      </Grid>
-
-      {/* Add/Update/Cancel Buttons */}
-      <Grid
-        item
-        xs={12}
-        mt={1}
-        sx={{ display: "flex", justifyContent: "space-evenly", gap: 2 }}
-      >
-        <Button
-          variant="contained"
-          onClick={handleAddOrUpdateFicoModel}
-          size="large"
-          sx={{
-            backgroundColor: "#7ad03a",
-            color: "#fff",
-            "&:hover": { backgroundColor: "#388e3c" },
-            padding: "8px 70px",
-          }}
-        >
-          {editIndex !== null ? "Update Model" : "Add Model"}
-        </Button>
-        {editIndex !== null && (
-          <Button
-            variant="outlined"
-            onClick={handleCancelEdit}
-            size="large"
-            sx={{
-              padding: "8px 70px",
-            }}
-          >
-            Cancel
-          </Button>
-        )}
-      </Grid>
-    {/* </> */}
-{/* )} */}
-</Box>
-{/* Drawer for Service tags */}
-<Drawer
-  anchor="top"
-  open={serviceTagDrawerOpen}
-  onClose={() => setServiceTagDrawerOpen(false)}
-  PaperProps={{ sx: { height: "95vh" } }}
->
-  <AppBar position="sticky" color="default" elevation={1}>
-    <Toolbar sx={{ justifyContent: "space-between" }}>
-      <Typography variant="h6" sx={{ color: "#ff9800" }}>
-        All Service Tags
+      {/* Franchise Business Models */}
+      <Typography variant="h6" fontWeight={700} sx={{ mt: 2, color: "#ff9800" }}>
+        Franchise Business Models
       </Typography>
-      <IconButton onClick={() => setServiceTagDrawerOpen(false)}>
-        <CloseIcon />
-      </IconButton>
-    </Toolbar>
-  </AppBar>
-
-  <Box sx={{ p: 2, overflowY: "auto", height: "calc(80vh - 64px)" }}>
-    {Object.entries(serviceTagGroups).map(([groupLabel, options]) => (
-      <Box key={groupLabel} sx={{ mb: 3 }}>
-        <Typography
-          variant="subtitle1"
-          sx={{ fontWeight: 700, mb: 1, color: "#ff9800" }}
-        >
-          {groupLabel}
+      {errors.fico && typeof errors.fico === "string" && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {errors.fico}
         </Typography>
+      )}
 
-        <Grid container spacing={1}>
-          {options.map((opt) => (
-            <Grid item xs={6} md={3} key={opt}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={tempSelectedServiceTags.includes(opt)}
-                    onChange={() => handleServiceTagToggle(opt)}
-                    color="primary"
-                  />
-                }
-                label={opt}
+      {/* Current FICO Model Form - Only show when editing */}
+      {isEditing && (
+        <Box sx={{ mb: 4 }}>
+          <Grid
+            container
+            spacing={2}
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
+              gap: 2,
+              mb: 2,
+              mt: 2,
+            }}
+          >
+            {/* Column 1 - Franchise Model */}
+            <Grid item>
+              <FormControl fullWidth error={!!errors.franchiseModel} required size="medium">
+                <InputLabel>Franchise Model</InputLabel>
+                <Select
+                  value={currentFicoModel.franchiseModel}
+                  onChange={handleFicoChange}
+                  name="franchiseModel"
+                  label="Franchise Model"
+                >
+                  {franchiseModels.map((model) => (
+                    <MenuItem key={model} value={model}>
+                      {model}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.franchiseModel && (
+                  <FormHelperText error>{errors.franchiseModel}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 2 - Franchise Type */}
+            <Grid item>
+              <FormControl fullWidth error={!!errors.franchiseType} required size="medium">
+                <InputLabel>Franchise Type</InputLabel>
+                <Select
+                  value={currentFicoModel.franchiseType}
+                  onChange={handleFicoChange}
+                  name="franchiseType"
+                  label="Franchise Type*"
+                >
+                  {franchiseTypes.map((type) => (
+                    <MenuItem key={type} value={type}>
+                      {type}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.franchiseType && (
+                  <FormHelperText error>{errors.franchiseType}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 3 - Investment Range */}
+            <Grid item>
+              <FormControl fullWidth error={!!errors.investmentRange} required size="medium">
+                <InputLabel>Investment Range</InputLabel>
+                <Select
+                  value={currentFicoModel.investmentRange}
+                  onChange={handleFicoChange}
+                  name="investmentRange"
+                  label="Investment Range*"
+                >
+                  {investmentRanges.map((range) => (
+                    <MenuItem key={range.value} value={range.value}>
+                      {range.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.investmentRange && (
+                  <FormHelperText error>{errors.investmentRange}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 4 - Area Required */}
+            <Grid item>
+              <FormControl fullWidth size="medium" required error={!!errors.areaRequired}>
+                <InputLabel>Area Required</InputLabel>
+                <Select
+                  label="Area Required"
+                  name="areaRequired"
+                  value={currentFicoModel.areaRequired || ""}
+                  onChange={handleFicoChange}
+                  endAdornment={
+                    <InputAdornment position="end" sx={{ mr: 2 }}>
+                      Sq.Ft
+                    </InputAdornment>
+                  }
+                >
+                  <MenuItem value="No Space Required">No Space Required</MenuItem>
+                  <MenuItem value="100 - 200 Sq. Ft.">100-200 Sq. Ft.</MenuItem>
+                  <MenuItem value="200 - 500 Sq. Ft.">200-500 Sq. Ft.</MenuItem>
+                  <MenuItem value="500 - 1,000 Sq. Ft.">500-1,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="1,000 - 2,000 Sq. Ft.">1,000-2,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="2,000 - 3,000 Sq. Ft.">2,000-3,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="3,000 - 5,000 Sq. Ft.">3,000-5,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="5,000 - 7,000 Sq. Ft.">5,000-7,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="7,000 - 10,000 Sq. Ft.">7,000-10,000 Sq. Ft.</MenuItem>
+                  <MenuItem value="10,000 - 15,000 Sq. Ft.">10,000-15,000 Sq. Ft.</MenuItem>
+                </Select>
+                {errors.areaRequired && (
+                  <FormHelperText error>{errors.areaRequired}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 5 - Agreement Period */}
+            <Grid item>
+              <FormControl fullWidth error={!!errors.agreementPeriod} required size="medium">
+                <InputLabel>Agreement Period</InputLabel>
+                <Select
+                  label="Agreement Period"
+                  name="agreementPeriod"
+                  value={currentFicoModel.agreementPeriod || ""}
+                  onChange={handleFicoChange}
+                  renderValue={(selected) => (selected ? `${selected}` : "")}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        width: 250,
+                        maxHeight: 300,
+                        "& .MuiList-root": {
+                          display: "grid",
+                          gridTemplateColumns: "repeat(5, 1fr)",
+                          gap: "4px",
+                          padding: "4px",
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {Array.from({ length: 50 }, (_, i) => i + 1).map((year) => (
+                    <MenuItem key={year} value={year}>
+                      {year}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.agreementPeriod && (
+                  <FormHelperText error>{errors.agreementPeriod}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 6 - Franchise Fee */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Franchise Fee"
+                  name="franchiseFee"
+                  value={currentFicoModel.franchiseFee}
+                  onChange={handleFicoChange}
+                  error={!!errors.franchiseFee}
+                  helperText={errors.franchiseFee}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.franchiseFeeUnit}
+                          onChange={handleFeeUnitChange("franchiseFee")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {otherFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.franchiseFee,
+                  }}
+                  required
+                  disabled={noFees.franchiseFee}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 7 - Interior Cost */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Interior Cost"
+                  name="interiorCost"
+                  value={currentFicoModel.interiorCost}
+                  onChange={handleFicoChange}
+                  error={!!errors.interiorCost}
+                  helperText={errors.interiorCost}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.interiorCostUnit}
+                          onChange={handleFeeUnitChange("interiorCost")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {otherFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.interiorCost,
+                  }}
+                  required
+                  disabled={noFees.interiorCost}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 8 - Stock Investment */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Stock Investment"
+                  name="stockInvestment"
+                  value={currentFicoModel.stockInvestment}
+                  onChange={handleFicoChange}
+                  error={!!errors.stockInvestment}
+                  helperText={errors.stockInvestment}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.stockInvestmentUnit}
+                          onChange={handleFeeUnitChange("stockInvestment")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {otherFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.stockInvestment,
+                  }}
+                  required
+                  disabled={noFees.stockInvestment}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 9 - Other Cost */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Required Additional Cost"
+                  name="otherCost"
+                  value={currentFicoModel.otherCost}
+                  onChange={handleFicoChange}
+                  error={!!errors.otherCost}
+                  helperText={errors.otherCost}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.otherCostUnit}
+                          onChange={handleFeeUnitChange("otherCost")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {otherFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.otherCost,
+                  }}
+                  required
+                  disabled={noFees.otherCost}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 10 - Required Investment Capital */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Annual Working Capital"
+                  name="requireWorkingCapital"
+                  value={currentFicoModel.requireWorkingCapital}
+                  onChange={handleFicoChange}
+                  error={!!errors.requireWorkingCapital}
+                  helperText={errors.requireWorkingCapital}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.requireWorkingCapitalUnit}
+                          onChange={handleFeeUnitChange("requireWorkingCapital")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {otherFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.requireWorkingCapital,
+                  }}
+                  required
+                  disabled={noFees.requireWorkingCapital}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 11 - Royalty Fee */}
+            <Grid item>
+              <FormControl fullWidth>
+                <TextField
+                  fullWidth
+                  size="medium"
+                  label="Royalty Fee"
+                  name="royaltyFee"
+                  value={currentFicoModel.royaltyFee}
+                  onChange={handleFicoChange}
+                  error={!!errors.royaltyFee}
+                  helperText={errors.royaltyFee}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <Select
+                          value={currentFicoModel.royaltyFeeUnit}
+                          onChange={handleFeeUnitChange("royaltyFee")}
+                          sx={{
+                            "& .MuiSelect-select": {
+                              padding: "8px 8px",
+                              fontSize: "0.875rem",
+                            },
+                            "& .MuiOutlinedInput-notchedOutline": {
+                              border: "none",
+                            },
+                          }}
+                        >
+                          {royaltyFeeUnits.map((unit) => (
+                            <MenuItem key={unit.value} value={unit.value}>
+                              {unit.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </InputAdornment>
+                    ),
+                    readOnly: noFees.royaltyFee,
+                  }}
+                  required
+                  disabled={noFees.royaltyFee}
+                />
+              </FormControl>
+            </Grid>
+            {/* Column 12 - Break Even */}
+            <Grid item>
+              <FormControl fullWidth size="medium" required error={!!errors.breakEven}>
+                <InputLabel>Break Even (months)</InputLabel>
+                <Select
+                  label="Break Even (months)*"
+                  name="breakEven"
+                  value={currentFicoModel.breakEven || ""}
+                  onChange={handleFicoChange}
+                >
+                  <MenuItem value="0 to 6 Months">0 to 6 Months</MenuItem>
+                  <MenuItem value="6 to 12 Months">6 to 12 Months</MenuItem>
+                  <MenuItem value="12 to 18 Months">12 to 18 Months</MenuItem>
+                  <MenuItem value="18 to 24 Months">18 to 24 Months</MenuItem>
+                  <MenuItem value="24 to 36 Months">24 to 36 Months</MenuItem>
+                  <MenuItem value="36 to 48 Months">36 to 48 Months</MenuItem>
+                  <MenuItem value="48 to 60 Months">48 to 60 Months</MenuItem>
+                </Select>
+                {errors.breakEven && (
+                  <FormHelperText error>{errors.breakEven}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+            {/* Column 13 - ROI */}
+            <Grid item>
+              <FormControl fullWidth size="medium" required error={!!errors.roi}>
+                <InputLabel>ROI (%)</InputLabel>
+                <Select
+                  label="ROI (%)"
+                  name="roi"
+                  value={currentFicoModel.roi || ""}
+                  onChange={handleFicoChange}
+                  renderValue={(selected) => (selected ? `${selected} %` : "")}
+                  disabled={noFees.roi}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        width: 390,
+                        maxHeight: 300,
+                        "& .MuiList-root": {
+                          display: "grid",
+                          gridTemplateColumns: "repeat(10, 1fr)",
+                          gap: "4px",
+                          padding: "4px",
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {Array.from({ length: 99 }, (_, i) => (
+                    <MenuItem key={i + 1} value={`${i + 1}`}>
+                      {i + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.roi && <FormHelperText error>{errors.roi}</FormHelperText>}
+              </FormControl>
+            </Grid>
+            {/* Column 14 - PayBack Period */}
+            <Grid item>
+              <TextField
+                fullWidth
+                size="medium"
+                label="PayBack Period"
+                name="payBackPeriod"
+                value={currentFicoModel.payBackPeriod}
+                onChange={handleFicoChange}
+                error={!!errors.payBackPeriod}
+                helperText={errors.payBackPeriod}
+                InputProps={{
+                  readOnly: true,
+                }}
+                required
+                disabled={noFees.roi}
               />
             </Grid>
-          ))}
-        </Grid>
+            {/* Column 15 - Margin on Sales */}
+            <Grid item>
+              <FormControl fullWidth size="medium" required error={!!errors.marginOnSales}>
+                <InputLabel>MarginOnSales (%)</InputLabel>
+                <Select
+                  label="Margin ON Sales (%)"
+                  name="marginOnSales"
+                  value={currentFicoModel.marginOnSales || ""}
+                  onChange={handleFicoChange}
+                  renderValue={(selected) => (selected ? `${selected} %` : "")}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        width: 390,
+                        maxHeight: 300,
+                        "& .MuiList-root": {
+                          display: "grid",
+                          gridTemplateColumns: "repeat(10, 1fr)",
+                          gap: "4px",
+                          padding: "4px",
+                        },
+                      },
+                    },
+                  }}
+                >
+                  {Array.from({ length: 99 }, (_, i) => (
+                    <MenuItem key={i + 1} value={`${i + 1}`}>
+                      {i + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {errors.marginOnSales && (
+                  <FormHelperText error>{errors.marginOnSales}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+          </Grid>
+
+          {/* Add/Update/Cancel Buttons */}
+          <Grid item xs={12} mt={1} sx={{ display: "flex", justifyContent: "space-evenly", gap: 2 }}>
+            <Button
+              variant="contained"
+              onClick={handleAddOrUpdateFicoModel}
+              size="large"
+              sx={{
+                backgroundColor: "#7ad03a",
+                color: "#fff",
+                "&:hover": { backgroundColor: "#388e3c" },
+                padding: "8px 70px",
+              }}
+            >
+              {editIndex !== null ? "Update Model" : "Add Model"}
+            </Button>
+            {editIndex !== null && (
+              <Button
+                variant="outlined"
+                onClick={handleCancelEdit}
+                size="large"
+                sx={{ padding: "8px 70px" }}
+              >
+                Cancel
+              </Button>
+            )}
+          </Grid>
+        </Box>
+      )}
+
+      {/* Display saved FICO models - ALWAYS SHOW THE TABLE */}
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
+          Saved Franchise Models {data.fico?.length > 0 && `(${data.fico.length})`}
+        </Typography>
+        <Box sx={{ width: "100%", overflowX: "auto", margin: "0 auto" }}>
+          <TableContainer sx={{ maxHeight: 600 }}>
+            <Table
+              stickyHeader
+              aria-label="saved franchise models"
+              size="medium"
+              sx={{
+                fontSize: "1rem",
+                "& th, & td": {
+                  padding: "12px 16px",
+                  fontSize: "1rem",
+                  whiteSpace: "nowrap",
+                },
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  {[
+                    "Model Type",
+                    "Franchise Type",
+                    "Investment Range",
+                    "Area Required",
+                    "Agreement Period",
+                    "Franchise Fee",
+                    "Interior Cost",
+                    "Stock Cost",
+                    "Additional Cost",
+                    "Annual Working Capital",
+                    "Royalty Fee",
+                    "Break Even",
+                    "ROI (%)",
+                    "Payback",
+                    "Margin On Sales",
+                    "Actions",
+                  ].map((label, i) => (
+                    <TableCell
+                      key={i}
+                      sx={{
+                        fontWeight: "bold",
+                        backgroundColor: "#f5f5f5",
+                      }}
+                    >
+                      {label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {data.fico && data.fico.length > 0 ? (
+                  data.fico.map((model, index) => (
+                    <TableRow
+                      key={index}
+                      hover
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        fontSize: "0.75rem",
+                      }}
+                    >
+                      <TableCell>{model.franchiseModel || "N/A"}</TableCell>
+                      <TableCell>{model.franchiseType || "N/A"}</TableCell>
+                      <TableCell>{model.investmentRange || "N/A"}</TableCell>
+                      <TableCell>{model.areaRequired || "N/A"}</TableCell>
+                      <TableCell>{model.agreementPeriod || "N/A"}</TableCell>
+                      <TableCell>{formatCurrency(model.franchiseFee)}</TableCell>
+                      <TableCell>{formatCurrency(model.interiorCost)}</TableCell>
+                      <TableCell>{formatCurrency(model.stockInvestment)}</TableCell>
+                      <TableCell>{formatCurrency(model.otherCost)}</TableCell>
+                      <TableCell>{formatCurrency(model.requireWorkingCapital)}</TableCell>
+                      <TableCell>
+                        {model.royaltyFee && model.royaltyFee !== "No Fee"
+                          ? `${model.royaltyFee}${
+                              model.royaltyFeeUnit === "%" ? "%" : ""
+                            }`
+                          : model.royaltyFee}
+                      </TableCell>
+                      <TableCell>{model.breakEven}</TableCell>
+                      <TableCell>{model.roi}%</TableCell>
+                      <TableCell>{model.payBackPeriod}</TableCell>
+                      <TableCell>{model.marginOnSales}%</TableCell>
+                      <TableCell>
+                        {isEditing && (
+                          <>
+                            <IconButton
+                              onClick={() => handleEditFicoModel(index)}
+                              color="primary"
+                              size="small"
+                              aria-label="edit"
+                              sx={{ mr: 1 }}
+                            >
+                              <EditIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDeleteFicoModel(index)}
+                              color="error"
+                              size="small"
+                              aria-label="delete"
+                            >
+                              <DeleteIcon fontSize="small" />
+                            </IconButton>
+                          </>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={16}
+                      align="center"
+                      sx={{
+                        py: 4,
+                        color: 'text.secondary',
+                        fontStyle: 'italic'
+                      }}
+                    >
+                      No franchise models added yet. {isEditing && "Use the form above to add your first franchise model."}
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
-    ))}
-  </Box>
 
-  {/* Drawer Footer */}
-  <Box
-    sx={{
-      position: "sticky",
-      bottom: 0,
-      p: 2,
-      bgcolor: "background.paper",
-      borderTop: "1px solid rgba(0,0,0,0.12)",
-      display: "flex",
-      justifyContent: "space-between",
-    }}
-  >
-    <Typography>{tempSelectedServiceTags.length} tag(s) selected</Typography>
-    <Box>
-      <Button
-        onClick={() => setServiceTagDrawerOpen(false)}
-        sx={{ mr: 2 }}
-        variant="outlined"
-      >
-        Cancel
-      </Button>
-      <Button
-        variant="contained"
-        onClick={handleServiceTagDone}
-        sx={{ backgroundColor: "#ff9800", color: "#fff" }}
-      >
-        Done
-      </Button>
-    </Box>
-  </Box>
-</Drawer>
-
-
-
-
-
-
-{/* Display saved FICO models - ALWAYS SHOW THE TABLE */}
-<Box sx={{ mt: 4 }}>
-  <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-    Saved Franchise Models {data.fico?.length > 0 && `(${data.fico.length})`}
-  </Typography>
-  <Box sx={{ width: "100%", overflowX: "auto", margin: "0 auto" }}>
-    <TableContainer sx={{ maxHeight: 600 }}>
-      <Table
-        stickyHeader
-        aria-label="saved franchise models"
-        size="medium"
-        sx={{
-          fontSize: "1rem",
-          "& th, & td": {
-            padding: "12px 16px",
-            fontSize: "1rem",
-            whiteSpace: "nowrap",
-          },
-        }}
-      >
-        <TableHead>
-          <TableRow>
-            {[
-              "Model Type",
-              "Franchise Type",
-              "Investment Range",
-              "Area Required",
-              "Agreement Period",
-              "Franchise Fee",
-              "Interior Cost",
-              "Stock Cost",
-              "Additional Cost",
-              "Annual Working Capital",
-              "Royalty Fee",
-              "Break Even",
-              "ROI (%)",
-              "Payback",
-              "Margin On Sales",
-              "Actions",
-            ].map((label, i) => (
-              <TableCell
-                key={i}
-                sx={{
-                  fontWeight: "bold",
-                  backgroundColor: "#f5f5f5",
-                }}
-              >
-                {label}
-              </TableCell>
-            ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {data.fico && data.fico.length > 0 ? (
-            data.fico.map((model, index) => (
-              <TableRow
-                key={index}
-                hover
-                sx={{
-                  "&:last-child td, &:last-child th": { border: 0 },
-                  fontSize: "0.75rem",
-                }}
-              >
-                <TableCell>{model.franchiseModel || "N/A"}</TableCell>
-                <TableCell>{model.franchiseType || "N/A"}</TableCell>
-                <TableCell>{model.investmentRange || "N/A"}</TableCell>
-                <TableCell>{model.areaRequired || "N/A"}</TableCell>
-                <TableCell>{model.agreementPeriod || "N/A"}</TableCell>
-                <TableCell>
-                  {formatCurrency(model.franchiseFee)}
-                </TableCell>
-                <TableCell>
-                  {formatCurrency(model.interiorCost)}
-                </TableCell>
-                <TableCell>
-                  {formatCurrency(model.stockInvestment)}
-                </TableCell>
-                <TableCell>{formatCurrency(model.otherCost)}</TableCell>
-                <TableCell>
-                  {formatCurrency(model.requireWorkingCapital)}
-                </TableCell>
-                <TableCell>
-                  {model.royaltyFee && model.royaltyFee !== "No Fee"
-                    ? `${model.royaltyFee}${
-                        model.royaltyFeeUnit === "%" ? "%" : ""
-                      }`
-                    : model.royaltyFee}
-                </TableCell>
-                <TableCell>{model.breakEven}</TableCell>
-                <TableCell>{model.roi}%</TableCell>
-                <TableCell>{model.payBackPeriod}</TableCell>
-                <TableCell>{model.marginOnSales}%</TableCell>
-                <TableCell>
-                  {isEditing && (
-                    <>
-                      <IconButton
-                        onClick={() => handleEditFicoModel(index)}
-                        color="primary"
-                        size="small"
-                        aria-label="edit"
-                        sx={{ mr: 1 }}
-                      >
-                        <EditIcon fontSize="small" />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => handleDeleteFicoModel(index)}
-                        color="error"
-                        size="small"
-                        aria-label="delete"
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))
-          ) : (
-            // Empty state row
-            <TableRow>
-              <TableCell 
-                colSpan={16} 
-                align="center" 
-                sx={{ 
-                  py: 4,
-                  color: 'text.secondary',
-                  fontStyle: 'italic'
-                }}
-              >
-                No franchise models added yet. {isEditing && "Use the form above to add your first franchise model."}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  </Box>
-</Box>
       <Divider
         sx={{
           my: 2,
@@ -3071,6 +2132,7 @@ const formatCurrency = (value) => {
           height: "1px",
         }}
       />
+
       {/* Support and Training Section */}
       <Grid item xs={12}>
         <Typography variant="h6" color="#ff9800" sx={{ fontWeight: "bold" }}>
@@ -3126,10 +2188,7 @@ const formatCurrency = (value) => {
               </RadioGroup>
             </FormControl>
             {errors.aidFinancing && (
-              <FormHelperText
-                error
-                sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}
-              >
+              <FormHelperText error sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}>
                 {errors.aidFinancing}
               </FormHelperText>
             )}
@@ -3173,9 +2232,7 @@ const formatCurrency = (value) => {
                     value={type}
                     control={
                       <Radio
-                        color={
-                          errors.franchiseDevelopment ? "error" : "primary"
-                        }
+                        color={errors.franchiseDevelopment ? "error" : "primary"}
                         disabled={!isEditing}
                       />
                     }
@@ -3186,10 +2243,7 @@ const formatCurrency = (value) => {
               </RadioGroup>
             </FormControl>
             {errors.franchiseDevelopment && (
-              <FormHelperText
-                error
-                sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}
-              >
+              <FormHelperText error sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}>
                 {errors.franchiseDevelopment}
               </FormHelperText>
             )}
@@ -3234,9 +2288,7 @@ const formatCurrency = (value) => {
                     value={type}
                     control={
                       <Radio
-                        color={
-                          errors.consultationOrAssistance ? "error" : "primary"
-                        }
+                        color={errors.consultationOrAssistance ? "error" : "primary"}
                         disabled={!isEditing}
                       />
                     }
@@ -3247,10 +2299,7 @@ const formatCurrency = (value) => {
               </RadioGroup>
             </FormControl>
             {errors.consultationOrAssistance && (
-              <FormHelperText
-                error
-                sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}
-              >
+              <FormHelperText error sx={{ ml: { md: 2 }, mt: { xs: 0, md: 0 } }}>
                 {errors.consultationOrAssistance}
               </FormHelperText>
             )}
@@ -3298,9 +2347,7 @@ const formatCurrency = (value) => {
                     key={option}
                     control={
                       <Checkbox
-                        checked={
-                          data.trainingSupport?.includes(option) || false
-                        }
+                        checked={data.trainingSupport?.includes(option) || false}
                         onChange={(e) => handleTrainingSupportChange(option, e.target.checked)}
                         name="trainingSupport"
                         color="primary"
@@ -3312,9 +2359,7 @@ const formatCurrency = (value) => {
                         {option}
                       </Typography>
                     }
-                    sx={{
-                      minWidth: "60px",
-                    }}
+                    sx={{ minWidth: "60px" }}
                   />
                 ))}
               </FormGroup>
@@ -3322,12 +2367,9 @@ const formatCurrency = (value) => {
           </Grid>
         </Grid>
       </Grid>
+
       <Grid item xs={12}>
-        <Typography
-          variant="h6"
-          color="#ff9800"
-          sx={{ mb: 2, mt: 4, fontWeight: "bold" }}
-        >
+        <Typography variant="h6" color="#ff9800" sx={{ mb: 2, mt: 4, fontWeight: "bold" }}>
           Brand Description
         </Typography>
         <Grid item xs={12}>
@@ -3367,9 +2409,7 @@ const formatCurrency = (value) => {
           </Typography>
           {/* USP Input and Add Button */}
           {isEditing && (
-            <Box
-              sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}
-            >
+            <Box sx={{ display: "flex", gap: 2, alignItems: "center", mb: 2 }}>
               <TextField
                 fullWidth
                 variant="outlined"
@@ -3409,10 +2449,7 @@ const formatCurrency = (value) => {
           {/* Display added USPs */}
           {data.uniqueSellingPoints?.length > 0 && (
             <Paper sx={{ p: 2, mb: 3, border: "1px solid #e0e0e0" }}>
-              <Typography
-                variant="subtitle2"
-                sx={{ fontWeight: "bold", mb: 1 }}
-              >
+              <Typography variant="subtitle2" sx={{ fontWeight: "bold", mb: 1 }}>
                 Added USPs:
               </Typography>
               <List dense sx={{ maxHeight: 200, overflow: "auto" }}>
@@ -3440,13 +2477,6 @@ const formatCurrency = (value) => {
                     <ListItemText
                       primary={`${index + 1}. ${usp}`}
                       primaryTypographyProps={{ variant: "body2" }}
-                      secondary={
-                        errors[`uniqueSellingPoints[${index}]`] && (
-                          <Typography variant="caption" color="error">
-                            {errors[`uniqueSellingPoints[${index}]`]}
-                          </Typography>
-                        )
-                      }
                     />
                   </ListItem>
                 ))}
@@ -3482,4 +2512,5 @@ const formatCurrency = (value) => {
     </Box>
   );
 };
+
 export default FranchiseDetailsEdit;

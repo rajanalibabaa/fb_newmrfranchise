@@ -64,7 +64,7 @@ const FranchiseDetails = ({ data = {}, errors = {}, onChange = () => {} }) => {
   ];
  
   // State for API data
-  const [industries, setIndustries] = useState([]);
+  const [industries, setIndustries] = useState(["Food & Beverages"]);
   const [industryData, setIndustryData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loadingIndustryDetails, setLoadingIndustryDetails] = useState(false);
@@ -111,7 +111,8 @@ const FranchiseDetails = ({ data = {}, errors = {}, onChange = () => {} }) => {
   const [showSelectedServiceTags, setShowSelectedServiceTags] = useState(false);
   // Fetch industries on component mount
   useEffect(() => {
-    fetchIndustries();
+    // fetchIndustries();
+    fetchIndustryDetails()
   }, []);
   // Fetch industries list
   const fetchIndustries = async () => {
@@ -131,16 +132,18 @@ const FranchiseDetails = ({ data = {}, errors = {}, onChange = () => {} }) => {
   };
   // Fetch industry details when an industry is selected
   const fetchIndustryDetails = async (industryName) => {
-    if (!industryName) return;
-   
+    // if (!industryName) return;
+    const industry = "Food & Beverages"
+    
     try {
       setLoadingIndustryDetails(true);
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/getIndustryByIndustryName?industry=${encodeURIComponent(industryName)}`
+        `http://localhost:5000/api/v1/admin/getIndustryByIndustryName?industry=${encodeURIComponent(industry)}`
       );
       const result = await response.json();
      
       if (result.success && result.data) {
+        
         setIndustryData(result.data);
        
         // Update selected category state
