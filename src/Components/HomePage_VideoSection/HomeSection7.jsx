@@ -232,7 +232,7 @@ useEffect(() => {
               },
             }}
           >
-           Top Truck And Kiosks Franchises
+           Top Quick Service Restaurants (QSR)
           </Typography>
 
           <Button

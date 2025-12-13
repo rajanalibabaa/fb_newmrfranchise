@@ -10,7 +10,7 @@ export const homeSection1 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Food Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Beverage Franchises`,
         {
           params: { page, id: userId },
         }
@@ -45,7 +45,7 @@ export const homeSection2 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Beverage Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Fine Dining %26 Casual Dining Restaurants`,
         {
           params: { page, id: userId },
         }
@@ -80,7 +80,7 @@ export const homeSection3 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Beverage Franchises&child=Coffee %26 Tea Cafes`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Tea, Coffee %26 Cafe Chains`,
         {
           params: { page, id: userId },
         }
@@ -109,13 +109,13 @@ export const homeSection3 = createAsyncThunk(
     }
   }
 );
-// Top Dessert And Bakery
+// Top Bakery, Confectionery %26 Traditional Sweets
 export const homeSection4 = createAsyncThunk(
   "homeSection4/fetchAll",
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Dessert %26 Bakery`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Bakery, Confectionery %26 Traditional Sweets`,
         {
           params: { page, id: userId },
         }
@@ -144,7 +144,41 @@ export const homeSection4 = createAsyncThunk(
     }
   }
 );
-// Top Truck And KiosksFranchises
+
+// export const homeSection5 = createAsyncThunk(
+//   "homeSection6/fetchAll",
+//   async ({ page = 1 }, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.get(
+//         `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Cloud Kitchen`,
+//         {
+//           params: { page, id: userId },
+//         }
+//       );
+
+//       if (!response.data.data || !response.data.data.brands) {
+//         console.error("Unexpected API response structure:", response.data);
+//         throw new Error("Invalid API response structure");
+//       }
+//       return {
+//         brands: response.data.data.brands,
+//         pagination: response.data.data.pagination || {
+//           currentPage: page,
+//           totalPages: 1,
+//           totalItems: 0,
+//           hasNextPage: false,
+//           hasPreviousPage: false,
+//         },
+//       };
+//     } catch (error) {
+//       console.error("API Error:", error.response?.data || error.message);
+//       return rejectWithValue(
+//         error.response?.data || { message: error.message }
+//       );
+//     }
+//   }
+// );
+
 // export const homeSection5 = createAsyncThunk(
 //   "homeSection5/fetchAll",
 //   async ({ page = 1 }, { rejectWithValue }) => {
@@ -178,13 +212,16 @@ export const homeSection4 = createAsyncThunk(
 //     }
 //   }
 // );
-//Top Food And Beverage Franchises
+
+
+
+// Top Cloud Kitchen
 export const homeSection6 = createAsyncThunk(
   "homeSection6/fetchAll",
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Cloud Kitchen`,
         {
           params: { page, id: userId },
         }
@@ -218,7 +255,7 @@ export const homeSection7 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Food Trucks %26 Kiosks Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Quick Service Restaurants (QSR)`,
         {
           params: { page, id: userId },
         }
