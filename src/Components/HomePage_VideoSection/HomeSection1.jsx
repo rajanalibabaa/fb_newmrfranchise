@@ -238,7 +238,7 @@ const {
             },
           }}
         >
-          Top Food Franchises
+          Top Beverage Franchises
         </Typography>
 
        <Button

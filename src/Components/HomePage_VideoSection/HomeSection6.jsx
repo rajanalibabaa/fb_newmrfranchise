@@ -230,7 +230,7 @@ const HomeSection6 = () => {
                },
              }}
            >
-             Top Food & Beverages
+             Top Cloud Kitchen
            </Typography>
  
            <Button

@@ -257,10 +257,10 @@ const Leads = () => {
           pagination={pagination}
           loadMore={loadMore}
           hasMore={hasMore}
-          leadsFilter={[
-            { label: "Category Investmentrange", value: "catInv" },
-            { label: "Category Location", value: "catLoc" },
-          ]}
+          // leadsFilter={[
+          //   { label: "Category Investmentrange", value: "catInv" },
+          //   { label: "Category Location", value: "catLoc" },
+          // ]}
           dateFilter={[
             { label: "Last 3 days", value: 3 },
             { label: "Last 7 days", value: 7 },

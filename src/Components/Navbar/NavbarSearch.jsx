@@ -233,7 +233,7 @@ const NavbarSearch = ({ open, handleClose }) => {
     childCategories.forEach(child => {
       if (child.toLowerCase().includes(term)) {
         suggestions.push({
-          type: 'Child-Category',
+          type: 'Menu-Tags',
           value: child,
           icon: '🏷️',
           searchTerm: term,

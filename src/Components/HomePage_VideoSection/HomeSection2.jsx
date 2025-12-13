@@ -265,7 +265,7 @@ const {
               },
             }}
           >
-             Top Beverage Brands
+             Top Fine Dining & Casual Dining Restaurants
           </Typography>
 
          <Button
