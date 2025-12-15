@@ -232,7 +232,7 @@ useEffect(() => {
               },
             }}
           >
-             Top Dessert & Bakery Brands 
+             Top Bakery, Confectionery & Traditional Sweets
           </Typography>
 
           <Button
