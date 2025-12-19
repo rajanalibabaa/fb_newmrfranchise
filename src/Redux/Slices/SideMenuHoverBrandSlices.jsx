@@ -5,28 +5,28 @@ import { API_BASE_URL } from "../../Api/api";
 // Cache object to store prefetched data
 const prefetchCache = {};
 
-// Thunk for fetching brands by child category with caching
-export const fetchBrandsByChildCategory = createAsyncThunk(
-  "brandCategory/fetchBrandsByChildCategory",
+// Thunk for fetching brands by sub category with caching
+export const fetchBrandsBySubCategory = createAsyncThunk(
+  "brandCategory/fetchBrandsBySubCategory",
   async (
-    { subCategory, childCategory, page = 1, limit = 30, isPrefetch = false },
+    { subCategory, id, page = 1, limit = 30, isPrefetch = false },
     { rejectWithValue, getState }
   ) => {
     try {
       // Check cache first for prefetched data
-      const cacheKey = `${subCategory}_${childCategory}_${page}`;
+      const cacheKey = `${subCategory}_${page}`;
 
       if (isPrefetch && prefetchCache[cacheKey]) {
         return { data: prefetchCache[cacheKey], page, isPrefetch };
       }
 
       const response = await axios.get(
-        `${API_BASE_URL}/brandlisting/getBrandsByChildCategory`,
+        `http://localhost:5000/api/v1/brandlisting/getBrandsByChildCategory`,
         {
-          params: { subCategory, childCategory, page, limit },
+          params: { subCategory, id, page, limit },
         }
       );
-
+ 
       // Ensure response has the expected structure
       if (!response.data || !response.data.data) {
         throw new Error("Invalid response structure");
@@ -37,8 +37,9 @@ export const fetchBrandsByChildCategory = createAsyncThunk(
         prefetchCache[cacheKey] = {
           brands: response.data.data.brands || [],
           mainCategory: response.data.data.mainCategory || "",
-          childCategories: response.data.data.childCategories || [],
+          subCategories: response.data.data.relatedCategories || [],
           currentCategory: response.data.data.currentCategory || "",
+          
           pagination: response.data.data.pagination || {
             total: 0,
             totalPages: 0,
@@ -50,11 +51,12 @@ export const fetchBrandsByChildCategory = createAsyncThunk(
         };
       }
 
+
       return {
         data: {
           brands: response.data.data.brands || [],
           mainCategory: response.data.data.mainCategory || "",
-          childCategories: response.data.data.childCategories || [],
+          subCategories: response.data.data.relatedCategories || [],
           currentCategory: response.data.data.currentCategory || "",
           pagination: response.data.data.pagination || {
             total: 0,
@@ -72,7 +74,7 @@ export const fetchBrandsByChildCategory = createAsyncThunk(
       return rejectWithValue(
         error.response?.data?.message ||
           error.message ||
-          "Brands Are Under Updateing"
+          "Brands Are Under Updating"
       );
     }
   }
@@ -81,14 +83,13 @@ export const fetchBrandsByChildCategory = createAsyncThunk(
 // Thunk for prefetching brands
 export const prefetchBrands = createAsyncThunk(
   "brandCategory/prefetchBrands",
-  async ({ subCategory, childCategory }, { dispatch }) => {
+  async ({ subCategory }, { dispatch }) => {
     // Only prefetch if we don't already have this data
-    const cacheKey = `${subCategory}_${childCategory}_1`;
+    const cacheKey = `${subCategory}_1`;
     if (!prefetchCache[cacheKey]) {
       await dispatch(
-        fetchBrandsByChildCategory({
+        fetchBrandsBySubCategory({
           subCategory,
-          childCategory,
           page: 1,
           limit: 30,
           isPrefetch: true,
@@ -102,7 +103,7 @@ export const prefetchBrands = createAsyncThunk(
 const initialState = {
   brands: [],
   mainCategory: "",
-  childCategories: [],
+  subCategories: [],
   currentCategory: "",
   loading: false,
   error: null,
@@ -116,6 +117,7 @@ const initialState = {
   },
   prefetched: [],
 };
+console.log("Initial State:", initialState);
 
 const brandCategorySlice = createSlice({
   name: "brandCategory",
@@ -124,7 +126,7 @@ const brandCategorySlice = createSlice({
     clearBrands: (state) => {
       state.brands = [];
       state.mainCategory = "";
-      state.childCategories = [];
+      state.subCategories = [];
       state.currentCategory = "";
       state.pagination = initialState.pagination;
       state.prefetched = [];
@@ -135,7 +137,7 @@ const brandCategorySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchBrandsByChildCategory.pending, (state, action) => {
+      .addCase(fetchBrandsBySubCategory.pending, (state, action) => {
         if (!action.meta.arg.isPrefetch) {
           state.loading = true;
           state.error = null;
@@ -145,13 +147,13 @@ const brandCategorySlice = createSlice({
           }
         }
       })
-      .addCase(fetchBrandsByChildCategory.fulfilled, (state, action) => {
+      .addCase(fetchBrandsBySubCategory.fulfilled, (state, action) => {
         const { data, page, isPrefetch } = action.payload;
 
         if (isPrefetch) {
-          const { subCategory, childCategory } = action.meta.arg;
-          if (!state.prefetched.includes(`${subCategory}_${childCategory}`)) {
-            state.prefetched.push(`${subCategory}_${childCategory}`);
+          const { subCategory } = action.meta.arg;
+          if (!state.prefetched.includes(`${subCategory}`)) {
+            state.prefetched.push(`${subCategory}`);
           }
           return;
         }
@@ -167,11 +169,11 @@ const brandCategorySlice = createSlice({
         }
 
         state.mainCategory = data.mainCategory || "";
-        state.childCategories = data.childCategories || [];
+        state.subCategories = data.subCategories || [];
         state.currentCategory = data.currentCategory || "";
         state.pagination = data.pagination || initialState.pagination;
       })
-      .addCase(fetchBrandsByChildCategory.rejected, (state, action) => {
+      .addCase(fetchBrandsBySubCategory.rejected, (state, action) => {
         if (!action.meta.arg?.isPrefetch) {
           state.loading = false;
           state.error =

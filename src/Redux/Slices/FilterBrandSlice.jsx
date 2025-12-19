@@ -31,6 +31,7 @@ export const fetchFilteredBrands = createAsyncThunk(
       params.append("limit", limit);
       if (id) params.append("id", id);
 
+      // console.log("searchTerm :",searchTerm)
       // ✅ Always include maincat
       params.append("maincat", maincat);
 
@@ -45,6 +46,7 @@ export const fetchFilteredBrands = createAsyncThunk(
       if (modelType) params.append("modelType", modelType);
       if (areaRequired) params.append("areaRequired", areaRequired); // ✅ Fixed areaRequired param
 
+      // console.log("params ;",`${API_BASE_URL}filter/getAllBrandsAndFilter?${params.toString()}`)
       // ✅ axios GET (better for filters)
       const response = await axios.get(
         `${API_BASE_URL}filter/getAllBrandsAndFilter?${params.toString()}`

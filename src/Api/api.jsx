@@ -40,6 +40,7 @@ export const api = {
     get: {
       investor: `${API_BASE_URL}/investor/getInvestorByUUID`,
       brand : `${API_BASE_URL}/brandlisting/getBrandListingByUUID`,
+      search: `${API_BASE_URL}/search`
     }
   },
 
