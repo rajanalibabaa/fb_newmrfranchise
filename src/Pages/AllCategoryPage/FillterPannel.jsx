@@ -415,7 +415,7 @@ const FilterPanel = React.memo(
                 >
                   {filteredMainCategories.map((category) => (
                     <Box key={`cat-container-${category}`} sx={{ mb: 0 }}>
-                      <FormControlLabel
+                      {/* <FormControlLabel
                         key={`cat-${category}`}
                         value={category}
                         control={
@@ -434,7 +434,7 @@ const FilterPanel = React.memo(
                           </Typography>
                         }
                         sx={{ mb: 0, mr: 0 }}
-                      />
+                      /> */}
 
                       {/* Show subcategories when this main category is selected */}
                       {filters.maincat === category && (
