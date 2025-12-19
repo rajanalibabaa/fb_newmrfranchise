@@ -69,7 +69,7 @@ const {
   error,
   pagination
 } = homeSection1State  || {};
-
+  
   // Load initial data
   useEffect(() => {
     dispatch(homeSection1({ page: 1 }));
@@ -238,7 +238,7 @@ const {
             },
           }}
         >
-          Top Beverage Franchises
+          Top Juice, Smoothie & Health Beverages
         </Typography>
 
        <Button

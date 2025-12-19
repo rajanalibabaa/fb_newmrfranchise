@@ -225,7 +225,7 @@ useEffect(() => {
               },
             }}
           >
-             Top Coffee & Tea Cafes Brands 
+             Top Tea, Coffee & Cafe Chains 
           </Typography>
 
           <Button

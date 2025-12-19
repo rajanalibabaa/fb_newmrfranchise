@@ -230,7 +230,7 @@ const HomeSection6 = () => {
                },
              }}
            >
-             Top Cloud Kitchen
+             Top Cloud Kitchens & Food Delivery
            </Typography>
  
            <Button
