@@ -27,6 +27,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import { fetchFilterOptions } from '../../Redux/Slices/filterDropdownData';
 import { setFilter, resetFilters } from '../../Redux/Slices/FilterBrandSlice';
+import Search from './Search';
 
 const highlightMatch = (text, searchTerm) => {
   if (!searchTerm || !text) return text;
@@ -484,92 +485,10 @@ const NavbarSearch = ({ open, handleClose }) => {
         </IconButton>
 
         {/* Search Input with Suggestions */}
-        <Box display="flex"  justifyContent="center" mb={2} position="relative">
-          <TextField
-            placeholder="Search for brands by name, category, or location"
-            fullWidth
-            variant="outlined"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              setOpenSuggestions(e.target.value.length > 1);
-            }}
-            onFocus={() => searchTerm.length > 1 && setOpenSuggestions(true)}
-            onBlur={() => setTimeout(() => setOpenSuggestions(false), 200)}
-            sx={{ maxWidth: 500 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon color="action" />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  {activeFiltersCount > 0 && (
-                    <Chip 
-                      label={`${activeFiltersCount} filters`} 
-                      size="small" 
-                      sx={{ mr: 1 }}
-                    />
-                  )}
-                  <IconButton 
-                    sx={{ bgcolor: '#7ad03a', color: 'white', "&:hover": { backgroundColor: "rgb(104, 159, 56)" } }}
-                    onClick={handleExplore}
-                    disabled={loading}
-                  >
-                    {loading ? <CircularProgress size={24} color="inherit" /> : <SearchIcon />}
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-          
-          {/* Search Suggestions Dropdown */}
-          {openSuggestions && searchSuggestions.length > 0 && (
-            <Paper 
-              elevation={3} 
-              sx={{
-                position: 'absolute',
-                top: '100%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: 'calc(100% - 32px)',
-                maxWidth: 500,
-                maxHeight: 300,
-                overflow: 'auto',
-                zIndex: 1300,
-                mt: 1
-              }}
-            >
-              <List>
-                {searchSuggestions.map((suggestion, index) => (
-                  <React.Fragment key={`${suggestion.type}-${suggestion.value}-${index}`}>
-                    <ListItemButton
-                      selected={index === activeSuggestion}
-                      onMouseEnter={() => setActiveSuggestion(index)}
-                      onClick={() => handleSuggestionSelect(suggestion)}
-                      sx={{
-                        '&:hover': { backgroundColor: 'action.hover' },
-                        '&.Mui-selected': { backgroundColor: 'action.selected' }
-                      }}
-                    >
-                      <Box sx={{ mr: 1, fontSize: '1.2rem' }}>{suggestion.icon}</Box>
-                      <ListItemText
-                        primary={highlightMatch(suggestion.value, suggestion.searchTerm)}
-                        secondary={
-                          <span>{suggestion.type}</span>
-                        }
-                        secondaryTypographyProps={{ color: 'text.secondary' }}
-                      />
-                    </ListItemButton>
-                    {index < searchSuggestions.length - 1 && <Divider />}
-                  </React.Fragment>
-                ))}
-              </List>
-            </Paper>
-          )}
-        </Box>
-
+        
+<Box display="flex" justifyContent="center" mb={2}>
+      <Search handleClose={handleClose} />
+    </Box>
         {/* Active Filters */}
         <Box display="flex" justifyContent="center" flexWrap="wrap" gap={1} mb={2}>
           {selectedMainCategory && (
