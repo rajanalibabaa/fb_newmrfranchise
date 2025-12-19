@@ -561,6 +561,20 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
       fetchInitialData();
     }
   }, [hoverCategory, fetchInitialData]);
+  
+//industries only make this categorires show 
+
+  useEffect(() => {
+    if (industries.length > 0 && activeIndustry === null && !loading.industries) {
+      const foodIndex = industries.findIndex(ind => ind === "Food & Beverages");
+      if (foodIndex !== -1) {
+        handleIndustryHover(foodIndex, "Food & Beverages");
+        if (isMobile) {
+          setMobileTabValue(1);
+        }
+      }
+    }
+  }, [industries, activeIndustry, loading.industries, isMobile, handleIndustryHover]);
 
   // Clear data when drawer closes
   useEffect(() => {
@@ -1081,7 +1095,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
           {!isMobile && (
             <>
               {/* Industries Column - Fixed */}
-              <Box
+              {/* <Box
                 sx={{
                   width: 300,
                   borderRight: `1px solid ${theme.palette.divider}`,
@@ -1149,7 +1163,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
                     No industries available
                   </Typography>
                 )}
-              </Box>
+              </Box> */}
 
               {/* Subcategories Column - Fixed */}
               {activeIndustry !== null && (
