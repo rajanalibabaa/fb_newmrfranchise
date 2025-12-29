@@ -672,7 +672,7 @@
                           <Typography 
                             variant="h4" 
                             fontWeight="bold" 
-                            gutterBottom
+                            gutterBottomf
                             sx={{
                               color: config.color,
                             }}
