@@ -440,77 +440,58 @@ const BrandHeader = ({
   variant="body1"
   sx={{ fontWeight: "bold" }}
 >
-  Brand Category Tags :
+  Product Tags :
   <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
-    {(() => {
-      const childCategories = brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.child;
-      
-      // Parse categories from different formats
-      let categoryArray = [];
-      if (Array.isArray(childCategories)) {
-        categoryArray = childCategories;
-      } else if (typeof childCategories === 'string' && childCategories !== "N/A") {
-        categoryArray = childCategories.split(/[,|\-|]/).map(item => item.trim()).filter(Boolean);
-      }
+ {(() => {
+  const productTags =
+    brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories
+      ?.productTags;
 
-      if (categoryArray.length === 0) {
-        return (
-          <Typography variant="caption" color="black">
-            N/A
-          </Typography>
-        );
-      }
+  console.log("productTags", productTags);
 
-      return (
-        <>
-          {/* First row - First 4 categories */}
-          <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-            {categoryArray.slice(0, 7).map((category, index) => (
-              <Chip
-                key={index}
-                label={category}
-                size="small"
-                variant="outlined"
-                sx={{
-                  fontSize: isMobile ? "0.65rem" : "0.75rem",
-                  height: "24px",
-                  backgroundColor: "#f8f9fa",
-                  borderColor: "#7AD03A",
-                  color: "black",
-                  "& .MuiChip-label": {
-                    padding: "0 8px",
-                  }
-                }}
-              />
-            ))}
-          </Box>
-          
-          {/* Second row - Remaining categories */}
-          {categoryArray.length > 4 && (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {categoryArray.slice(4).map((category, index) => (
-                <Chip
-                  key={index + 4}
-                  label={category}
-                  size="small"
-                  variant="outlined"
-                  sx={{
-                    fontSize: isMobile ? "0.65rem" : "0.75rem",
-                    height: "24px",
-                    backgroundColor: "#f8f9fa",
-                    borderColor: "#7AD03A",
-                    color: "black",
-                    "& .MuiChip-label": {
-                      padding: "0 8px",
-                    }
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-        </>
-      );
-    })()}
+  let categoryArray = [];
+
+  // ✅ NEW FORMAT: [{ parent, tags: [] }]
+  if (Array.isArray(productTags)) {
+    categoryArray = productTags.flatMap(item =>
+      Array.isArray(item?.tags) ? item.tags : []
+    );
+  }
+
+  if (categoryArray.length === 0) {
+    return (
+      <Typography variant="caption" color="black">
+        N/A
+      </Typography>
+    );
+  }
+
+  return (
+    <>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        {categoryArray.map((category, index) => (
+          <Chip
+            key={index}
+            label={category}
+            size="small"
+            variant="outlined"
+            sx={{
+              fontSize: isMobile ? "0.65rem" : "0.75rem",
+              height: "24px",
+              backgroundColor: "#f8f9fa",
+              borderColor: "#7AD03A",
+              color: "black",
+              "& .MuiChip-label": {
+                padding: "0 8px",
+              },
+            }}
+          />
+        ))}
+      </Box>
+    </>
+  );
+})()}
+
   </Box>
 </Typography>
 

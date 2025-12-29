@@ -69,21 +69,24 @@ const ApplyDrawer = ({
             mb: 2,
           }}
         >
-          <Typography variant="h6" fontWeight={700} color="#ff9800">
+             <Box>
+          <Typography variant="h6" fontWeight={700} mb={1} color="#ff9800" >
             Apply for Franchise
-            <Typography display="flex" flexDirection="column">
-              <Typography fontSize="0.7rem" color="black">
-                Brand Name: {selectedBrand[0]?.brandDetails?.brandName}
+             </Typography>
+             
+            <Box display="flex" flexDirection="column">
+              <Typography fontSize="0.7rem" color="black" mb={0.5}>
+                <b>Brand Name:</b> {selectedBrand[0]?.brandDetails?.brandName}
               </Typography>
               <Typography fontSize="0.7rem" color="black">
-                Brand Category:{" "}
+               <b> Brand Category: </b>
                 {
                   selectedBrand[0]?.brandfranchisedetails?.franchiseDetails
-                    ?.brandCategories?.child
+                    ?.brandCategories?.sub
                 }
               </Typography>
-            </Typography>
-          </Typography>
+            </Box>
+            </Box>
           <IconButton onClick={onClose}>
             <Close />
           </IconButton>
@@ -294,7 +297,7 @@ const ApplyDrawer = ({
             </Grid>
           </Grid>
           <Grid item xs={12} sx={{ mt: 2 }}>
-            {/* Disclaimer: Instantly rendered */}
+            {/* aimer: Instantly rendered */}
       <Box
         sx={{
           mt: 4,
@@ -303,11 +306,11 @@ const ApplyDrawer = ({
           bgcolor: "rgba(244, 67, 54, 0.05)",
         }}
       >
-        <Typography variant="body1" fontWeight={700} color="#f44336">
+        <Typography variant="body1"fontSize={10} color="#f44336">
           Disclaimer:
         </Typography>
         {!isMobile ? (
-          <Typography variant="caption" color="#212121">
+          <Typography variant="caption"  fontSize={9} color="#212121">
             Mr Franchise and the site sponsors accept no liability for the
             accuracy of any information contained on this site or on other
             linked sites. We recommend you take advice from a lawyer,
@@ -318,7 +321,7 @@ const ApplyDrawer = ({
           </Typography>
         ) : (
           <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap', minWidth: '300px', py: 1 }}>
-            <Typography variant="caption" color="#212121">
+            <Typography variant="caption"  fontSize={9} color="#212121">
               Mr Franchise and the site sponsors accept no liability for the
               accuracy of any information contained on this site or on other
               linked sites. We recommend you take advice from a lawyer,

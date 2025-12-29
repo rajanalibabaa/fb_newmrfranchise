@@ -3,7 +3,7 @@ import SEO from "../../Components/SEO/Seo";
 import Navbar from "../../Components/Navbar/NavBar";
 import { Box, CircularProgress, useTheme } from "@mui/material";
 import { useMediaQuery } from "@mui/system";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setFilter } from '../../Redux/Slices/FilterBrandSlice';
 import Footer from "../../Components/Footers/Footer.jsx";
@@ -16,6 +16,7 @@ function BrandCategoryViewPage() {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Get category from URL
   const category = new URLSearchParams(location.search).get('subcat') || 'Food & Beverage';
@@ -43,7 +44,9 @@ useEffect(() => {
   if (params.has('searchTerm')) {
     dispatch(setFilter({ filterName: 'searchTerm', value: params.get('searchTerm') }));
   }
-}, [location.search, dispatch]);
+    navigate("/brandViewPage", { replace: true })
+
+}, [location.search, dispatch,navigate]);
 
   // Generate dynamic title and description
   const seoTitle = investmentRange 

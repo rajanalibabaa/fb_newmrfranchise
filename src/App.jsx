@@ -15,6 +15,7 @@ import BrandDetailsPage from './Pages/AllCategoryPage/BrandDetailsPage'
 import BrandCategroyViewPage from './Pages/AllCategoryPage/BrandCategroyViewPage'
 import { autoLogOut } from './Api/autologout.jsx';
 import BrandActionManagement from './Components/BrandProfile_Component/BrandRequestHandle/BrandActionManagement.jsx';
+import MembershipPackagesEdit from './Components/Footers/QuickLinks/PaymentPakageUpgrade/MembershipPackagesEdit.jsx';
 // Lazy-loaded components with prefetching
 // const  = lazy(() => import(/* webpackPrefetch: true */ ));
 // const  = lazy(() => import(/* webpackPrefetch: true */ ''));
@@ -178,10 +179,10 @@ const App = () => {
                   <Route index element={<BrandDashBoard />} />
                   <Route path="brandDashboard" element={<BrandDashBoard />} />
                   <Route path="branddetailcontrol" element={<BrandDetailsEdit />} />
-
                   <Route path="franchisedetailcontrol" element={<FranchiseDetailsEdit />} />
                   <Route path="expansionlocationcontrol" element={<ExpansionLocationEdit />} />
                   <Route path="uploadcontrol" element={<UploadsEdit />} />
+                    <Route path="packageupgrade" element={<MembershipPackagesEdit />} />
                   <Route path="brandfeedback" element={<BrandFeedBack />} />
                   <Route path="brandcomplaint" element={<BrandComplaint />} />
                   <Route path="brandsearchus" element={<BrandSearchus />} />

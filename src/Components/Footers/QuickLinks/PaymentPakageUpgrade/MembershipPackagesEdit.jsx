@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import {
   Box,
   Grid,
@@ -20,15 +20,19 @@ import { ArrowBack, ArrowForward, Close, Home } from '@mui/icons-material';
 import { keyframes } from '@emotion/react';
 import {
   Check as CheckIcon,
-//   Star as StarIcon,
-//   Bolt as BoltIcon,
-//   WorkspacePremium as PremiumIcon,
-//   Diamond as DiamondIcon,
+  // Star as StarIcon,
+  // Bolt as BoltIcon,
+  // WorkspacePremium as PremiumIcon,
+  // Diamond as DiamondIcon,
   TrendingUp as TrendingUpIcon,
   AutoAwesome as AutoAwesomeIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import PaymentPage from './PaymentPage';
+import PaymentPage from './PaymentPackageEdit.jsx';
+import { userId } from '../../../../Utils/autherId';
+import { api } from '../../../../Api/api.jsx';
+import { GetApiCall } from '../../../../Api/DefaultApi.jsx';
+// import Navbar from '../../../Navbar/NavBar';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
@@ -37,7 +41,6 @@ import MilitaryTechIcon from '@mui/icons-material/MilitaryTech';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import StarIcon from '@mui/icons-material/Star';  
 import BoltIcon from '@mui/icons-material/Bolt';
-// import Navbar from '../../../Navbar/NavBar';
 // Animation keyframes
 const floatAnimation = keyframes`
   0%, 100% { transform: translateY(0px) rotate(0deg); }
@@ -59,7 +62,7 @@ const slideDownAnimation = keyframes`
   0% { transform: translateY(-100px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 `;
-const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackbar, isSubmitting, setSnackbar,submitSuccess, }) => {
+const MembershipSelection = ({ }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [selectedMembership, setSelectedMembership] = useState(null);
@@ -71,6 +74,48 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [activePackageName, setActivePackageName] = useState(null);
+  const [activePackageEnddate, setActivePackageEnddate] = useState(null);
+
+  const activeIndex = useMemo(() => {
+    return packages.findIndex(pkg =>
+      activePackageName && pkg.packageName.toLowerCase() === activePackageName.toLowerCase()
+    );
+  }, [activePackageName, packages]);
+
+  // Check if active package is expired
+  const isActivePackageExpired = useMemo(() => {
+    if (!activePackageEnddate) return true; // If no active package, treat as expired (enable all)
+    const endDate = new Date(activePackageEnddate);
+    const currentDate = new Date();
+    return endDate <= currentDate;
+  }, [activePackageEnddate]);
+
+  useEffect(() => {
+    const fetchActivePackages = async () => {
+      try {
+       const res = await GetApiCall(
+                 `${api.allBrandsApi.get.getBrandByID}/${userId}`,
+                 { paymentHistory: true }
+               );
+   
+        const data = res.data.data
+        if (data && data.activePackage) {
+           const activePackageNames = data.activePackage.packageType;
+              setActivePackageName(activePackageNames);
+              const endDate = data.activePackage.packageEndDate;
+              setActivePackageEnddate(endDate);
+            console.log('Active Package Name:', activePackageNames);
+            console.log('Active Package End Date:', endDate);
+        }
+ 
+      } catch (err) {
+        console.error('Error fetching active packages:', err);
+      }
+    };
+    fetchActivePackages();
+  }, []);
+// console.log("Active Package Name outside useEffect:", activePackageName);
   // Fetch packages from API
   useEffect(() => {
     const fetchPackages = async () => {
@@ -91,15 +136,19 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
           throw new Error('Server returned non-JSON response');
         }
         const data = await response.json();
-  
         // Check if data exists and has the expected structure
         if (data.success && data.data && Array.isArray(data.data) && data.data.length > 0) {
           const packageData = data.data[0];
-    
+          console.log('Raw Package Data from API:', packageData);
+ 
           // Process membership packages from the packages array dynamically
           const membershipPkgs = [];
           if (packageData.packages && Array.isArray(packageData.packages)) {
             membershipPkgs.push(...packageData.packages.map(pkg => {
+              // Skip if packageName is 'free'
+              if (pkg.packageName.toLowerCase() === 'free') {
+                return null;
+              }
               // Capitalize and format display name (e.g., 'basicPro' -> 'Basic Pro')
               const displayName = pkg.packageName
                 .replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -110,7 +159,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                 packageName: pkg.packageName, // Keep original for config lookup
                 _id: pkg._id
               };
-            }));
+            }).filter(Boolean)); // Filter out null entries (free packages)
           }
           // Extract listing packages from array
           const listingPkgs = [];
@@ -138,16 +187,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
     };
     fetchPackages();
   }, []);
-// ---------------------------
-// ICON IMPORTS
-// ---------------------------
-
-
-// ---------------------------
-// TIER CONFIG
-// ---------------------------
-
- const tierConfig = {
+  const tierConfig = {
   free: {
     color: '#000000',
     badgeColor: '#9ca3af',
@@ -268,6 +308,9 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
       alert('Please select a plan first');
     }
   };
+// const handleBack = () => {
+// navigate(-1); // Go back to the previous page
+// };
   const clearSelection = () => {
     setSelectedMembership(null);
     setSelectedListing(null);
@@ -344,34 +387,28 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
   if (showPaymentPage && selectedPlan) {
     return (
       <PaymentPage
-        onSubmit={handleSubmit}
         selectedMembership={selectedMembership}
         selectedListing={selectedListing}
         selectedPlan={selectedPlan}
-        snackbar={snackbar}
-          onCloseSnackbar={handleCloseSnackbar}
-          isSubmitting={isSubmitting}
-          submitSuccess={submitSuccess}
-        onBack={() => setShowPaymentPage(false)}
       />
     );
   }
   return (
     <Box >
     <Container maxWidth="xl" sx={{ py: 2, position: 'relative' }}>
-       
+    
       {/* Back Button */}
-      {onBack && (
+{/*
         <Box sx={{ display: 'flex', justifyContent: 'flex-start', }}>
           <Button
             startIcon={<ArrowBack />}
-            onClick={onBack}
+            onClick={handleBack}
             sx={{ textTransform: 'none',bgcolor: "#f0a729ff",color: "#000000" }}
           >
             Back to Form
           </Button>
-        </Box>
-      )}
+        </Box> */}
+ 
       {/* Center Page Floating Summary Box */}
       {selectedPlan && (
         <Fade in>
@@ -539,7 +576,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
       {/* Main Content */}
       <Box>
         {/* Header Section */}
-        <Box textAlign="center" mb={3}>
+        <Box textAlign="center" mb={4}>
           <Typography
             variant="h2"
             fontWeight="bold"
@@ -550,11 +587,11 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
-              fontSize: { xs: '2.5rem', md: '3rem' },
+              fontSize: { xs: '2.1rem', md: '3rem' },
               animation: `${shimmerAnimation} 3s ease-in-out infinite`,
             }}
           >
-            Choose Your Perfect Plan
+            Choose Your Perfect Plan 
           </Typography>
           <Typography
             variant="h6"
@@ -562,7 +599,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
             sx={{
               maxWidth: 600,
               mx: 'auto',
-              fontSize: { xs: '0.8rem', md: '1.10rem' },
+              fontSize: { xs: '1rem', md: '1.10rem' },
               lineHeight: 1.6
             }}
           >
@@ -570,7 +607,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
           </Typography>
         </Box>
         {/* Membership Packages */}
-        <Grid container spacing={2} justifyContent="center" mb={10}>
+        <Grid container spacing={4} justifyContent="center" mb={10}>
           {packages.map((pkg, index) => {
             // Use original packageName for config lookup
             const configKey = pkg.packageName.toLowerCase();
@@ -578,13 +615,17 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
             const isSelected = selectedMembership?._id === pkg._id;
             const isPopular = config.popular;
             const isHovered = hoveredCard === pkg._id;
+            const isActive = activePackageName && pkg.packageName.toLowerCase() === activePackageName.toLowerCase();
+            // Only disable if package is not expired and this is a lower/equal tier
+            const isDisabled = !isActivePackageExpired && activeIndex >= 0 && index <= activeIndex;
+            console.log("Active Index:", isActivePackageExpired);
             return (
               <Grid item xs={12} md={6} lg={4} key={pkg._id}>
                 <Fade in timeout={800} style={{ transitionDelay: `${index * 100}ms` }}>
                   <Card
-                    onMouseEnter={() => setHoveredCard(pkg._id)}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    onClick={() => handlePlanSelect(pkg)}
+                    onMouseEnter={isDisabled ? undefined : () => setHoveredCard(pkg._id)}
+                    onMouseLeave={isDisabled ? undefined : () => setHoveredCard(null)}
+                    onClick={isDisabled ? undefined : () => handlePlanSelect(pkg)}
                     sx={{
                       height: '100%',
                       border: isSelected ? `3px solid ${config.badgeColor}` : '2px solid #e5e7eb',
@@ -598,11 +639,13 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                         : '0 8px 25px rgba(0, 0, 0, 0.1)',
                       animation: isPopular ? `${floatAnimation} 3s ease-in-out infinite` : 'none',
                       transform: isHovered ? 'translateY(-15px) scale(1.02)' : 'translateY(0px) scale(1)',
-                      cursor: 'pointer',
+                      cursor: isDisabled ? 'not-allowed' : 'pointer',
+                      opacity: isDisabled ? 0.6 : 1,
+                      pointerEvents: isDisabled ? 'none' : 'auto',
                       '&:hover': {
-                        transform: 'translateY(-15px) scale(1.02)',
-                        boxShadow: `0 40px 80px -20px ${alpha(config.badgeColor, 0.3)}, 0 0 40px ${alpha(config.badgeColor, 0.2)}`,
-                        borderColor: config.badgeColor,
+                        transform: isDisabled ? 'none' : 'translateY(-15px) scale(1.02)',
+                        boxShadow: isDisabled ? 'none' : `0 40px 80px -20px ${alpha(config.badgeColor, 0.3)}, 0 0 40px ${alpha(config.badgeColor, 0.2)}`,
+                        borderColor: isDisabled ? '#e5e7eb' : config.badgeColor,
                       },
                       '&::before': {
                         content: '""',
@@ -616,9 +659,10 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                         zIndex: 1,
                       },
                       '&:hover::before': {
-                        left: '100%',
+                        left: isDisabled ? '-100%' : '100%',
                       }
                     }}
+                    // disabled={isDisabled}
                   >
                     {/* Animated Background Elements */}
                     <Box
@@ -634,13 +678,39 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                         animationDelay: `${index * 0.5}s`,
                       }}
                     />
+                    {/* Active Badge */}
+                    {isActive && !isActivePackageExpired  && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 7,
+                          left: 6,
+                          background: 'linear-gradient(135deg, #10b981, #059669)',
+                          color: 'white',
+                          px: 0.5,
+                          py: 0.4,
+                          borderRadius: 3,
+                          fontSize: '0.6rem',
+                          fontWeight: 'bold',
+                          textTransform: 'uppercase',
+                          zIndex: 2,
+                          animation: `${pulseAnimation} 2s ease-in-out infinite`,
+                          boxShadow: `0 4px 12px rgba(16, 185, 129, 0.3)`,
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <CheckIcon sx={{ fontSize: 12, mr: 0.5 }} />
+                        Active
+                      </Box>
+                    )}
                     {/* Popular Badge */}
                     {isPopular && (
                       <Box
                         sx={{
                           position: 'absolute',
-                          top: -5,
-                          left: '65%',
+                          top: -4,
+                          left: '60%',
                           transform: 'translateX(-50%)',
                           background: config.badgeGradient,
                           color: theme.palette.getContrastText(config.badgeColor),
@@ -724,6 +794,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                           variant="h5"
                           fontWeight="bold"
                           gutterBottom
+                         
                           sx={{
                             color: config.color,
                           }}
@@ -799,6 +870,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                       <Button
                         fullWidth
                         variant={isSelected ? "contained" : "outlined"}
+                        disabled={isDisabled}
                         startIcon={isSelected ? <CheckIcon /> : <AutoAwesomeIcon />}
                         sx={{
                           py: 2,
@@ -835,10 +907,16 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
                           },
                           '&:active': {
                             transform: 'scale(0.98)',
+                          },
+                          '&.Mui-disabled': {
+                            backgroundColor: 'rgba(0, 0, 0, 0.12)',
+                            color: 'rgba(0, 0, 0, 0.26)',
+                            borderColor: 'rgba(0, 0, 0, 0.12)',
                           }
                         }}
                       >
-                        {isSelected ? 'Selected' : 'Select Plan'}
+
+                        {!isDisabled  && !isActivePackageExpired ? 'Upgrade' : 'Select'}
                       </Button>
                     </CardContent>
                   </Card>
@@ -848,7 +926,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
           })}
         </Grid>
         {/* Listing Packages */}
-      
+    
       </Box>
     </Container>
     </Box>
@@ -856,7 +934,7 @@ const MembershipSelection = ({ handleSubmit, onBack, snackbar, handleCloseSnackb
 };
 export default MembershipSelection;
 
-  // {listingPackages.length > 0 && (
+  //  {listingPackages.length > 0 && (
   //         <Box mb={8}>
   //           <Box textAlign="center" mb={6}>
   //             <Typography
@@ -1051,3 +1129,4 @@ export default MembershipSelection;
   //           </Grid>
   //         </Box>
   //       )}
+    

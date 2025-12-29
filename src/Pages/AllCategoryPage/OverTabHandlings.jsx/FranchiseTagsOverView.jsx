@@ -1,119 +1,109 @@
-import React from 'react';
-import { Box, Typography, Divider, Grid, Chip } from '@mui/material';
+import React from "react";
+import { Box, Typography, Divider, Chip } from "@mui/material";
 
-const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
-  if (!franchiseTagsDetails) return null;
+const FranchiseTagsOverView = ({ serviceTags }) => {
+  if (!Array.isArray(serviceTags) || serviceTags.length === 0) return null;
 
-  const tagSections = [
-        { key: 'PrimaryClassifications', label: 'Primary Classifications' },
-    { key: 'ProductServiceTypes', label: 'Product & Service Types' },
-    { key: 'TargetAudience', label: 'Target Audience' },
-    { key: 'ServiceModel', label: 'Service Model' },
-    { key: 'PricingValue', label: 'Pricing & Value' },
-    { key: 'AmbienceExperience', label: 'Ambience & Experience' },
-    { key: 'FeaturesAmenities', label: 'Features & Amenities' },
-    { key: 'TechnologyIntegration', label: 'Technology Integration' },
-    { key: 'BusinessOperations', label: 'Business Operations' },
-    { key: 'SustainabilityEthics', label: 'Sustainability & Ethics' },
-  ];
+  console.log("serviceTags", serviceTags);
 
   return (
     <Box
       sx={{
         mt: 3,
         borderRadius: 2,
-        // boxShadow: 1,
-        // bgcolor: '#fff',
-        width: '100%',
+        width: "100%",
       }}
     >
       <Typography
-        variant="h6" fontWeight={700} sx={{ mb: 2, color: "#7ad03a" }}
+        variant="h6"
+        fontWeight={700}
+        sx={{ mb: 2, color: "#7ad03a" }}
       >
-        Brand Overview Tags
+        Service Tags
       </Typography>
+
       <Divider sx={{ mb: 2 }} />
 
+      {/* TABLE STYLE LAYOUT */}
       <Box
         sx={{
-          display: 'table',
-          width: '100%',
-          borderCollapse: 'collapse',
-
+          display: "table",
+          width: "100%",
+          borderCollapse: "collapse",
         }}
       >
-        {tagSections.map((section, index) => {
-          const items = franchiseTagsDetails[section.key] || [];
-          if (!items || items.length === 0) return null;
+        {serviceTags.map((item, index) => {
+          const tags = Array.isArray(item?.tags) ? item.tags : [];
+          if (tags.length === 0) return null;
 
           return (
             <Box
-              key={section.key}
+              key={item._id || index}
               sx={{
-                display: 'table-row',
+                display: "table-row",
                 borderBottom:
-                  index !== tagSections.length - 1 ? '1px solid #e0e0e0' : 'none',
+                  index !== serviceTags.length - 1
+                    ? "1px solid #e0e0e0"
+                    : "none",
               }}
             >
-              {/* Left column - Label */}
+              {/* LEFT COLUMN – PARENT */}
               <Box
                 sx={{
-                  display: 'table-cell',
-                  width: { xs: '30%', sm: '30%', md: '25%' },
-                  verticalAlign: 'top',
-                  py: 0.8,
+                  display: "table-cell",
+                  width: { xs: "35%", sm: "30%", md: "25%" },
+                  verticalAlign: "top",
+                  py: 1,
                   px: 1,
-                  textAlign: { xs: 'left', sm: 'left' },
                 }}
               >
                 <Typography
                   variant="body2"
                   sx={{
                     fontWeight: 600,
-                    color: '#333',
-                    fontSize: '0.9rem',
+                    color: "#333",
+                    fontSize: "0.9rem",
                     lineHeight: 1.6,
+                    textTransform: "capitalize",
                   }}
                 >
-                  {section.label} 
+                  {item.parent}
                 </Typography>
               </Box>
-:
-              {/* Right column - Tags */}
+
+              {/* RIGHT COLUMN – TAGS */}
               <Box
                 sx={{
-                  display: 'table-cell',
-                  width: { xs: '60%', sm: '70%', md: '75%' },
-                  verticalAlign: 'top',
-                  py: 0.8,
+                  display: "table-cell",
+                  width: { xs: "65%", sm: "70%", md: "75%" },
+                  verticalAlign: "top",
+                  py: 1,
                   px: 1,
-                  textAlign: { xs: 'left', sm: 'left' },
                 }}
               >
                 <Box
                   sx={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
+                    display: "flex",
+                    flexWrap: "wrap",
                     gap: 0.8,
                   }}
                 >
-                  {items.map((tag, i) => (
+                  {tags.map((tag, i) => (
                     <Chip
                       key={i}
                       label={tag}
-                       size="small"
-                  variant="outlined"
-                  sx={{
-                    // fontSize: isMobile ? "0.65rem" : "0.75rem",
-                    height: "24px",
-                    backgroundColor: "#f8f9fa",
-                    borderColor: "#7AD03A",
-                    color: "black",
-                    "& .MuiChip-label": {
-                      padding: "0 8px",
-                      whiteSpace: "nowrap",
-                    }
-                  }}
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        height: "24px",
+                        backgroundColor: "#f8f9fa",
+                        borderColor: "#7AD03A",
+                        color: "black",
+                        "& .MuiChip-label": {
+                          padding: "0 8px",
+                          whiteSpace: "nowrap",
+                        },
+                      }}
                     />
                   ))}
                 </Box>
@@ -122,8 +112,8 @@ const FranchiseTagsOverView = ({ franchiseTagsDetails }) => {
           );
         })}
       </Box>
-            <Divider sx={{ mb: 2 }} />
 
+      <Divider sx={{ mt: 2 }} />
     </Box>
   );
 };

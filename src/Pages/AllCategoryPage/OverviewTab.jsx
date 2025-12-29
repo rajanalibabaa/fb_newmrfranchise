@@ -67,7 +67,7 @@ const OverviewTab = ({ brand }) => {
     const number = Number(value);
     return isNaN(number) ? "N/A" : `₹${number.toLocaleString("en-IN")}`;
   };
-
+console.log("brand",brand)
   const hasData = (sectionData) => {
     if (Array.isArray(sectionData)) {
       return sectionData.length > 0;
@@ -78,7 +78,8 @@ const OverviewTab = ({ brand }) => {
   const franchiseDetails = brand?.[0]?.brandfranchisedetails?.franchiseDetails || {};
   const expansionLocationData = brand?.[0]?.brandexpansionlocationdatas || {};
   const uploads = brand?.[0]?.uploads || {};
-const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchiseTags || {};
+const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories.serviceTags || {};
+
 
   return (
     <Box ref={overviewRef}>
@@ -91,9 +92,10 @@ const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchi
           formatCurrency={formatCurrency}
         />
       )}
-      {hasData(FranchiseTags) && (
+      {hasData(serviceTags) && (
         <FranchiseTagsOverView 
-        franchiseTagsDetails={FranchiseTags}
+
+        serviceTags={serviceTags}
         />
       )}
      
@@ -335,11 +337,11 @@ const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchi
           bgcolor: "rgba(244, 67, 54, 0.05)",
         }}
       >
-        <Typography variant="body1" fontWeight={700} color="#f44336">
+        <Typography variant="body1"  fontSize={10}  color="#f44336">
           Disclaimer:
         </Typography>
         {!isMobile ? (
-          <Typography variant="caption" color="#212121">
+          <Typography variant="caption"  fontSize={9} color="#212121">
             Mr Franchise and the site sponsors accept no liability for the
             accuracy of any information contained on this site or on other
             linked sites. We recommend you take advice from a lawyer,
@@ -350,7 +352,7 @@ const FranchiseTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.franchi
           </Typography>
         ) : (
           <Box sx={{ overflowX: 'auto', whiteSpace: 'nowrap', minWidth: '300px', py: 1 }}>
-            <Typography variant="caption" color="#212121">
+            <Typography variant="caption"  fontSize={9} color="#212121">
               Mr Franchise and the site sponsors accept no liability for the
               accuracy of any information contained on this site or on other
               linked sites. We recommend you take advice from a lawyer,

@@ -18,7 +18,10 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import ArrowRight from "@mui/icons-material/ArrowRight";
 import { useSelector, useDispatch } from "react-redux";
-import { homeSection2, toggleHomeCardLike  } from '../../Redux/Slices/TopCardFetchingSlice.jsx';
+import {
+  homeSection2,
+  toggleHomeCardLike,
+} from "../../Redux/Slices/TopCardFetchingSlice.jsx";
 
 import LoginPage from "../../Pages/LoginPage/LoginPage";
 import { motion } from "framer-motion";
@@ -41,16 +44,13 @@ const HomeSection2 = () => {
   const theme = useTheme();
   const dispatch = useDispatch();
 
-const homeSection2State  = useSelector((state) => state.overAllPlatform.homeSection2);
+  const homeSection2State = useSelector(
+    (state) => state.overAllPlatform.homeSection2
+  );
 
-const {
-  brands = [],
-  isLoading,
-  error,
-  pagination
-} = homeSection2State  || {};
+  const { brands = [], isLoading, error, pagination } = homeSection2State || {};
 
-// console.log("beveragesFranchiseState",beveragesFranchiseState);
+  // console.log("beveragesFranchiseState",beveragesFranchiseState);
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
   const isSmallDesktop = useMediaQuery(theme.breakpoints.between("md", "lg"));
@@ -83,9 +83,9 @@ const {
     return CARD_DIMENSIONS.largeDesktop;
   }, [isMobile, isTablet, isSmallDesktop, isDesktop, isLargeDesktop]);
 
- useEffect(() => {
-     dispatch(homeSection2({ page: 1 }));
-   }, [dispatch]);
+  useEffect(() => {
+    dispatch(homeSection2({ page: 1 }));
+  }, [dispatch]);
 
   useLayoutEffect(() => {
     const updateVisibleCards = () => {
@@ -105,15 +105,15 @@ const {
 
   const handleLikeClick = useCallback(
     async (brandId) => {
-         if (!token) {
-              setShowLogin(true);
-              return;
-            }
-            dispatch(toggleBrandLike(brandId))
-            dispatch(toggleHomeCardLike(brandId))
-            await likeApiFunction(brandId)
-          },
-   
+      if (!token) {
+        setShowLogin(true);
+        return;
+      }
+      dispatch(toggleBrandLike(brandId));
+      dispatch(toggleHomeCardLike(brandId));
+      await likeApiFunction(brandId);
+    },
+
     [dispatch]
   );
 
@@ -265,35 +265,36 @@ const {
               },
             }}
           >
-             Top Beverage Brands
+            Top Fine Dining & Casual Dining Restaurants
           </Typography>
 
-         <Button
-  variant="contained"
-  size="small"
-  aria-label="view more brands"
-  endIcon={<ArrowRight />}
-  sx={{
-    textTransform: "none",
-    fontSize: isMobile ? 14 : 16,
-    background: theme.palette.mode === "dark" 
-      ? "linear-gradient(90deg, #ff9800, #ffb74d)" 
-      : "linear-gradient(90deg, #f57c00, #ff9800)",
-    color: "#fff",
-    borderRadius: "8px",
-    px: 2,
-    "&:hover": {
-      background: theme.palette.mode === "dark" 
-        ? "linear-gradient(90deg, #ffb74d, #ff9800)" 
-        : "linear-gradient(90deg, #ff9800, #f57c00)",
-      boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-    },
-  }}
-  onClick={() => window.open("/brandviewpage", "_blank")}
->
-  View More
-</Button>
-
+          <Button
+            variant="contained"
+            size="small"
+            aria-label="view more brands"
+            endIcon={<ArrowRight />}
+            sx={{
+              textTransform: "none",
+              fontSize: isMobile ? 14 : 16,
+              background:
+                theme.palette.mode === "dark"
+                  ? "linear-gradient(90deg, #ff9800, #ffb74d)"
+                  : "linear-gradient(90deg, #f57c00, #ff9800)",
+              color: "#fff",
+              borderRadius: "8px",
+              px: 2,
+              "&:hover": {
+                background:
+                  theme.palette.mode === "dark"
+                    ? "linear-gradient(90deg, #ffb74d, #ff9800)"
+                    : "linear-gradient(90deg, #ff9800, #f57c00)",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+              },
+            }}
+            onClick={() => window.open("/brandviewpage", "_blank")}
+          >
+            View More
+          </Button>
         </Box>
 
         <Box sx={{ position: "relative" }}>
@@ -303,17 +304,18 @@ const {
             disabled={!showStartShadow}
             sx={{
               position: "absolute",
-              left: isMobile ? 4 : 8,
-              top: "50%",
+              left: isMobile ? 4 : -10,
+              top: "63.5%",
               transform: "translateY(-50%)",
               zIndex: 1,
               minWidth: 40,
               height: 40,
               borderRadius: "50%",
-              backgroundColor: "background.paper",
+              backgroundColor: "#ff9800",
+              color:"black",
               boxShadow: 2,
               "&:hover": {
-                backgroundColor: "action.hover",
+                backgroundColor: "#c28223ff",
               },
               "&:disabled": {
                 opacity: 0,
@@ -330,17 +332,18 @@ const {
             aria-label="next"
             sx={{
               position: "absolute",
-              right: isMobile ? 4 : 8,
-              top: "50%",
+              right: isMobile ? 4 : -10,
+              top: "63.5%",
               transform: "translateY(-50%)",
               zIndex: 1,
               minWidth: 40,
               height: 40,
               borderRadius: "50%",
-              backgroundColor: "background.paper",
+              backgroundColor: "#ff9800",
+              color:"black",
               boxShadow: 2,
               "&:hover": {
-                backgroundColor: "action.hover",
+                backgroundColor: "#c28223ff",
               },
               "&:disabled": {
                 opacity: 0,

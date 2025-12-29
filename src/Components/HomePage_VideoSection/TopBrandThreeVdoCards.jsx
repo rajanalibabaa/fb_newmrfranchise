@@ -840,7 +840,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                           textOverflow="ellipsis"
                           color="text.secondary"
                         >
-                          {mainBrand.brandCategories?.child || "N/A"}
+                          {mainBrand.brandCategories?.sub || "N/A"}
                         </Typography>
                       </Box>
                     </Stack>
@@ -1359,7 +1359,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                         color="Black"
                         sx={{ fontSize: "0.7rem", lineHeight: 1.1 }}
                       >
-                        Categories: {brand.brandCategories?.child}
+                        Categories: {brand.brandCategories?.sub}
                       </Typography>
 
                       <Typography

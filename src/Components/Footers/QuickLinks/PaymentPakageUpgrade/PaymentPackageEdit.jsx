@@ -37,6 +37,10 @@ import {
 } from "@mui/icons-material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircularProgress from "@mui/material/CircularProgress";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { userId } from "../../../../Utils/autherId";
+
 // Keyframe animations
 const floatAnimation = keyframes`
   0%, 100% { transform: translateY(0px); }
@@ -65,7 +69,7 @@ const gradientShift = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPlan, onBack , snackbar, handleCloseSnackbar, isSubmitting, setSnackbar,submitSuccess }) => {
+const PaymentPage = ({ selectedMembership, selectedListing,selectedPlan }) => {
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [cardDetails, setCardDetails] = useState({
     number: "",
@@ -75,10 +79,19 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
   });
   const [showQR, setShowQR] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  
+
   const theme = useTheme();
 
   const location = useLocation();
   const navigate = useNavigate();
+    const  Id  = userId
+    console.log("Brand ID for Payment:", Id);
+ 
+
 
   // const { selectedPlan } = location.state || {};
 
@@ -99,20 +112,30 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
   const darkGreen = "#388E3C";
 
   const handleBack = () => {
-    // If a parent provided an onBack callback (inline rendering), use it.
-    // Otherwise, fall back to navigation history.
-    if (typeof onBack === 'function') {
-      onBack();
-      return;
-    }
+
     navigate(-1);
   };
 
-  const handleSubmit = () => {
-     onSubmit(selectedMembership,selectedListing);
-    
-     
-  };
+
+
+const handleSubmit = () => {
+  const PackageName = selectedMembership.packageName;
+  console.log("Submitting Payment for Package:", PackageName);
+  console.log("Brand ID:", Id);
+
+  axios.put(`http://localhost:5000/api/v1/leadPackageUpdate/${Id}`, {
+    packageName: PackageName
+  })
+  .then(res => {
+    console.log("Updated Successfully:", res.data);
+      navigate("/brandDashboard");
+  })
+  .catch(err => {
+    console.error("Update Error:", err);
+  });
+
+};
+
 
   // GUARD CLAUSE: Show fallback if no membership is selected
   if (!membership) {
@@ -809,17 +832,16 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
       </Box>
 
            <Snackbar
-                open={snackbar.open}
+            
                 autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
+     
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               >
                 <Alert
-                  onClose={handleCloseSnackbar}
-                  severity={snackbar.severity}
+                //   severity={snackbar.severity}
                   sx={{ width: "100%" }}
                 >
-                  {snackbar.message}
+                  {/* {snackbar.message} */}
                 </Alert>
               </Snackbar>
 

@@ -10,7 +10,7 @@ export const homeSection1 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Food Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Juice, Smoothie %26 Health Beverages`,
         {
           params: { page, id: userId },
         }
@@ -45,7 +45,7 @@ export const homeSection2 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Beverage Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Fine Dining %26 Casual Dining Restaurants`,
         {
           params: { page, id: userId },
         }
@@ -80,7 +80,7 @@ export const homeSection3 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Beverage Franchises&child=Coffee %26 Tea Cafes`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Tea, Coffee %26 Cafe Chains`,
         {
           params: { page, id: userId },
         }
@@ -109,17 +109,19 @@ export const homeSection3 = createAsyncThunk(
     }
   }
 );
-// Top Dessert And Bakery
+// Top Bakery, Confectionery %26 Traditional Sweets
 export const homeSection4 = createAsyncThunk(
   "homeSection4/fetchAll",
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Dessert %26 Bakery`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Bakery, Confectionery %26 Traditional Sweets`,
         {
           params: { page, id: userId },
         }
       );
+
+      
 
       if (!response.data.data || !response.data.data.brands) {
         console.error("Unexpected API response structure:", response.data);
@@ -144,7 +146,42 @@ export const homeSection4 = createAsyncThunk(
     }
   }
 );
-// Top Truck And KiosksFranchises
+
+
+export const homeSection5 = createAsyncThunk(
+  "homeSection5/fetchAll",
+  async ({ page = 1 }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Ice Cream %26 Frozen Desserts`,
+        {
+          params: { page, id: userId },
+        }
+      );
+
+      if (!response.data.data || !response.data.data.brands) {
+        console.error("Unexpected API response structure:", response.data);
+        throw new Error("Invalid API response structure");
+      }
+      return {
+        brands: response.data.data.brands,
+        pagination: response.data.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalItems: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
+    }
+  }
+);
+
 // export const homeSection5 = createAsyncThunk(
 //   "homeSection5/fetchAll",
 //   async ({ page = 1 }, { rejectWithValue }) => {
@@ -178,13 +215,16 @@ export const homeSection4 = createAsyncThunk(
 //     }
 //   }
 // );
-//Top Food And Beverage Franchises
+
+
+
+// Top Cloud Kitchen
 export const homeSection6 = createAsyncThunk(
   "homeSection6/fetchAll",
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Cloud Kitchens %26 Food Delivery`,
         {
           params: { page, id: userId },
         }
@@ -218,7 +258,40 @@ export const homeSection7 = createAsyncThunk(
   async ({ page = 1 }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Food Trucks %26 Kiosks Franchises`,
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Quick Service Restaurants (QSR)`,
+        {
+          params: { page, id: userId },
+        }
+      );
+
+      if (!response.data.data || !response.data.data.brands) {
+        console.error("Unexpected API response structure:", response.data);
+        throw new Error("Invalid API response structure");
+      }
+      return {
+        brands: response.data.data.brands,
+        pagination: response.data.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalItems: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+        },
+      };
+    } catch (error) {
+      console.error("API Error:", error.response?.data || error.message);
+      return rejectWithValue(
+        error.response?.data || { message: error.message }
+      );
+    }
+  }
+);
+export const homeSection8 = createAsyncThunk(
+  "homeSection8/fetchAll",
+  async ({ page = 1 }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Food %26 Beverages&sub=Bars, Pubs %26 Lounges`,
         {
           params: { page, id: userId },
         }
@@ -252,11 +325,12 @@ export const homeSection7 = createAsyncThunk(
 //   async ({ page = 1 }, { rejectWithValue }) => {
 //     try {
 //       const response = await axios.get(
-//         `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Hotels %26 Resorts`,
+//         `${API_BASE_URL}/overAllPlatformOnlyMainCategory?main=Bars, Pubs %26 Lounges`,
 //         {
 //           params: { page, id: userId },
 //         }
 //       );
+// console.log('sec8res',response);
 
 //       if (!response.data.data || !response.data.data.brands) {
 //         console.error("Unexpected API response structure:", response.data);
@@ -401,19 +475,19 @@ const initialState = {
     error: null,
     viewedBrandsCount: 0,
   },
-  // homeSection5: {
-  //   brands: [],
-  //   pagination: {
-  //     currentPage: 1,
-  //     totalPages: 1,
-  //     totalItems: 0,
-  //     hasNextPage: false,
-  //     hasPreviousPage: false,
-  //   },
-  //   isLoading: false,
-  //   error: null,
-  //   viewedBrandsCount: 0,
-  // },
+  homeSection5: {
+    brands: [],
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    isLoading: false,
+    error: null,
+    viewedBrandsCount: 0,
+  },
   homeSection6: {
     brands: [],
     pagination: {
@@ -440,19 +514,19 @@ const initialState = {
     error: null,
     viewedBrandsCount: 0,
   },
-  // homeSection8: {
-  //   brands: [],
-  //   pagination: {
-  //     currentPage: 1,
-  //     totalPages: 1,
-  //     totalItems: 0,
-  //     hasNextPage: false,
-  //     hasPreviousPage: false,
-  //   },
-  //   isLoading: false,
-  //   error: null,
-  //   viewedBrandsCount: 0,
-  // },
+  homeSection8: {
+    brands: [],
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 0,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    },
+    isLoading: false,
+    error: null,
+    viewedBrandsCount: 0,
+  },
   // homeSection9: {
   //   brands: [],
   //   pagination: {
@@ -497,18 +571,18 @@ const OverAllPlatform = createSlice({
     resethomeSection4: (state) => {
       state.homeSection4 = initialState.homeSection4;
     },
-    // resethomeSection5: (state) => {
-    //   state.homeSection5 = initialState.homeSection5;
-    // },
+    resethomeSection5: (state) => {
+      state.homeSection5 = initialState.homeSection5;
+    },
     resethomeSection6: (state) => {
       state.homeSection6 = initialState.homeSection6;
     },
     resethomeSection7: (state) => {
       state.homeSection7 = initialState.homeSection7;
     },
-    // resethomeSection8: (state) => {
-    //   state.homeSection8 = initialState.homeSection8;
-    // },
+    resethomeSection8: (state) => {
+      state.homeSection8 = initialState.homeSection8;
+    },
 
     // resethomeSection9: (state) => {
     //   state.homeSection9 = initialState.homeSection9;
@@ -531,18 +605,18 @@ const OverAllPlatform = createSlice({
     homeSection4ViewedCount: (state) => {
       state.homeSection4.viewedBrandsCount += 1;
     },
-    // homeSection5ViewedCount: (state) => {
-    //   state.homeSection5.viewedBrandsCount += 1;
-    // },
+    homeSection5ViewedCount: (state) => {
+      state.homeSection5.viewedBrandsCount += 1;
+    },
     homeSection6ViewedCount: (state) => {
       state.homeSection6.viewedBrandsCount += 1;
     },
     homeSection7ViewedCount: (state) => {
       state.homeSection7.viewedBrandsCount += 1;
     },
-    // homeSection8ViewedCount: (state) => {
-    //   state.homeSection8.viewedBrandsCount += 1;
-    // },
+    homeSection8ViewedCount: (state) => {
+      state.homeSection8.viewedBrandsCount += 1;
+    },
     // homeSection9ViewedCount: (state) => {
     //   state.homeSection9.viewedBrandsCount += 1;
     // },
@@ -563,18 +637,18 @@ const OverAllPlatform = createSlice({
     resetHomeSection4ViewedCount: (state) => {
       state.homeSection4.viewedBrandsCount = 0;
     },
-    // resetHomeSection5ViewedCount: (state) => {
-    //   state.homeSection5.viewedBrandsCount = 0;
-    // },
+    resetHomeSection5ViewedCount: (state) => {
+      state.homeSection5.viewedBrandsCount = 0;
+    },
     resetHomeSection6ViewedCount: (state) => {
       state.homeSection6.viewedBrandsCount = 0;
     },
     resetHomeSection7ViewedCount: (state) => {
       state.homeSection7.viewedBrandsCount = 0;
     },
-    // resetHomeSection8ViewedCount: (state) => {
-    //   state.homeSection8.viewedBrandsCount = 0;
-    // },
+    resetHomeSection8ViewedCount: (state) => {
+      state.homeSection8.viewedBrandsCount = 0;
+    },
     // resetHomeSection9ViewedCount: (state) => {
     //   state.homeSection9.viewedBrandsCount = 0;
     // },
@@ -620,15 +694,15 @@ const OverAllPlatform = createSlice({
         }
         return brand;
       });
-      // state.homeSection5.brands = state.homeSection5.brands.map((brand) => {
-      //   if (brand.uuid === brandId) {
-      //     return {
-      //       ...brand,
-      //       isLiked: !brand.isLiked,
-      //     };
-      //   }
-      //   return brand;
-      // });
+      state.homeSection5.brands = state.homeSection5.brands.map((brand) => {
+        if (brand.uuid === brandId) {
+          return {
+            ...brand,
+            isLiked: !brand.isLiked,
+          };
+        }
+        return brand;
+      });
       state.homeSection6.brands = state.homeSection6.brands.map((brand) => {
         if (brand.uuid === brandId) {
           return {
@@ -647,15 +721,15 @@ const OverAllPlatform = createSlice({
         }
         return brand;
       });
-      // state.homeSection8.brands = state.homeSection8.brands.map((brand) => {
-      //   if (brand.uuid === brandId) {
-      //     return {
-      //       ...brand,
-      //       isLiked: !brand.isLiked,
-      //     };
-      //   }
-      //   return brand;
-      // });
+      state.homeSection8.brands = state.homeSection8.brands.map((brand) => {
+        if (brand.uuid === brandId) {
+          return {
+            ...brand,
+            isLiked: !brand.isLiked,
+          };
+        }
+        return brand;
+      });
       // state.homeSection9.brands = state.homeSection9.brands.map((brand) => {
       //   if (brand.uuid === brandId) {
       //     return {
@@ -714,15 +788,15 @@ const OverAllPlatform = createSlice({
         }
         return brand;
       });
-      // state.homeSection5.brands = state.homeSection5.brands.map((brand) => {
-      //   if (brand.uuid === brandId) {
-      //     return {
-      //       ...brand,
-      //       isShortListed: !brand.isShortListed,
-      //     };
-      //   }
-      //   return brand;
-      // });
+      state.homeSection5.brands = state.homeSection5.brands.map((brand) => {
+        if (brand.uuid === brandId) {
+          return {
+            ...brand,
+            isShortListed: !brand.isShortListed,
+          };
+        }
+        return brand;
+      });
       state.homeSection6.brands = state.homeSection6.brands.map((brand) => {
         if (brand.uuid === brandId) {
           return {
@@ -741,15 +815,15 @@ const OverAllPlatform = createSlice({
         }
         return brand;
       });
-      // state.homeSection8.brands = state.homeSection8.brands.map((brand) => {
-      //   if (brand.uuid === brandId) {
-      //     return {
-      //       ...brand,
-      //       isShortListed: !brand.isShortListed,
-      //     };
-      //   }
-      //   return brand;
-      // });
+      state.homeSection8.brands = state.homeSection8.brands.map((brand) => {
+        if (brand.uuid === brandId) {
+          return {
+            ...brand,
+            isShortListed: !brand.isShortListed,
+          };
+        }
+        return brand;
+      });
       // state.homeSection9.brands = state.homeSection9.brands.map((brand) => {
       //   if (brand.uuid === brandId) {
       //     return {
@@ -838,20 +912,20 @@ const OverAllPlatform = createSlice({
 
       // //trucks and Kiosks
 
-      // .addCase(homeSection5.pending, (state) => {
-      //   state.homeSection5.isLoading = true;
-      //   state.homeSection5.error = null;
-      // })
-      // .addCase(homeSection5.fulfilled, (state, action) => {
-      //   state.homeSection5.isLoading = false;
-      //   state.homeSection5.brands = action.payload.brands;
-      //   state.homeSection5.pagination = action.payload.pagination;
-      // })
-      // .addCase(homeSection5.rejected, (state, action) => {
-      //   state.homeSection5.isLoading = false;
-      //   state.homeSection5.error =
-      //     action.payload?.message || action.error.message;
-      // })
+      .addCase(homeSection5.pending, (state) => {
+        state.homeSection5.isLoading = true;
+        state.homeSection5.error = null;
+      })
+      .addCase(homeSection5.fulfilled, (state, action) => {
+        state.homeSection5.isLoading = false;
+        state.homeSection5.brands = action.payload.brands;
+        state.homeSection5.pagination = action.payload.pagination;
+      })
+      .addCase(homeSection5.rejected, (state, action) => {
+        state.homeSection5.isLoading = false;
+        state.homeSection5.error =
+          action.payload?.message || action.error.message;
+      })
 
       //restarunt
       .addCase(homeSection6.pending, (state) => {
@@ -886,20 +960,20 @@ const OverAllPlatform = createSlice({
       })
 
       // //restarunt
-      // .addCase(homeSection8.pending, (state) => {
-      //   state.homeSection8.isLoading = true;
-      //   state.homeSection8.error = null;
-      // })
-      // .addCase(homeSection8.fulfilled, (state, action) => {
-      //   state.homeSection8.isLoading = false;
-      //   state.homeSection8.brands = action.payload.brands;
-      //   state.homeSection8.pagination = action.payload.pagination;
-      // })
-      // .addCase(homeSection8.rejected, (state, action) => {
-      //   state.homeSection8.isLoading = false;
-      //   state.homeSection8.error =
-      //     action.payload?.message || action.error.message;
-      // })
+      .addCase(homeSection8.pending, (state) => {
+        state.homeSection8.isLoading = true;
+        state.homeSection8.error = null;
+      })
+      .addCase(homeSection8.fulfilled, (state, action) => {
+        state.homeSection8.isLoading = false;
+        state.homeSection8.brands = action.payload.brands;
+        state.homeSection8.pagination = action.payload.pagination;
+      })
+      .addCase(homeSection8.rejected, (state, action) => {
+        state.homeSection8.isLoading = false;
+        state.homeSection8.error =
+          action.payload?.message || action.error.message;
+      })
 
       // //restarunt
 
@@ -942,10 +1016,10 @@ export const {
   resethomeSection2,
   resethomeSection3,
   resethomeSection4,
-  // resethomeSection5,
+  resethomeSection5,
   resethomeSection6,
   resethomeSection7,
-  // resethomeSection8,
+  resethomeSection8,
   // resethomeSection9,
   // resethomeSection10,
 
@@ -953,10 +1027,10 @@ export const {
   homeSection2ViewedCount,
   homeSection3ViewedCount,
   homeSection4ViewedCount,
-  // homeSection5ViewedCount,
+  homeSection5ViewedCount,
   homeSection6ViewedCount,
   homeSection7ViewedCount,
-  // homeSection8ViewedCount,
+  homeSection8ViewedCount,
   // homeSection9ViewedCount,
   // homeSection10ViewedCount,
 
@@ -964,10 +1038,10 @@ export const {
   resetHomeSection2ViewedCount,
   resetHomeSection3ViewedCount,
   resetHomeSection4ViewedCount,
-  // resetHomeSection5ViewedCount,
+  resetHomeSection5ViewedCount,
   resetHomeSection6ViewedCount,
   resetHomeSection7ViewedCount,
-  // resetHomeSection8ViewedCount,
+  resetHomeSection8ViewedCount,
   // resetHomeSection9ViewedCount,
   // resetHomeSection10ViewedCount,
 

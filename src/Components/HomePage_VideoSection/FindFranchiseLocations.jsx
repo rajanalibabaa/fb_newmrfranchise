@@ -351,17 +351,18 @@ const FindFranchiseLocations = () => {
           disabled={!showStartShadow}
           sx={{
             position: "absolute",
-            left: isMobile ? 2 : 8,
-            top: "55%",
+            left: isMobile ? 2 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            backgroundColor: "#ff9800",
+            color:"black",
             boxShadow: 2,
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#c28223ff",
             },
             "&:disabled": {
               opacity: 0,
@@ -378,17 +379,18 @@ const FindFranchiseLocations = () => {
           aria-label="next"
           sx={{
             position: "absolute",
-            right: isMobile ? 4 : 8,
-            top: "55%",
+            right: isMobile ? 4 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            color:"black",
+            backgroundColor: "#ff9800",
             boxShadow: 2,
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#c28223ff",
             },
             "&:disabled": {
               opacity: 0,

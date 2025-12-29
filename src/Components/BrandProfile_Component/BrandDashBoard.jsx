@@ -7,6 +7,7 @@ import BrandHeader from "./BrandDashboardController/BrandDashboardFiles/BrandHea
 import DashboardTabs from "./BrandDashboardController/BrandDashboardFiles/DashboardTabs";
 import TabContent from "./BrandDashboardController/BrandDashboardFiles/TabContent";
 import LeadDetailDialog from "./BrandDashboardController/BrandDashboardFiles/LeadDetailDialog";
+import { userId } from "../../Utils/autherId";
 
 const API_BASE_URL = "http://localhost:5000/api/v1";
 
@@ -21,8 +22,9 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   
-  const brandUUID = useSelector((state) => state.auth.brandUUID);
+  const brandUUID = userId ||useSelector((state) => state.auth.brandUUID);
   const token = useSelector((state) => state.auth.AccessToken);
+  console.log("===id=== :",brandUUID)
 
   const fetchData = async () => {
     if (!brandUUID || !token) return;
@@ -51,6 +53,7 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
 
       if (brandRes.status === 'fulfilled' && brandRes.value.data?.success) {
         setBrandData(brandRes.value.data.data || {});
+        console.log("===brandData===: ",brandRes.value.data.data )
       } else {
         console.warn('Brand data fetch failed');
         setBrandData({});
@@ -99,13 +102,14 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
     return sectionContent[selectedSection];
   }
 
+  console.log("brandData :",brandData)
+
   return (
     <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", pb: 4 }}>
       <Box sx={{ px: isMobile ? 1 : 3, maxWidth: 1400, mx: "auto", p: 3 }}>
         <BrandHeader brandData={brandData} />
         <DashboardTabs
           brandData={brandData}
-          Leads={Leads}
           loading={loading}
           error={error}
           onRetry={fetchData}

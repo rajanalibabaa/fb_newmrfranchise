@@ -24,7 +24,7 @@ const colors = {
   divider: "#ecf0f1",
 };
 
-const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetails }) => {
+const DashboardTabs = ({ brandData}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -34,14 +34,14 @@ const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetail
     setTabValue(newValue);
   };
 
-  const getTabCount = (tabIndex) => {
-    switch (tabIndex) {
-      case 0:
-        return Array.isArray(Leads) ? Leads.length : 0;
-      default:
-        return 0;
-    }
-  };
+  // const getTabCount = (tabIndex) => {
+  //   switch (tabIndex) {
+  //     case 0:
+  //       return brandData?.brandDetails?.overAllLeads ? brandData?.brandDetails?.overAllLeads : 0;
+  //     default:
+  //       return 0;
+  //   }
+  // };
 
   const renderTabLabel = (label, index) => (
     <Box sx={{ 
@@ -78,7 +78,7 @@ const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetail
           {label}
         </Typography>
       </Box>
-      <Box
+      {/* <Box
         sx={{
           backgroundColor: "#39da39ff",
           color: "#111b14ff",
@@ -86,7 +86,7 @@ const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetail
           width: isMobile ? 20 : 24,
           height: isMobile ? 20 : 24,
           display: "flex",
-          alignItems: "center",
+          alignItems: "center", 
           justifyContent: "center",
           fontSize: isMobile ? "0.65rem" : "0.75rem",
           ml: isMobile ? 0 : 0.5,
@@ -95,7 +95,7 @@ const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetail
         }}
       >
         {getTabCount(index)}
-      </Box>
+      </Box> */}
     </Box>
   );
 
@@ -167,11 +167,7 @@ const DashboardTabs = ({ brandData, Leads, loading, error, onRetry, onViewDetail
       >
         <TabContent
           tabValue={tabValue}
-          Leads={Leads}
-          loading={loading}
-          error={error}
-          onRetry={onRetry}
-          onViewDetails={onViewDetails}
+          brandData={brandData}
         />
       </Card>
     </>

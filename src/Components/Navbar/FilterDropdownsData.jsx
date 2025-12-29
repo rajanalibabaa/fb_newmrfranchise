@@ -43,6 +43,8 @@ const FilterDropdowns = ({ onFilterChange }) => {
     loading,
     error,
   } = useSelector((state) => state.filterDropdown);
+  // console.log('filter dropdown data,',subCategories);
+  
 
   // Fetch initial filter options when component mounts
   useEffect(() => {

@@ -13,7 +13,7 @@ import { ArrowRight, ArrowBack, ArrowForward, Close } from "@mui/icons-material"
 import { useSelector, useDispatch } from 'react-redux';
 import HomePageBrandCard from './HomePageBrandCard';
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
-import { fetchBrandsByChildCategory } from "../../Redux/Slices/SideMenuHoverBrandSlices.jsx";
+import { fetchBrandsBySubCategory } from "../../Redux/Slices/SideMenuHoverBrandSlices.jsx";
 import LoginPage from '../../Pages/LoginPage/LoginPage.jsx';
 import { toggleHomeCardLike } from '../../Redux/Slices/TopCardFetchingSlice.jsx';
 import { toggleBrandLike } from "../../Redux/Slices/GetAllBrandsDataUpdationFile.jsx";
@@ -27,8 +27,6 @@ const CARD_DIMENSIONS = {
 };
 
 const SimilarBrands = ({ brandData }) => {
-
-  
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.down("md"));
@@ -45,34 +43,39 @@ const SimilarBrands = ({ brandData }) => {
   // Get brands from Redux
   const { brands, loading, error } = useSelector((state) => state.brandCategory);
 
+  console.log("SimilarBrands Brands from Redux:", brands);
+
   // Get current brand's subCategory and childCategory
   const currentSubCategory = brandData[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.main;
-  const currentChildCategory = brandData[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.child;
+  const currentChildCategory = brandData[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.sub;
   const currentBrandUUID = brandData[0]?.uuid;
+
+  // console.log("SimilarBrands Rendered", currentChildCategory);
 
   // Fetch brands from Redux when brandData changes
   useEffect(() => {
-    if (currentSubCategory && currentChildCategory) {
-      dispatch(fetchBrandsByChildCategory({
-        subCategory: currentSubCategory,
-        childCategory: currentChildCategory,
-        page: 1,
-        limit: 30,
+    if (currentChildCategory) {
+      dispatch(fetchBrandsBySubCategory({
+        subCategory: currentChildCategory,
+        id: currentBrandUUID,
         isPrefetch: false
       }));
     }
-  }, [dispatch, currentSubCategory, currentChildCategory]);
+  }, [dispatch, currentChildCategory]);
+  
 
-  // Filter brands: same subCategory, not current brand
-  const filteredBrands = useMemo(() => {
-    if (!brands || !currentSubCategory) return [];
-    return brands.filter(
-      (brand) =>
-        brand.brandCategories?.main === currentSubCategory &&
-        brand.uuid !== currentBrandUUID
-    );
-  }, [brands, currentSubCategory, currentBrandUUID]);
+  // // Filter brands: same subCategory, not current brand
+  // const filteredBrands = useMemo(() => {
+  //   if (!brands || !currentChildCategory) return [];
+  //   return brands.filter(
+  //     (brand) =>
+  //       brand.brandCategories?.sub === currentChildCategory &&
+  //       brand.uuid !== currentBrandUUID 
+  //   );
+  // }, [brands, currentChildCategory, currentBrandUUID]);
 
+
+  // console.log("Filtered Similar Brands:", filteredBrands);
   const dimensions = useMemo(() => {
     if (isMobile) return CARD_DIMENSIONS.mobile;
     if (isTablet) return CARD_DIMENSIONS.tablet;
@@ -147,15 +150,15 @@ const SimilarBrands = ({ brandData }) => {
     };
   }, [handleScroll]);
 
- const handleLikeClick = async(brandId) => {
+  const handleLikeClick = async (brandId) => {
     if (!token) {
-            setShowLogin(true);
-            return;
-          }
-          
-          dispatch(toggleHomeCardLike(brandId))
-          dispatch(toggleBrandLike(brandId))
-          await likeApiFunction(brandId)
+      setShowLogin(true);
+      return;
+    }
+
+    dispatch(toggleHomeCardLike(brandId));
+    dispatch(toggleBrandLike(brandId));
+    await likeApiFunction(brandId);
   };
 
   const handleApply = useCallback((brand) => {
@@ -173,6 +176,9 @@ const SimilarBrands = ({ brandData }) => {
   }
 
   if (error) {
+    if (error === "No brands found for this category" || error === "Sub category not found") {
+      return null;
+    }
     return (
       <Box sx={{
         display: 'flex',
@@ -191,7 +197,7 @@ const SimilarBrands = ({ brandData }) => {
     );
   }
 
-  if (filteredBrands.length === 0) return null;
+  if (brands.length === 0) return null;
 
   return (
     <>
@@ -258,26 +264,26 @@ const SimilarBrands = ({ brandData }) => {
           </Typography>
 
           <Button
-           variant="outlined"
-             size="small"
-             aria-label="view more brands"
-             endIcon={<ArrowRight />}
-             sx={{
-               textTransform: "none",
-               fontSize: isMobile ? 14 : 16,
-               background: theme.palette.mode === "dark" 
-                 ? "linear-gradient(90deg, #ff9800, #ffb74d)" 
-                 : "linear-gradient(90deg, #f57c00, #ff9800)",
-               color: "#fff",
-               borderRadius: "8px",
-               px: 2,
-               "&:hover": {
-                 background: theme.palette.mode === "dark" 
-                   ? "linear-gradient(90deg, #ffb74d, #ff9800)" 
-                   : "linear-gradient(90deg, #ff9800, #f57c00)",
-                 boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-               },
-             }}
+            variant="outlined"
+            size="small"
+            aria-label="view more brands"
+            endIcon={<ArrowRight />}
+            sx={{
+              textTransform: "none",
+              fontSize: isMobile ? 14 : 16,
+              background: theme.palette.mode === "dark" 
+                ? "linear-gradient(90deg, #ff9800, #ffb74d)" 
+                : "linear-gradient(90deg, #f57c00, #ff9800)",
+              color: "#fff",
+              borderRadius: "8px",
+              px: 2,
+              "&:hover": {
+                background: theme.palette.mode === "dark" 
+                  ? "linear-gradient(90deg, #ffb74d, #ff9800)" 
+                  : "linear-gradient(90deg, #ff9800, #f57c00)",
+                boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
+              },
+            }}
             onClick={() => {
               window.open(`/brandviewpage?category=${currentSubCategory}&subCategory=${currentChildCategory}`, "_blank");
             }}
@@ -353,7 +359,8 @@ const SimilarBrands = ({ brandData }) => {
               "&::-webkit-scrollbar": { display: "none" },
             }}
           >
-            {filteredBrands.map((brand) => (
+            {brands?.map((brand) => (
+              console.log("Rendering brand in SimilarBrands:", brand),
               <motion.div key={brand.uuid || brand.id}>
                 <HomePageBrandCard
                   brand={brand}

@@ -20,7 +20,9 @@ import {
   CheckBox,
   CheckBoxOutlineBlank,
   PlaylistAddCheckCircleOutlined,
-  RadioButtonUnchecked,Block ,CheckCircle
+  RadioButtonUnchecked,
+  Block,
+  CheckCircle,
 } from "@mui/icons-material";
 import LoginPage from "../LoginPage/LoginPage";
 import { postView } from "../../Utils/function/view";
@@ -32,9 +34,19 @@ import {
 } from "../../Redux/Slices/FilterBrandSlice.jsx";
 import { likeApiFunction } from "../../Api/likeApi";
 import { handleShortList } from "../../Api/shortListApi";
-import { toggleBrandLike, toggleBrandShortList } from "../../Redux/Slices/GetAllBrandsDataUpdationFile.jsx";
-import { toggleHomeCardLike, toggleHomeCardShortlist } from "../../Redux/Slices/TopCardFetchingSlice.jsx";
-import { addSortlist, removeSortList, toggleSortlistBrandLike } from "../../Redux/Slices/shortlistslice.jsx";
+import {
+  toggleBrandLike,
+  toggleBrandShortList,
+} from "../../Redux/Slices/GetAllBrandsDataUpdationFile.jsx";
+import {
+  toggleHomeCardLike,
+  toggleHomeCardShortlist,
+} from "../../Redux/Slices/TopCardFetchingSlice.jsx";
+import {
+  addSortlist,
+  removeSortList,
+  toggleSortlistBrandLike,
+} from "../../Redux/Slices/shortlistslice.jsx";
 import { RiBookmark3Fill } from "react-icons/ri";
 import { VideoPlayer } from "../../services/VideoControllerMedia/VideoPlayercomponents.jsx";
 import confetti from "canvas-confetti";
@@ -49,8 +61,8 @@ const cardStyles = {
   transition: "transform 0.3s, box-shadow 0.3s",
   position: "relative",
   overflow: "hidden",
-  border: '1px solid #ff9800',
-  borderRadius: '6px',
+  border: "1px solid #ff9800",
+  borderRadius: "6px",
   "&:hover": {
     transform: "translateY(-5px)",
     boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
@@ -61,7 +73,7 @@ const titleStyles = {
   fontWeight: 600,
   color: "text.primary",
   pr: 1,
-  ml:1,
+  ml: 1,
   overflow: "hidden",
   textOverflow: "ellipsis",
   display: "-webkit-box",
@@ -74,8 +86,8 @@ const titleStyles = {
 
 const viewButtonStyles = {
   // py: 0.5,
-  mx:1,
-  mb:1,
+  mx: 1,
+  mb: 1,
   bgcolor: "#4caf50",
   borderRadius: 1,
   fontWeight: 500,
@@ -94,7 +106,7 @@ const BrandCard = memo(
     isSelectedForComparison,
     onToggleBrandComparison,
     maxComparisonReached,
-    enableComparison
+    enableComparison,
   }) => {
     const {
       uuid,
@@ -120,12 +132,23 @@ const BrandCard = memo(
         const rect = buttonRef.current.getBoundingClientRect();
         const x = (rect.left + rect.width / 2) / window.innerWidth;
         const y = (rect.top + rect.height / 2) / window.innerHeight;
-        
+
         confetti({
           particleCount: 150,
           spread: 100,
           origin: { x, y },
-          colors: [color, "#ffffff", "#fdc81cff", "#76ec1cff", "#ff1dd6ffff", "#00eaffff", "#0400ffff", "#000000", "#f10808ffff", "#f5f50aff"],
+          colors: [
+            color,
+            "#ffffff",
+            "#fdc81cff",
+            "#76ec1cff",
+            "#ff1dd6ffff",
+            "#00eaffff",
+            "#0400ffff",
+            "#000000",
+            "#f10808ffff",
+            "#f5f50aff",
+          ],
         });
       } else {
         // Fallback to center if element not found
@@ -195,13 +218,13 @@ const BrandCard = memo(
       try {
         if (!brand.isShortListed) {
           dispatch(addSortlist(brand));
-        } else dispatch(removeSortList(brand.uuid)); 
+        } else dispatch(removeSortList(brand.uuid));
         // Dispatch the Redux action to update UI immediately
         dispatch(toggleBrandShortListfilter(uuid));
         dispatch(toggleBrandShortList(uuid));
         dispatch(toggleHomeCardShortlist(uuid));
         // Call the API to update the server
-        await handleShortList(uuid); 
+        await handleShortList(uuid);
 
         // Trigger confetti if it's a new shortlist
         if (!isShortListed) {
@@ -216,60 +239,64 @@ const BrandCard = memo(
       } finally {
         setShortlistProcessing(false);
       }
-    }, [brand, uuid, shortlistProcessing, onShowLogin, dispatch, isShortListed]);
-
-
+    }, [
+      brand,
+      uuid,
+      shortlistProcessing,
+      onShowLogin,
+      dispatch,
+      isShortListed,
+    ]);
 
     return (
       <Card sx={cardStyles}>
-       {/* Compare Toggle */}
-{enableComparison && (
-  <Tooltip
-    title={
-      maxComparisonReached && !isSelectedForComparison
-        ? "Maximum 3 brands can be compared"
-        : isSelectedForComparison
-        ? "Already selected"
-        : "Click to add to comparison"
-    }
-    placement="right"
-    arrow
-  >
-    <span>
-      <IconButton
-        sx={{
-          position: "absolute",
-          top: 8,
-          right: 8,
-          zIndex: 2,
-          backgroundColor: isSelectedForComparison
-            ? "#ff9800"
-            : maxComparisonReached
-            ? "rgba(244, 67, 54, 0.75)"
-            : "rgba(255,255,255,0.85)",
-          color: isSelectedForComparison ? "#fff" : "#ff8914ff",
-          "&:hover": {
-            transform: "scale(1.15)",
-          },
-          width: 36,
-          height: 36,
-          borderRadius: "50%",
-        }}
-        onClick={() => onToggleBrandComparison(brand)}
-        disabled={maxComparisonReached && !isSelectedForComparison}
-      >
-        {isSelectedForComparison ? (
-          <CheckCircle fontSize="small" /> // ✅ Selected
-        ) : maxComparisonReached ? (
-          <Block fontSize="small" /> // ❌ disabled
-        ) : (
-          <RadioButtonUnchecked fontSize="small" /> // ⚪ default
+        {/* Compare Toggle */}
+        {enableComparison && (
+          <Tooltip
+            title={
+              maxComparisonReached && !isSelectedForComparison
+                ? "Maximum 3 brands can be compared"
+                : isSelectedForComparison
+                ? "Already selected"
+                : "Click to add to comparison"
+            }
+            placement="right"
+            arrow
+          >
+            <span>
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  zIndex: 2,
+                  backgroundColor: isSelectedForComparison
+                    ? "#ff9800"
+                    : maxComparisonReached
+                    ? "rgba(244, 67, 54, 0.75)"
+                    : "rgba(255,255,255,0.85)",
+                  color: isSelectedForComparison ? "#fff" : "#ff8914ff",
+                  "&:hover": {
+                    transform: "scale(1.15)",
+                  },
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                }}
+                onClick={() => onToggleBrandComparison(brand)}
+                disabled={maxComparisonReached && !isSelectedForComparison}
+              >
+                {isSelectedForComparison ? (
+                  <CheckCircle fontSize="small" /> // ✅ Selected
+                ) : maxComparisonReached ? (
+                  <Block fontSize="small" /> // ❌ disabled
+                ) : (
+                  <RadioButtonUnchecked fontSize="small" /> // ⚪ default
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
         )}
-      </IconButton>
-    </span>
-  </Tooltip>
-)}
-
 
         <Box
           sx={{ p: 0.5, flexGrow: 1, display: "flex", flexDirection: "column" }}
@@ -282,7 +309,7 @@ const BrandCard = memo(
               height: "auto",
               aspectRatio: "16 / 9",
               margin: "0 auto",
-              backgroundColor: "#000",
+              backgroundColor: "white",
               overflow: "hidden",
               flexShrink: 0,
             }}
@@ -299,46 +326,39 @@ const BrandCard = memo(
           </Box>
 
           <Divider sx={{ my: 1 }} />
-<Typography >
-             
-              {brandCategories?.sub ? (
-  <Tooltip title={brandCategories?.sub} arrow>
-    <Chip
-      label={
-        brandCategories.sub.length > 35
-          ? `${brandCategories.sub.slice(0, 25)}...`
-          : brandCategories.sub
-      }
-      size="small"
-      sx={{
-        bgcolor: "rgba(255, 152, 0, 0.1)",
-        color: "orange.dark",
-        fontWeight: 150,
-        ml:0.5,
-        maxWidth: 250, 
-        overflow: "hidden",
-        textOverflow: "ellipsis",
-        whiteSpace: "nowrap",
-        ".MuiChip-label": {
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        },
-      }}
-    />
-  </Tooltip>
-) : (
-  <Typography variant="body2" color="text.secondary">
-    N/A
-  </Typography>
-)}
 
-            </Typography>
+          <Box display={"flex"} sx={{ justifyContent: "space-between" }}>
+            <Box display={"flex"}>
+              <Typography
+                variant="body2"
+                component="div"
+                mt={1}
+                sx={titleStyles}
+              >
+                {brandname}
+              </Typography>
+            </Box>
 
-
-       
-            
-   
+            <Box display={"flex"} sx={{ justifyContent: "flex-end" }}>
+              <IconButton
+                ref={likeButtonRef}
+                onClick={handleLike}
+                disabled={likeProcessing}
+                size="small"
+              >
+                {likeProcessing ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <Favorite
+                    sx={{
+                      color: isLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
+                      fontSize: 22,
+                    }}
+                  />
+                )}
+              </IconButton>
+            </Box>
+          </Box>
 
           <Box
             sx={{
@@ -347,52 +367,62 @@ const BrandCard = memo(
               justifyContent: "space-between",
               alignItems: "center",
             }}
-          >     
-          
-                 
-                        <Typography variant="body2" component="div" sx={titleStyles}>
-              {brandname}
+          >
+            <Typography>
+              {brandCategories?.sub ? (
+                <Tooltip title={brandCategories?.sub} arrow>
+                  <Chip
+                    label={
+                      brandCategories.sub.length > 35
+                        ? `${brandCategories.sub.slice(0, 25)}...`
+                        : brandCategories.sub
+                    }
+                    size="small"
+                    sx={{
+                      bgcolor: "rgba(255, 152, 0, 0.1)",
+                      color: "orange.dark",
+                      fontWeight: 150,
+                      ml: 0.5,
+                      maxWidth: 250,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      ".MuiChip-label": {
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                      },
+                    }}
+                  />
+                </Tooltip>
+              ) : (
+                <Typography variant="body2" color="text.secondary">
+                  N/A
+                </Typography>
+              )}
             </Typography>
 
-       <Box
-  display="flex"
-  flexDirection={'column'}
-  justifyContent="flex-end"
->
-  <IconButton
-    ref={likeButtonRef}
-    onClick={handleLike}
-    disabled={likeProcessing}
-    size="small"
-  >
-    {likeProcessing ? (
-      <CircularProgress size={20} />
-    ) : (
-      <Favorite
-        sx={{
-          color: isLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
-          fontSize: 22,
-        }}
-      />
-    )}
-  </IconButton>
-
-  <IconButton
-    ref={shortlistButtonRef}
-    onClick={handleToggleShortList}
-    size="small"
-    disabled={shortlistProcessing}
-  >
-    {shortlistProcessing ? (
-      <CircularProgress size={20} />
-    ) : (
-      <RiBookmark3Fill
-        size={21}
-        color={isShortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.23)"}
-      />
-    )}
-  </IconButton>
-</Box>
+            <Box
+              display="flex"
+              flexDirection={"column"}
+              justifyContent="flex-end"
+            >
+              <IconButton
+                ref={shortlistButtonRef}
+                onClick={handleToggleShortList}
+                size="small"
+                disabled={shortlistProcessing}
+              >
+                {shortlistProcessing ? (
+                  <CircularProgress size={20} />
+                ) : (
+                  <RiBookmark3Fill
+                    size={21}
+                    color={isShortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.23)"}
+                  />
+                )}
+              </IconButton>
+            </Box>
             {/* {brandCategories?.main ? (
               <Chip
                 label={brandCategories?.main}
@@ -410,7 +440,14 @@ const BrandCard = memo(
             )} */}
           </Box>
 
-          <Box sx={{ mb: 2,ml:1, flexGrow: 1, "& > *:not(:last-child)": { mb: 1 ,} }}>
+          <Box
+            sx={{
+              mb: 2,
+              ml: 1,
+              flexGrow: 1,
+              "& > *:not(:last-child)": { mb: 1 },
+            }}
+          >
             <DetailItem
               icon={<AttachMoney />}
               label="Investment"
@@ -428,30 +465,29 @@ const BrandCard = memo(
             />
           </Box>
 
-         <Box
-  sx={{
-    mt: "auto", 
-    px: 1,      
-    pb: 1,      
-    display: "flex",
-    justifyContent: "center",
-  }}
->
-  <Button
-    variant="contained"
-    onClick={handleOpenBrand}
-    startIcon={<Description />}
-    sx={{
-      ...viewButtonStyles,
-      width: "100%", 
-      maxWidth: 220, 
-      textAlign: "center",
-    }}
-  >
-    View Details
-  </Button>
-</Box>
-
+          <Box
+            sx={{
+              mt: "auto",
+              px: 1,
+              pb: 1,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              variant="contained"
+              onClick={handleOpenBrand}
+              startIcon={<Description />}
+              sx={{
+                ...viewButtonStyles,
+                width: "100%",
+                maxWidth: 220,
+                textAlign: "center",
+              }}
+            >
+              View Details
+            </Button>
+          </Box>
         </Box>
 
         {showLogin && (
@@ -466,9 +502,8 @@ const BrandCard = memo(
     prevProps.brand.isShortListed === nextProps.brand.isShortListed &&
     prevProps.isSelectedForComparison === nextProps.isSelectedForComparison &&
     prevProps.showLogin === nextProps.showLogin &&
-    prevProps.maxComparisonReached === nextProps.maxComparisonReached&&
-    prevProps.enableComparison === nextProps.enableComparison 
-
+    prevProps.maxComparisonReached === nextProps.maxComparisonReached &&
+    prevProps.enableComparison === nextProps.enableComparison
 );
 
 const DetailItem = memo(({ icon, label, value }) => {

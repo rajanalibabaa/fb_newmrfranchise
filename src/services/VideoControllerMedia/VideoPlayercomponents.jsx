@@ -212,7 +212,7 @@ export const VideoPlayer = ({
   }, []);
 
   return (
-    <Box ref={containerRef} sx={{ position: 'relative', width, height, backgroundColor: '#000', overflow: 'hidden' }}>
+    <Box ref={containerRef} sx={{ position: 'relative', width, height, backgroundColor: 'white', overflow: 'hidden' }}>
       {(!isLoaded || isBuffering) && (
         <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
           <CircularProgress sx={{ color: 'white' }} />
@@ -257,7 +257,7 @@ export const VideoPlayer = ({
 
       {/* Bottom controls */}
       {showControls && (
-        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 1, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', gap: 0 }}>
           {/* <IconButton onClick={togglePlayPause} sx={{ color: 'white' }}>{isPlaying ? <Pause /> : <PlayArrow />}</IconButton> */}
           <IconButton onClick={toggleMute} sx={{ color: 'white' }}>{isMuted ? <VolumeOff /> : <VolumeUp />}</IconButton>
           <Box sx={{ color: 'white', fontSize: '0.75rem' }}>
