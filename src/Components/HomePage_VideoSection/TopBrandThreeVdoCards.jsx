@@ -559,7 +559,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                     height: CARD_SIZES.main.videoHeight,
                     position: "relative",
                     cursor: "pointer",
-                    backgroundColor: "#000",
+                    backgroundColor: "white",
                     overflow: "hidden",
                   }}
                   onClick={(e) => {
@@ -587,7 +587,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                         sx={{
                           textTransform: "none",
                           color:
-                            theme.palette.mode === "dark" ? "white" : "white",
+                            "black",
                           borderColor:
                             theme.palette.mode === "dark"
                               ? "#43ea5e"
@@ -637,7 +637,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                           sx={{
                             textTransform: "none",
                             color:
-                              theme.palette.mode === "dark" ? "black" : "black",
+                              "black",
                             borderColor:
                               theme.palette.mode === "dark"
                                 ? "#ffb74d"
@@ -678,7 +678,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                           sx={{
                             textTransform: "none",
                             color:
-                              theme.palette.mode === "dark" ? "white" : "white",
+                              "black",
                             borderColor:
                               theme.palette.mode === "dark"
                                 ? "#ffb74d"
@@ -1062,7 +1062,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                     height: "100%",
                     position: "relative",
                     cursor: "pointer",
-                    backgroundColor: "#000",
+                    backgroundColor: "white",
                     flexShrink: 0,
                   }}
                   // Modified: Changed onClick to use handleSideVideoClick instead of togglePlayPause
