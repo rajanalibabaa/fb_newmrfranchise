@@ -212,7 +212,7 @@ export const VideoPlayer = ({
   }, []);
 
   return (
-    <Box ref={containerRef} sx={{ position: 'relative', width, height, backgroundColor: '#000', overflow: 'hidden' }}>
+    <Box ref={containerRef} sx={{ position: 'relative', width, height, backgroundColor: 'white', overflow: 'hidden' }}>
       {(!isLoaded || isBuffering) && (
         <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2 }}>
           <CircularProgress sx={{ color: 'white' }} />

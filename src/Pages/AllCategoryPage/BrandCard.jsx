@@ -309,7 +309,7 @@ const BrandCard = memo(
               height: "auto",
               aspectRatio: "16 / 9",
               margin: "0 auto",
-              backgroundColor: "#000",
+              backgroundColor: "white",
               overflow: "hidden",
               flexShrink: 0,
             }}

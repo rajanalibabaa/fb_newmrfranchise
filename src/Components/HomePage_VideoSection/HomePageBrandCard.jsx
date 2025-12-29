@@ -228,6 +228,7 @@ const HomePageBrandCard = React.memo(
           }}
         >
           <VideoPlayer
+          
             id={brand.uuid}
             videoUrl={brand.franchiseVideos || brand.logo}
             poster={brand.logo}
@@ -309,7 +310,7 @@ const HomePageBrandCard = React.memo(
 
               <Typography
                 variant="body1"
-                fontWeight={800}
+                fontWeight={500}
                 onClick={() => handleApply(brand)}
                 cursor="pointer"
                 sx={{
