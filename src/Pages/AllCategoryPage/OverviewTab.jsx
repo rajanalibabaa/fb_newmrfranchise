@@ -329,7 +329,7 @@ const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCate
       )}
 
       {/* Disclaimer: Instantly rendered */}
-      <Box
+      {/* <Box
         sx={{
           mt: 4,
           p: 3,
@@ -363,7 +363,8 @@ const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCate
             </Typography>
           </Box>
         )}
-      </Box>
+      </Box> */}
+      
     </Box>
   );
 };

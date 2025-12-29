@@ -89,6 +89,54 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
     }
   };
 
+  const tableData = ficoDetails.map(model => ({
+  model: model.franchiseModel,
+  type: model.franchiseType,
+  investment: model.investmentRange,
+  area: model.areaRequired,
+  agreement: model.agreementPeriod ? `${model.agreementPeriod} yrs` : "N/A",
+  franchiseFee: model.franchiseFee ? formatCurrency(model.franchiseFee) : "N/A",
+  interiorCost: model.interiorCost ? formatCurrency(model.interiorCost) : "N/A",
+  stock: model.stockInvestment ? formatCurrency(model.stockInvestment) : "N/A",
+  otherCosts: model.otherCost ? formatCurrency(model.otherCost) : "N/A",
+  workingCapital: model.requireWorkingCapital
+    ? formatCurrency(model.requireWorkingCapital)
+    : "N/A",
+  royaltyFee: model.royaltyFee || "N/A",
+  breakEven: model.breakEven || "N/A",
+  roi: model.roi ? `${model.roi}%` : "N/A",
+  payback: model.payBackPeriod || "N/A",
+  margin: model.marginOnSales ? `${model.marginOnSales}%` : "N/A",
+}));
+
+
+  const columns = [
+  { label: "Model", key: "model" },
+  { label: "Type", key: "type" },
+  { label: "Investment", key: "investment" },
+  { label: "Area", key: "area" },
+  { label: "Agreement", key: "agreement" },
+  { label: "Franchise Fee", key: "franchiseFee" },
+  { label: "Interior Cost", key: "interiorCost" },
+  { label: "Stock", key: "stock" },
+  { label: "Other Costs", key: "otherCosts" },
+  { label: "Working Capital", key: "workingCapital" },
+  { label: "Royalty Fee", key: "royaltyFee" },
+  { label: "Break Even", key: "breakEven" },
+  { label: "ROI", key: "roi" },
+  { label: "Payback", key: "payback" },
+  { label: "Margin", key: "margin" },
+];
+
+const visibleColumns = columns.filter(col =>
+  tableData.some(row =>
+    row[col.key] &&
+    row[col.key] !== "N/A"
+  )
+);
+
+
+
   return (
     <Box sx={{ mb: 4 }}>
       <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#7ad03a" }}>
@@ -150,14 +198,15 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
         >
           <TableHead>
             <TableRow>
-              {[
+              {/* {[
                 "Model", "Type", "Investment", "Area", "Agreement",
                 "Franchise Fee", "Interior Cost", "Stock", "Other Costs",
                 "Working Capital", "Royalty Fee", "Break Even", "ROI",
                 "Payback", "Margin"
-              ].map((header, i) => (
+              ].map((header, i) => ( */}
+              {visibleColumns.map((col, i) => (
                 <TableCell
-                  key={i}
+                  key={col.key}
                   align="center"
                   sx={{
                     backgroundColor: "#7ad03a",
@@ -172,12 +221,46 @@ const FranchiseDetailsTable = ({ ficoDetails, formatCurrency }) => {
                     zIndex: 1,
                   }}
                 >
-                  {header}
+                  {col.label}
                 </TableCell>
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>{tableRows}</TableBody>
+          <TableBody>
+  {tableData.map((row, index) => (
+    <Fade in key={index} timeout={index * 100}>
+      <TableRow hover>
+        {visibleColumns.map((col, j) => (
+          <TableCell
+            key={col.key}
+            align="center"
+            sx={{
+              borderBottom: "1px solid rgba(0,0,0,0.05)",
+              padding: "16px",
+              minWidth: j === 0 ? "180px" : "170px",
+              maxWidth: "200px",
+              wordBreak: "break-word",
+              fontWeight:
+                (col.key === "roi" && row.roi !== "N/A") ||
+                (col.key === "margin" && row.margin !== "N/A")
+                  ? 700
+                  : "inherit",
+              color:
+                col.key === "roi" && parseFloat(row.roi) > 20
+                  ? "success.main"
+                  : col.key === "margin" && parseFloat(row.margin) > 30
+                  ? "success.main"
+                  : "inherit",
+            }}
+          >
+            {row[col.key]}
+          </TableCell>
+        ))}
+      </TableRow>
+    </Fade>
+  ))}
+</TableBody>
+
         </Table>
       </TableContainer>
     </Box>

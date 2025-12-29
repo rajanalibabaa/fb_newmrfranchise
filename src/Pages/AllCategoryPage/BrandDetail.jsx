@@ -31,6 +31,7 @@ import LoginPage from "../LoginPage/LoginPage.jsx";
 
 import BrandHeader from "./BrandViewPageHandling/BrandHeaderViewPage.jsx";
 import MediaSection from "./BrandViewPageHandling/MediaSectionViewPage.jsx";
+import Disclaimer from "./OverTabHandlings.jsx/DisclimerPage.jsx";
 
 // LAZY load (secondary) components
 const Navbar = lazy(() => import("../../Components/Navbar/NavBar.jsx"));
@@ -626,6 +627,7 @@ const handleSubmit = useCallback(
       <Suspense fallback={<Box minHeight={120}><CircularProgress /></Box>}>
         <SimilarBrands brandData={selectedBrand} />
       </Suspense>
+<Disclaimer isMobile={isMobile} />
 
       {/* EXPANSION LOCATIONS LAZY ON SCROLL */}
       <Box
@@ -652,7 +654,6 @@ const handleSubmit = useCallback(
           isLargeDesktop={isLargeDesktop}
         />
       </Box>
-
       <Suspense fallback={null}>
         <BackToTopButton show={showBackToTop} isMobile={isMobile} />
       </Suspense>

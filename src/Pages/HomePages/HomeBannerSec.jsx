@@ -696,7 +696,8 @@ const HomeBannerSec = () => {
             key={index}
             componentKey={section.component}
             dynamicComponents={dynamicComponents}
-            background={section.background || "#d5e7ddac"}
+            // background={section.background || "#d5e7ddac"}
+            background={'black'}
             isMobile={isMobile}
           />
         ))}
