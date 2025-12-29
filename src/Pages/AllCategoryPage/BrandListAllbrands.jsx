@@ -389,13 +389,13 @@ const toggleBrandComparison = useCallback((brand) => {
                 sx={{
                   display: "grid",
                   gridTemplateColumns: {
-                    xs: "repeat(1, 1fr)", // Mobile: 1 column
-                    sm: "repeat(1, 1fr)", // Small devices: 2 columns
-                    md: "repeat(3, 1fr)", // Tablets: 3 columns
-                    lg: "repeat(3, 1fr)", // Desktop: 4 columns
-                    xl: "repeat(4, 1fr)", // Extra large screens: 5 columns
+                    xs: "repeat(1, 1fr)", 
+                    sm: "repeat(1, 1fr)",
+                    md: "repeat(3, 1fr)", 
+                    lg: "repeat(3, 1fr)", 
+                    xl: "repeat(4, 1fr)", 
                   },
-                  gap: 1, // theme spacing (8px * 2 = 16px)
+                  gap: 1, 
                 }}
               >
                 {brands.map((brand) => (
@@ -520,8 +520,9 @@ const toggleBrandComparison = useCallback((brand) => {
         <BrandComparison
           open={comparisonOpen}
           onClose={() => {
-    setComparisonOpen(false);   // ✅ close modal
-    setSelectedForComparison([]); // ✅ clear brands selection
+    setComparisonOpen(false);   
+    setSelectedForComparison([]); 
+    setEnableComparison(false); 
   }}
           selectedBrands={selectedForComparison}
            onRemoveFromComparison={(uuid) =>

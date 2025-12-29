@@ -223,7 +223,7 @@ const {
           variant={isMobile ? "body1" : "h5"}
           fontWeight="bold"
           sx={{
-            color: "black",
+            color: "#ff9800",
             mb: 1,
             textAlign: "left",
             position: "relative",

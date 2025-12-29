@@ -89,7 +89,7 @@ const BrandComparison = ({
       } finally {
         setLoading(false);
       }
-    };
+    };  
 
     fetchBrandDetails();
   }, [selectedBrands]);
