@@ -402,13 +402,14 @@ const HomePageBrandCard = React.memo(
                 sx={{
                   backgroundColor: "#f29724",
                   "&:hover": {
-                    backgroundColor: "#e68a1e",
+                    backgroundColor: "#000000ff",
                     boxShadow: 2,
                   },
                   py: 1,
                   borderRadius: 1,
                   textTransform: "none",
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  fontSize: "1.1rem",
                 }}
               >
                 View Details

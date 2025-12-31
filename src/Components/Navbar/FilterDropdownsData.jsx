@@ -177,7 +177,7 @@ const handleFindBrands = useCallback(() => {
         p: 3,
         borderRadius: 2,
         alignItems: "center",
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#000000ff",
         boxShadow: 1,
       }}
     >
@@ -265,6 +265,9 @@ const handleFindBrands = useCallback(() => {
           height: "56px",
           minWidth: isMobile ? "100%" : "180px",
           backgroundColor: "#ff9800",
+          textTransform: "none",
+          fontWeight: "600",
+          fontSize: '1rem',
           color: "white",
           "&:hover": {
             backgroundColor: "#fb8c00",

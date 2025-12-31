@@ -16,6 +16,7 @@ const SupportProvided = ({ trainingSupport, aidFinancing, isInternationalExpansi
       <Card
         sx={{
           borderRadius: "16px",
+          background:'#eaf6df',
           height: "100%",
           "&:hover": {
             transform: "translateY(-5px)",
@@ -30,9 +31,10 @@ const SupportProvided = ({ trainingSupport, aidFinancing, isInternationalExpansi
             gutterBottom
             display="flex"
             alignItems="center"
-            color="#7ad03a"
+            color="#000000ff"
+            sx={{ background:'#eedbbcff',p:1}}
           >
-            <Business sx={{ color: "#ff9800", mr: 1 }} />
+            {/* <Business sx={{ color: "#000000ff", mr: 1 }} /> */}
             Support Provided By Brand
           </Typography>
           <Divider sx={{ mb: 2, borderColor: "rgba(0,0,0,0.1)" }} />

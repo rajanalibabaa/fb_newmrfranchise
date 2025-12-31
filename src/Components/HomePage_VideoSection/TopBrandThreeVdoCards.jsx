@@ -880,8 +880,8 @@ const triggerCelebration = (e, color = "#f44336") => {
                               "&:hover": {
                                 background:
                                   theme.palette.mode === "dark"
-                                    ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                                    : "linear-gradient(45deg, #ff9800, #f57c00)",
+                                    ? "linear-gradient(45deg, #000000ff, #000000ff)"
+                                    : "linear-gradient(45deg, #000000ff, #000000ff)",
                                 boxShadow: theme.shadows[4],
                               },
                             }}
@@ -900,6 +900,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                             sx={{
                               px: 3,
                               fontWeight: 600,
+                              fontSize: '1rem',
                               textTransform: "none",
                               color: "#fff",
                               background:
@@ -909,8 +910,8 @@ const triggerCelebration = (e, color = "#f44336") => {
                               "&:hover": {
                                 background:
                                   theme.palette.mode === "dark"
-                                    ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                                    : "linear-gradient(45deg, #ff9800, #f57c00)",
+                                    ? "linear-gradient(45deg, #000000ffrgba(0, 0, 0, 1)4d)"
+                                    : "linear-gradient(45deg, #000000ff, #000000ff)",
                                 boxShadow: theme.shadows[4],
                               },
                             }}
@@ -1403,15 +1404,16 @@ const triggerCelebration = (e, color = "#f44336") => {
                           ? "linear-gradient(45deg, #ffb74d, #ff9800)"
                           : "linear-gradient(45deg, #f57c00, #ff9800)",
                       textTransform: "none",
-                      fontSize: "0.75rem",
+                      fontSize: "1rem",
                       color: "#fff",
                       fontWeight: 600,
+                      
                       minWidth: 100,
                       "&:hover": {
                         background:
                           theme.palette.mode === "dark"
-                            ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                            : "linear-gradient(45deg, #ff9800, #f57c00)",
+                            ? "linear-gradient(45deg, #000000ff, #000000ff)"
+                            : "linear-gradient(45deg, #000000ff, #000000ff)",
                         boxShadow: theme.shadows[2],
                       },
                     }}

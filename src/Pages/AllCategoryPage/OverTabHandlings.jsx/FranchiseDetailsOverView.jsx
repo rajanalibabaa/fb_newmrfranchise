@@ -138,14 +138,21 @@ const visibleColumns = columns.filter(col =>
 
 
   return (
-    <Box sx={{ mb: 4 }}>
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#7ad03a" }}>
+    <Box sx={{ mb: 2 }}>
+       {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#eedbbcff',padding:'10px',borderRadius:'5px' }}>
+       Franchise Details :
+      </Typography>  */}
+      {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5, color: "#7ad03a" }}>
         Franchise Details
-      </Typography>
+      </Typography> */}
      <TableContainer
   ref={containerRef}
   sx={{
-    borderRadius: "16px",
+    borderTopLeftRadius: "16px",
+    borderTopRightRadius: "16px",
+    borderBottomLeftRadius: "16px",
+    borderBottomRightRadius: "16px",
+    // border: "3px solid #ff9800",
     overflowX: "auto",
     overflowY: "auto",
     maxHeight: "calc(100vh - 300px)",
@@ -153,14 +160,16 @@ const visibleColumns = columns.filter(col =>
     cursor: "grab",                   // show grab cursor
     "&:active": { cursor: "grabbing" },
     "&::-webkit-scrollbar": {
-      height: "8px",
-      backgroundColor: "#f1f1f1",
+      height: "4px",
+      backgroundColor: "#ffffffff",
+      borderRadius: "7px",
     },
     "&::-webkit-scrollbar-thumb": {
       backgroundColor: "#7ad03a",
 
-      borderRadius: "4px",
+      borderRadius: "7px",
     },
+    
   }}
   onTouchStart={handleUserScrollStart}
   onTouchEnd={handleUserScrollEnd}
@@ -209,9 +218,10 @@ const visibleColumns = columns.filter(col =>
                   key={col.key}
                   align="center"
                   sx={{
-                    backgroundColor: "#7ad03a",
+                    backgroundColor: "#eaf6df",
                     color: "black",
                     fontWeight: 700,
+                    fontSize: "0.8rem",
                     padding: "12px 16px",
                     borderBottom: "none",
                     whiteSpace: "nowrap",
@@ -240,6 +250,7 @@ const visibleColumns = columns.filter(col =>
               minWidth: j === 0 ? "180px" : "170px",
               maxWidth: "200px",
               wordBreak: "break-word",
+              backgroundColor: "#eedbbcff",
               fontWeight:
                 (col.key === "roi" && row.roi !== "N/A") ||
                 (col.key === "margin" && row.margin !== "N/A")
@@ -250,7 +261,7 @@ const visibleColumns = columns.filter(col =>
                   ? "success.main"
                   : col.key === "margin" && parseFloat(row.margin) > 30
                   ? "success.main"
-                  : "inherit",
+                  : "black",
             }}
           >
             {row[col.key]}

@@ -187,7 +187,7 @@ const TopInvestVdocardround = () => {
         variant={isMobile ? "body1" : "h5"}
         fontWeight="bold"
         sx={{
-          color: "black",
+          color: "#f29624",
           mb: 1,
           textAlign: "left",
           position: "relative",
@@ -404,12 +404,13 @@ const TopInvestVdocardround = () => {
                 sx={{
                   mt: "auto",
                   borderRadius: 2,
-                  fontSize: "0.7rem",
+                  fontSize: "1rem",
                   py: 0.5,
-                  borderColor: "#f29724",
-                  color: "green",
+                  borderColor: "#f29624",
+                  backgroundColor: "#f29624",
+                  color: "white",
                   "&:hover": {
-                    backgroundColor: "rgba(250, 141, 8, 0.7)",
+                    backgroundColor: "rgba(0, 0, 0, 1)",
                   },
                 }}
               >

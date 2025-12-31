@@ -5,7 +5,7 @@ import { CircularProgress, Box } from "@mui/material";
 import axios from "axios";
 import { userId } from "../../Utils/autherId.jsx";
 import SEO from "../../Components/SEO/Seo";
-
+import img1 from '../../assets/Images/bg12.jpeg'
 const BrandDetails = lazy(() => import("./BrandDetail.jsx"));
 
 function BrandDetailsPage() {
@@ -277,13 +277,26 @@ function BrandDetailsPage() {
           <Box sx={{ minHeight: 220, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CircularProgress color="warning" size={40} />
           </Box>
+          
         }
       >
-        <BrandDetails
-          brandData={brandData}
-          fromSession={true}
-          key={brandCacheKey}
-        />
+        <Box
+  sx={{
+    backgroundImage: `url(${img1})`,
+    backgroundSize: "contain",        // fill entire box
+    // backgroundPosition: "center",   // center image
+    // backgroundRepeat: "no-repeat",
+    minHeight: "100vh",             // full screen height
+    width: "100%",
+  }}
+>
+  <BrandDetails
+    brandData={brandData}
+    fromSession={true}
+    key={brandCacheKey}
+  />
+</Box>
+
       </Suspense>
     </>
   );

@@ -111,7 +111,7 @@ const BrandHeader = ({
         flexDirection={isMobile ? "column" : "row"}
         alignItems={isMobile ? "flex-start" : "center"}
         justifyContent="space-between"
-        mb={3}
+        mb={1}
         gap={2}
       >
         {/* Brand logo and basic info */}
@@ -133,6 +133,7 @@ const BrandHeader = ({
               alignItems: "center",
               justifyContent: "center",
               overflow: "hidden",
+              backgroundColor: "rgba(255, 255, 255, 1)",
             }}
           >
             <Box
@@ -162,9 +163,10 @@ const BrandHeader = ({
                   sx={{
                     fontWeight: 600,
                     mb: 1,
-                    background: "linear-gradient(45deg, #000 30%, #000 90%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
+                    backgroundColor: "#eedbbcff",p:1,
+                    // color: "linear-gradient(45deg, #000000ff 30%, #000000ff 90%)",
+                    // WebkitBackgroundClip: "text",
+                    // WebkitTextFillColor: "transparent",
                     textAlign: isMobile ? "center" : "left",
                   }}
                 >
@@ -172,7 +174,8 @@ const BrandHeader = ({
                 </Typography>
                 <Typography
                   variant="body1"
-                  color="text.secondary"
+                  color="black"
+                  sx={{backgroundColor: "#eedbbcff",p:1}}
                   textAlign={isMobile ? "center" : "left"}
                   fontSize={isMobile ? "0.875rem" : "1rem"}
                 >
@@ -186,18 +189,19 @@ const BrandHeader = ({
                     gap: isMobile ? 1 : 10,
                     mt: 1,
                     justifyContent: isMobile ? "center" : "flex-start",
+                    backgroundColor: "#eedbbcff",p:1
                   }}
                 >
-                  <Typography fontSize={isMobile ? "0.8rem" : "0.9rem"}>
+                  <Typography fontSize={isMobile ? "0.8rem" : "0.9rem"} color="black">
                     Established Year:{" "}
-                    <label variant="body1" color="text.secondary">
+                    <label variant="body1" >
                       {brand?.[0]?.brandfranchisedetails?.franchiseDetails
                         ?.establishedYear || "N/A"}
                     </label>
                   </Typography>
-                  <Typography fontSize={isMobile ? "0.8rem" : "0.9rem"}>
+                  <Typography fontSize={isMobile ? "0.8rem" : "0.9rem"} color="black">
                     Franchise Since:{" "}
-                    <label variant="body1" color="text.secondary">
+                    <label variant="body1" >
                       {brand?.[0]?.brandfranchisedetails?.franchiseDetails
                         ?.franchiseSinceYear || "N/A"}
                     </label>
@@ -213,6 +217,7 @@ const BrandHeader = ({
                   sx={{
                     px: isMobile ? 0 : 1.5,
                     py: isMobile ? 1 : 2,
+                    borderRadius: "20px",
                     bgcolor: "#ff9800",
                     "&:hover": { bgcolor: "#e65100" },
                     fontSize: isMobile ? "0.75rem" : "0.875rem",
@@ -222,7 +227,7 @@ const BrandHeader = ({
                 </Button>
                 <IconButton
                   ref={likeButtonRef}
-                  sx={{ marginLeft: "90px" }}
+                  sx={{ marginLeft: "90px",backgroundColor: "#eedbbcff",p:1 }}
                   onClick={handleLikeClickWithConfetti}
                   disabled={isProcessingLike}
                 >
@@ -231,7 +236,7 @@ const BrandHeader = ({
                   ) : (
                     <Favorite
                       sx={{
-                        color: localIsLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
+                        color: localIsLiked ? "#f44336" : "rgba(0, 0, 0, 0.35)",
                       }}
                     />
                   )}
@@ -240,7 +245,8 @@ const BrandHeader = ({
                   ref={shortlistButtonRef}
                   onClick={handleToggleShortListWithConfetti}
                   sx={{
-                    color: shortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.23)",
+                    color: shortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.35)",
+                    backgroundColor: "#eedbbcff",p:1
                   }}
                 >
                   <RiBookmark3Fill />
@@ -250,10 +256,9 @@ const BrandHeader = ({
                   size={isMobile ? "small" : "medium"}
                 >
                   <ShareOutlined
-                    sx={{ fontSize: isMobile ? "1.2rem" : "1.5rem" }}
+                    sx={{ fontSize: isMobile ? "1.2rem" : "1.5rem",color: "rgba(0, 0, 0, 0.35)",backgroundColor: "#eedbbcff",p:1 }}
                   />
                 </IconButton>
-
                 <ShareDialogActions
                   anchorEl={anchorEl}
                   setAnchorEl={setAnchorEl}
@@ -272,6 +277,7 @@ const BrandHeader = ({
                 component={Paper}
                 sx={{
                   width: "100%",
+                  borderRadius: "16px",
                   overflowX: "auto",
                   "&::-webkit-scrollbar": {
                     height: "6px",
@@ -298,7 +304,7 @@ const BrandHeader = ({
                   <TableHead>
                     <TableRow
                       sx={{
-                        backgroundColor: "#7ad03a",
+                        backgroundColor: "#eedbbcff",
                         "& th": {
                           padding: isMobile ? "6px 8px" : "10px 12px",
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
@@ -325,8 +331,8 @@ const BrandHeader = ({
                       </TableCell>
                     </TableRow>
                   </TableHead>
-                  <TableBody>
-                    <TableRow>
+                  <TableBody >
+                    <TableRow >
                       <TableCell
                         sx={{
                           width: "25%",
@@ -334,6 +340,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
+                          backgroundColor: "#eaf6df",
                         }}
                       >
                         {brand?.[0]?.brandfranchisedetails?.franchiseDetails
@@ -346,6 +353,8 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
+                                                    backgroundColor: "#eaf6df",
+
                         }}
                       >
                         {brand?.[0]?.brandfranchisedetails?.franchiseDetails
@@ -358,6 +367,8 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
+                                                    backgroundColor: "#eaf6df",
+
                         }}
                       >
                         {brand?.[0]?.brandfranchisedetails?.franchiseDetails
@@ -370,6 +381,8 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
+                                                    backgroundColor: "#eaf6df",
+
                         }}
                       >
                         {getOutletRange(
@@ -384,6 +397,8 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
+                                                    backgroundColor: "#eaf6df",
+
                         }}
                       >
                         {/* {(() => {
@@ -433,21 +448,22 @@ const BrandHeader = ({
                 </Table>
               </TableContainer>
             </Box>
-           <Typography
-  color="#7AD03A"
-  mt={isMobile ? 2 : 1}
+           {/* <Typography
+  color="#000000ff"
+  mt={isMobile ? 2 : 2}
   fontSize={isMobile ? "0.8rem" : "0.9rem"}
   variant="body1"
-  sx={{ fontWeight: "bold" }}
+  sx={{ fontWeight: "bold",backgroundColor: "#eedbbcff",p:1 }}
 >
-  Product Tags :
-  <Box sx={{ mt: 1, display: "flex", flexDirection: "column", gap: 1 }}>
+  Brand Tags :
+  
+</Typography> */}
+<Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1 }}>
  {(() => {
   const productTags =
     brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories
       ?.productTags;
 
-  console.log("productTags", productTags);
 
   let categoryArray = [];
 
@@ -493,8 +509,6 @@ const BrandHeader = ({
 })()}
 
   </Box>
-</Typography>
-
           </Box>
         </Box>
       </Box>

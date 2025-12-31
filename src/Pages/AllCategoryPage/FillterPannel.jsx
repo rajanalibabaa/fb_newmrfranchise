@@ -298,7 +298,7 @@ const FilterPanel = React.memo(
           alignItems="center"
           mb={2}
         >
-          <Typography variant="h6">Filters</Typography>
+          <Typography variant="h6"sx={{ color: "#ff9800" }} >Filters</Typography>
           <Button
             size="small"
             variant="outlined"
@@ -313,14 +313,14 @@ const FilterPanel = React.memo(
 
         <Breadcrumbs
           separator="|"
-          sx={{ mb: 2, fontSize: "0.875rem" }}
+          sx={{ mb: 2, fontSize: "0.875rem",color: "#ff9800" }}
           aria-label="filter sections"
         >
           <Link
             underline="hover"
             color="black"
             onClick={() => scrollToSection(mainCategoryRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#ff9800" }}
           >
             Industries
           </Link>
@@ -329,7 +329,7 @@ const FilterPanel = React.memo(
             underline="hover"
             color="black"
             onClick={() => scrollToSection(modelTypeRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#ff9800" }}
           >
             Model Type
           </Link>
@@ -337,7 +337,7 @@ const FilterPanel = React.memo(
             underline="hover"
             color="black"
             onClick={() => scrollToSection(locationRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#ff9800" }}
           >
             Location Filter
           </Link>
@@ -345,7 +345,7 @@ const FilterPanel = React.memo(
             underline="hover"
             color="black"
             onClick={() => scrollToSection(investmentRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#ff9800" }}
           >
             Investment Range
           </Link>
@@ -353,7 +353,7 @@ const FilterPanel = React.memo(
             underline="hover"
             color="black"
             onClick={() => scrollToSection(areaRequiredRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#ff9800" }}
           >
             Area Required
           </Link>

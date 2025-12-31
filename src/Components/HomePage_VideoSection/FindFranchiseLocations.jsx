@@ -274,7 +274,7 @@ const FindFranchiseLocations = () => {
           variant={isMobile ? "body1" : "h5"}
           fontWeight="bold"
           sx={{
-            color: "black",
+            color: "#f57a00",
             mb: 1,
             textAlign: "left",
             position: "relative",
@@ -293,9 +293,19 @@ const FindFranchiseLocations = () => {
           {selectedState ? `Franchise Opportunities in ${selectedState}` : "All Franchise Opportunities"}
         </Typography>
  
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <FormControl sx={{ minWidth: isMobile ? 120 : 200 }} size="small">
-            <InputLabel id="state-filter-label">Filter by expansion Location</InputLabel>
+        <Box sx={{ display: "flex", gap: 2, alignItems: "center",}}>
+          <FormControl sx={{ minWidth: isMobile ? 120 : 200,backgroundColor: '#f57a00' }} size="small">
+<InputLabel
+  id="state-filter-label"
+  sx={{
+    color: "#fff",
+    "&.Mui-focused": {
+      color: "#fff",
+    },
+  }}
+>
+  Filter by State
+</InputLabel>
             <Select
               labelId="state-filter-label"
               value={selectedState || ""}

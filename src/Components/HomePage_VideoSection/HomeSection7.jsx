@@ -216,7 +216,7 @@ useEffect(() => {
             variant={isMobile ? "body1" : "h5"}
             fontWeight="bold"
             sx={{
-              color: "black",
+              color: "#f57a00",
               mb: 1,
               textAlign: "left",
               position: "relative",

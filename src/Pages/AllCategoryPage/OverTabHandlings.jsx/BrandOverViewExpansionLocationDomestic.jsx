@@ -127,7 +127,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
     p: 2,
     position: "sticky",
     top: 0,
-    bgcolor: "#ff9800",
+    bgcolor: "#eaf6df",
     zIndex: 2,
     borderBottom: "1px solid #e0e0e0",
     display: "flex",
@@ -135,7 +135,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
     justifyContent: "center", // horizontal center
   }}
 >
-  <Place sx={{ mr: 1, color: "#fff" }} />
+  <Place sx={{ mr: 1, color: "#ff9800" }} />
   States
 </Typography>
 
@@ -146,7 +146,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                   overflowY: "auto",
                 }}
               >
-                {renderItemsWithFallback(visibleLocations, "Country").map((loc, stateIndex) => (
+                {/* {renderItemsWithFallback(visibleLocations, "Country").map((loc, stateIndex) => (
                   <Card
                     key={`state-${stateIndex}`}
                     onClick={() => toggleState(stateIndex)}
@@ -183,7 +183,67 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                       </Typography>
                     </Box>
                   </Card>
-                ))}
+                ))} */}
+{renderItemsWithFallback(visibleLocations, "Country").map((loc, stateIndex) => {
+  const isEven = stateIndex % 2 === 0;
+
+  const baseBgColor = isEven
+    ? "#eaf6df"   // blue-ish
+    : "#eedbbcff";  // green-ish
+
+  const expandedBgColor = isEven
+    ? "#white"
+    : "#white";
+
+  const borderColor = isEven
+    ? "#4caf50"
+    : "#ff9800";
+
+  return (
+    <Card
+      key={`state-${stateIndex}`}
+      onClick={() => toggleState(stateIndex)}
+      sx={{
+        mb: 1,
+        cursor: "pointer",
+        borderRadius: "6px",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+
+        // 🔴 alternating background (ALWAYS visible)
+        bgcolor:
+          expandedState === stateIndex
+            ? expandedBgColor
+            : baseBgColor,
+
+        // 🔴 alternating border color
+        borderLeft: `4px solid ${
+          expandedState === stateIndex ? borderColor : borderColor
+        }`,
+
+        transition: "all 0.2s ease",
+
+        "&:hover": {
+          transform: "translateY(-1px)",
+          boxShadow: "0 4px 8px rgba(0,0,0,0.15)",
+        },
+      }}
+    >
+      <Box
+        sx={{
+          p: 0.8,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
+        <Typography fontWeight={600}>
+          {typeof loc === "string" ? loc : loc.state || "Unknown State"}
+        </Typography>
+      </Box>
+    </Card>
+  );
+})}
+
+
               </Box>
             </Box>
 
@@ -211,7 +271,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                   p: 2,
                   position: "sticky",
                   top: 0,
-                  bgcolor: "#7ad03a",
+                  bgcolor: "#eedbbcff",
                   zIndex: 2,
                   borderBottom: "1px solid #e0e0e0",
                   display: "flex",
@@ -219,7 +279,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                   justifyContent: "center",
                 }}
               >
-                <Map sx={{ mr: 1, color: "#fff" }} />
+                <Map sx={{ mr: 1, color: "#4caf50" }} />
                 Cities
                 {isMobile && expandedState !== null && (
                   <IconButton
@@ -244,6 +304,21 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                     data.locations[expandedState]?.state || "Unknown State"
                   ).map((dist, distIndex) => {
                     const districtKey = `${expandedState}-${distIndex}`;
+                    const isEven = distIndex % 2 === 0;
+
+                    const baseBgColor = isEven
+                      ? "#eaf6df"   // blue-ish
+                      : "#eedbbcff";  // green-ish
+
+                    const expandedBgColor = isEven
+                      ? "#white"
+                      : "#white";
+
+                    const borderColor = isEven
+                      ? "#4caf50"
+                      : "#ff9800";
+
+
                     return (
                       <Card
                         key={`district-${districtKey}`}
@@ -257,13 +332,13 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                           boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
                           borderLeft: `4px solid ${
                             expandedDistrict === districtKey
-                              ? theme.palette.secondary.main
-                              : "transparent"
+                              ? borderColor
+                              : borderColor
                           }`,
                           bgcolor:
                             expandedDistrict === districtKey
-                              ? "rgba(255, 152, 0, 0.08)"
-                              : "background.paper",
+                              ? expandedBgColor
+                              : baseBgColor,
                           transition: "all 0.2s ease",
                           "&:hover": {
                             transform: "translateY(-1px)",

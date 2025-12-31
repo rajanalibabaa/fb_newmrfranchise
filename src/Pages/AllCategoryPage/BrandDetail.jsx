@@ -583,7 +583,7 @@ const handleSubmit = useCallback(
             getOutletRange={getOutletRange}
           />
 
-        <Divider sx={{ my: 3 }} />
+        <Divider sx={{ my: 1 }} />
 
           <MediaSection
             allVideos={allVideos}
@@ -594,7 +594,7 @@ const handleSubmit = useCallback(
             handleImageOpen={handleImageOpen}
           />
         {/* </Suspense> */}
-        <Divider sx={{ my: 5 }} />
+        <Divider sx={{ my: 1 }} />
 
         <Suspense fallback={<Box minHeight={180}><CircularProgress /></Box>}>
           <LazyOverviewTab brand={selectedBrand} />
@@ -627,7 +627,6 @@ const handleSubmit = useCallback(
       <Suspense fallback={<Box minHeight={120}><CircularProgress /></Box>}>
         <SimilarBrands brandData={selectedBrand} />
       </Suspense>
-<Disclaimer isMobile={isMobile} />
 
       {/* EXPANSION LOCATIONS LAZY ON SCROLL */}
       <Box
@@ -654,6 +653,8 @@ const handleSubmit = useCallback(
           isLargeDesktop={isLargeDesktop}
         />
       </Box>
+      <Disclaimer isMobile={isMobile} />
+
       <Suspense fallback={null}>
         <BackToTopButton show={showBackToTop} isMobile={isMobile} />
       </Suspense>

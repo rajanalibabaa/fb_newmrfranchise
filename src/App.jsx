@@ -106,7 +106,7 @@ const App = () => {
       if (Date.now() >= parseInt(logoutTimestamp, 10)) {
         dispatch(logout());
         //  await postApi(`${api.logout.post.logout}/${id}`)
-        window.location.href = '/loginpage';
+        window.location.href = '/';
       }
       // const autoLogOut = await postApi(`${api.logout.post.autoLogout}/${id}`)
       

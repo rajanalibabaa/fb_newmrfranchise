@@ -21,6 +21,7 @@ import Navbar from "../../Components/Navbar/NavBar.jsx";
 import SEO from "../../Components/SEO/Seo.jsx";
 import HomeBanner from "../../assets/Images/HomeBanner.avif";
 import CompareButton from "./CompareButtonsCompenents.jsx";
+import BrandComparison from "../AllCategoryPage/BrandCompariosn.jsx";
 
 // --- ErrorBoundary ---
 class ErrorBoundary extends React.Component {
@@ -704,6 +705,7 @@ const HomeBannerSec = () => {
 
       {/* 👇 Add here, before Footer */}
       <CompareButton />
+      <BrandComparison />
 
       <Footer />
     </>

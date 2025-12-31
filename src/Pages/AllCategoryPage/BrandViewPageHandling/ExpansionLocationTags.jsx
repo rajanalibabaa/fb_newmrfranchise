@@ -153,7 +153,7 @@ const ExpansionLocationTags = ({
                     variant="caption"
                     sx={{
                       borderRadius: "4px",
-                      color: "black",
+                      color: "white",
                       whiteSpace: "nowrap",
                       fontSize: isMobile ? "0.7rem" : "0.8rem",
                     }}

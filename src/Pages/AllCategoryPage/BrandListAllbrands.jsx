@@ -67,7 +67,7 @@ const FilterPanelSkeleton = React.memo(() => (
 ));
 
 // Lazy load heavy components
-const BrandComparison = lazy(() => import("./BrandComparison.jsx"));
+const BrandComparison = lazy(() => import("./BrandCompariosn.jsx"));
 const FilterPanel = lazy(() => import("./FillterPannel.jsx"));
 const BrandCard = lazy(() => import("./BrandCard.jsx"));
 
@@ -137,6 +137,18 @@ function BrandList() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Handle enableComparison from navigation state or localStorage
+  useEffect(() => {
+    if (location.state?.enableComparison !== undefined) {
+      setEnableComparison(location.state.enableComparison);
+    }
+    const enableFromStorage = localStorage.getItem('enableComparison');
+    if (enableFromStorage === 'true') {
+      setEnableComparison(true);
+      localStorage.removeItem('enableComparison');
+    }
+  }, [location.state]);
 
   // Handle filter changes
   const handleFilterChange = useCallback(
@@ -227,8 +239,19 @@ const toggleBrandComparison = useCallback((brand) => {
     ).length;
   }, [filters]);
 
+  const comp = () => {
+    if (!enableComparison) {
+      setEnableComparison(true);
+    }
+    if (selectedForComparison.length > 0) {
+      setComparisonOpen(true);
+    }
+  }
+
   return (
-    <Container maxWidth="xl" sx={{ mt: 0, mb: 6 }}>
+    <Container maxWidth="xl" sx={{ mt: 0, mb: 6 ,background:'#000000ff'}}>
+
+
       {/* Comparison Button */}
      
               <Box sx={{ position: "fixed", top: "30%", right: 12, zIndex: 1000 }}>
@@ -238,12 +261,7 @@ const toggleBrandComparison = useCallback((brand) => {
         variant="contained"
         color="primary"
         startIcon={<Compare />}
-        onClick={() => {
-          setEnableComparison(true);
-          if (selectedForComparison.length > 0) {
-            setComparisonOpen(true);
-          }
-        }}
+        onClick={comp}
         sx={{
           transform: "rotate(-90deg)", // 🔹 Rotate button
           transformOrigin: "right center",
@@ -377,11 +395,11 @@ const toggleBrandComparison = useCallback((brand) => {
                 sx={{ ml: 2 }}
                 variant={isMobile ? "h5" : "h4"}
                 gutterBottom
-                color="#ff9800"
+                color="#f57a00"
               >
                 Food & Beverage Brands
               </Typography>
-              <Typography sx={{ ml: 2, mb: 2 }} variant="body2" gutterBottom>
+              <Typography sx={{ ml: 2, mb: 0 ,color: "#f57a00"}} variant="body2" gutterBottom>
                 Showing {brands.length} of {pagination.total} brands
               </Typography>
 
@@ -516,12 +534,13 @@ const toggleBrandComparison = useCallback((brand) => {
         </Box>
       </Drawer>
 
-      <Suspense fallback={null}>
+       <Suspense fallback={null}>
         <BrandComparison
           open={comparisonOpen}
           onClose={() => {
-    setComparisonOpen(false);   // ✅ close modal
-    setSelectedForComparison([]); // ✅ clear brands selection
+    setComparisonOpen(false);  
+    setSelectedForComparison([]);
+    setEnableComparison(false);
   }}
           selectedBrands={selectedForComparison}
            onRemoveFromComparison={(uuid) =>
@@ -529,6 +548,7 @@ const toggleBrandComparison = useCallback((brand) => {
   }
         />
       </Suspense>
+ 
 
       {showLogin && (
         <LoginPage open={showLogin} onClose={() => setShowLogin(false)} />

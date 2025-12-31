@@ -244,7 +244,7 @@ const SimilarBrands = ({ brandData }) => {
             variant={isMobile ? "body1" : "h5"}
             fontWeight="bold"
             sx={{
-              color: "black",
+              color: "#f57c00",
               mb: 1,
               textAlign: "left",
               position: "relative",

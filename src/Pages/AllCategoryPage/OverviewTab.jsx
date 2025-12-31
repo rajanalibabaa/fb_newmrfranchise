@@ -112,7 +112,7 @@ const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCate
       {(hasData(franchiseDetails.trainingSupport) ||
         franchiseDetails.aidFinancing ||
         hasData(franchiseDetails.uniqueSellingPoints)) && (
-        <Grid container spacing={3} sx={{ mt: 2, mb: 3 }}>
+        <Grid container spacing={3} sx={{ mt: 2, mb: 0 }}>
           <Grid item xs={12} md={6}>
             <SupportProvided
               trainingSupport={franchiseDetails.trainingSupport}
@@ -123,11 +123,11 @@ const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCate
         </Grid>
       )}
 
-     <Box display={{ sm: 'none', md: 'flex', }} >
+     <Box display={{ sm: 'none', md: 'flex', }} gap={2} >
        {/* OUTLET GRIDS: Lazy-load (domestic, international) */}
       {hasData(expansionLocationData.currentOutletLocations?.domestic?.locations) && (
         <LazyInViewSection minHeight={180}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 4, mt: 4, color: "#7ad03a" }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, mt: 2, color: "#000000ff",background:'#eedbbcff',padding:'10px',borderRadius:'5px' }}>
             Current Outlets (India)
           </Typography>
           <Suspense fallback={<SectionSkeleton lines={2} height={36} />}>
@@ -140,7 +140,7 @@ const serviceTags=brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCate
 
        {hasData(expansionLocationData.expansionLocations?.domestic?.locations) && (
         <LazyInViewSection minHeight={180}>
-          <Typography variant="h6" sx={{ fontWeight: 700, mb: 4, mt: 4, color: "#7ad03a" }} id="expansion-location">
+          <Typography variant="h6" sx={{ fontWeight: 700, mb: 2, mt: 2, color: "#000000ff",background:'#eedbbcff',padding:'10px',borderRadius:'5px' }} id="expansion-location">
             Expansion Locations (India)
           </Typography>
           <Suspense fallback={<SectionSkeleton lines={2} height={36} />}>
