@@ -1,18 +1,17 @@
-import {
-  Typography,
-  Box,
-  Button,
-  Card,
-  IconButton,
-  Stack,
-  CircularProgress,
-  Tooltip,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import React, {  useEffect, useState, useRef } from "react";
+
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import CircularProgress from "@mui/material/CircularProgress";
+import Tooltip from "@mui/material/Tooltip";
+import { useMediaQuery, useTheme } from "@mui/material";
+
 import { RiBookmark3Fill } from "react-icons/ri";
 import { motion } from "framer-motion";
-import React, { useCallback, useEffect, useState, useRef } from "react";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import { postView } from "../../Utils/function/view";
@@ -26,6 +25,7 @@ import { handleShortList } from "../../Api/shortListApi";
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
 import { addSortlist, removeSortList, toggleSortlistBrandLike } from "../../Redux/Slices/shortlistslice.jsx";
 import confetti from "canvas-confetti";
+import { useNavigate } from "react-router-dom";
 
 const TopInvestVdocardround = () => {
   const [likeProcessing, setLikeProcessing] = useState({});
@@ -36,7 +36,7 @@ const TopInvestVdocardround = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const likeButtonRefs = useRef({});
   const shortlistButtonRefs = useRef({});
-
+const navigate = useNavigate();
   const dispatch = useDispatch();
  
   const {
@@ -64,26 +64,6 @@ const TopInvestVdocardround = () => {
       });
     }
   }, [brands]);
- 
-  // Scroll-based infinite loading
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.documentElement.scrollHeight;
- 
-      if (
-        scrollTop + windowHeight >= fullHeight - 300 &&
-        hasMore &&
-        !isLoading
-      ) {
-        setPage((prev) => prev + 1);
-      }
-    };
- 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [hasMore, isLoading]);
 
   // 🎉 Updated confetti effect to use element position
   const triggerCelebration = (color, brandId, buttonType) => {
@@ -163,7 +143,7 @@ const TopInvestVdocardround = () => {
     dispatch(openBrandDialog(brand));
   };
  
-  if (isLoading && page === 1) {
+  if (isLoading && allBrands.length === 0) {
     return (
       <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
         <CircularProgress size={60} thickness={4} sx={{ color: "#f29724" }} />
@@ -188,7 +168,11 @@ const TopInvestVdocardround = () => {
         fontWeight="bold"
         sx={{
           color: "#f29624",
-          mb: 1,
+          mb: 3.5,
+          // backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
+            display: "inline-block",
           textAlign: "left",
           position: "relative",
           "&:after": {
@@ -216,7 +200,7 @@ const TopInvestVdocardround = () => {
             lg: "repeat(5, 1fr)",
           },
           gap: { xs: 4, sm: 3, md: 4, lg: 5 },
-          mb: 6,
+          mb: 3,
           width: "100%",
           px: { xs: 1, sm: 2 },
           scrollbarWidth: "none",
@@ -226,7 +210,7 @@ const TopInvestVdocardround = () => {
           },
         }}
       >
-        {brands.map((brand) => (
+        {allBrands.map((brand) => (
           <motion.div
             key={brand.uuid}
             whileHover={{ y: -5 }}
@@ -421,13 +405,83 @@ const TopInvestVdocardround = () => {
         ))}
       </Box>
  
-      {/* Spinner at bottom for infinite loading */}
-      {isLoading && page > 1 && (
-        <Box sx={{ textAlign: "center", py: 4 }}>
-          <CircularProgress size={30} sx={{ color: "#f29724" }} />
-        </Box>
-      )}
- 
+    <Box sx={{ textAlign: "center", py: 3 }}>
+  {hasMore && (
+    <>
+      {/* <Box
+        sx={{
+          mb: 1,
+          fontSize: 16,
+          fontWeight: 500,
+          color: "#000000ff",
+        }}
+      >
+        Would you like to browse more brands?
+      </Box> */}
+
+      <Box
+        onClick={() => setPage((prev) => prev + 1)}
+        sx={{
+          backgroundColor: "#ff9800",
+          px: 4,
+          py: 1.2,
+          borderRadius: 2,
+          cursor: "pointer",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontWeight: "bold",
+          color: "white",
+          minWidth: 180,
+          "&:hover": {
+            backgroundColor: "#000",
+          },
+        }}
+      >
+        {isLoading ? (
+          <CircularProgress size={22} sx={{ color: "white" }} />
+        ) : (
+          "Load More Brands"
+        )}
+      </Box>
+    </>
+  )}
+
+  {!hasMore && (
+    <>
+      <Box
+        sx={{
+          mb: 1,
+          fontSize: 16,
+          fontWeight: 500,
+          color: "#555",
+        }}
+      >
+        Would you like to browse more brands?
+      </Box>
+
+      <Box
+        sx={{
+          backgroundColor: "#000",
+          px: 4,
+          py: 1.2,
+          borderRadius: 2,
+          display: "inline-block",
+          fontWeight: "bold",
+          color: "white",
+          cursor: "pointer",
+          "&:hover": {
+            backgroundColor: "#333",
+          },
+        }}
+        onClick={()=>navigate('/brandViewPage')}
+      >
+        View All Brands
+      </Box>
+    </>
+  )}
+</Box>
+
       {showLogin && <LoginPage open={showLogin} onClose={() => setShowLogin(false)} />}
     </Box>
   );

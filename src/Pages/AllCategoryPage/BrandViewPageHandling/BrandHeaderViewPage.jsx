@@ -39,7 +39,7 @@ const BrandHeader = ({
   const likeButtonRef = useRef(null);
   const shortlistButtonRef = useRef(null);
 
-  console.log('brand loading ', brand);
+  // console.log('brand loading ', brand);
   
   // 🎉 Confetti effect to use element position
   const triggerCelebration = (color, buttonRef) => {
@@ -121,6 +121,7 @@ const BrandHeader = ({
           gap={isMobile ? 1 : 3}
           flexDirection={isMobile ? "column" : "row"}
           width="100%"
+          sx={{background:'white',padding:{xs:'5px',sm:'5px',md:'20px'},borderRadius:'10px'}}
         >
           <Box
             position="relative"
@@ -148,7 +149,7 @@ const BrandHeader = ({
             />
           </Box>
 
-          <Box width="100%">
+          <Box width="100%" >
             {/* Brand name and actions */}
             <Box
               display="flex"
@@ -163,7 +164,7 @@ const BrandHeader = ({
                   sx={{
                     fontWeight: 600,
                     mb: 1,
-                    backgroundColor: "#eedbbcff",p:1,
+                    // backgroundColor: "#eedbbcff",p:1,
                     // color: "linear-gradient(45deg, #000000ff 30%, #000000ff 90%)",
                     // WebkitBackgroundClip: "text",
                     // WebkitTextFillColor: "transparent",
@@ -175,7 +176,7 @@ const BrandHeader = ({
                 <Typography
                   variant="body1"
                   color="black"
-                  sx={{backgroundColor: "#eedbbcff",p:1}}
+                  // sx={{backgroundColor: "#eedbbcff",p:1}}
                   textAlign={isMobile ? "center" : "left"}
                   fontSize={isMobile ? "0.875rem" : "1rem"}
                 >
@@ -189,7 +190,7 @@ const BrandHeader = ({
                     gap: isMobile ? 1 : 10,
                     mt: 1,
                     justifyContent: isMobile ? "center" : "flex-start",
-                    backgroundColor: "#eedbbcff",p:1
+                    // backgroundColor: "#eedbbcff",p:1
                   }}
                 >
                   <Typography fontSize={isMobile ? "0.8rem" : "0.9rem"} color="black">
@@ -215,19 +216,19 @@ const BrandHeader = ({
                   startIcon={<Phone />}
                   onClick={toggleDrawer(true)}
                   sx={{
-                    px: isMobile ? 0 : 1.5,
+                    px: isMobile ? 1 : 1.5,
                     py: isMobile ? 1 : 2,
-                    borderRadius: "20px",
+                    borderRadius: { xs: 1, sm: 2,md:'20px' },
                     bgcolor: "#ff9800",
                     "&:hover": { bgcolor: "#e65100" },
-                    fontSize: isMobile ? "0.75rem" : "0.875rem",
+                    fontSize: isMobile ? "0.65rem" : "0.875rem",
                   }}
                 >
                   VIEW CONTACT
                 </Button>
                 <IconButton
                   ref={likeButtonRef}
-                  sx={{ marginLeft: "90px",backgroundColor: "#eedbbcff",p:1 }}
+                  sx={{ marginLeft: "80px" }}
                   onClick={handleLikeClickWithConfetti}
                   disabled={isProcessingLike}
                 >
@@ -246,7 +247,7 @@ const BrandHeader = ({
                   onClick={handleToggleShortListWithConfetti}
                   sx={{
                     color: shortListed ? "#7ef400ff" : "rgba(0, 0, 0, 0.35)",
-                    backgroundColor: "#eedbbcff",p:1
+                    // backgroundColor: "#eedbbcff",p:1
                   }}
                 >
                   <RiBookmark3Fill />
@@ -256,7 +257,7 @@ const BrandHeader = ({
                   size={isMobile ? "small" : "medium"}
                 >
                   <ShareOutlined
-                    sx={{ fontSize: isMobile ? "1.2rem" : "1.5rem",color: "rgba(0, 0, 0, 0.35)",backgroundColor: "#eedbbcff",p:1 }}
+                    sx={{ fontSize: isMobile ? "1.2rem" : "1.5rem",color: "rgba(0, 0, 0, 0.35)" }}
                   />
                 </IconButton>
                 <ShareDialogActions
@@ -270,9 +271,59 @@ const BrandHeader = ({
                 />
               </Box>
             </Box>
+<Box sx={{ mt: { xs: 1, sm: 2, md: 3}, display: "flex", flexDirection: "column", gap: 1 }}>
+ {(() => {
+  const productTags =
+    brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories
+      ?.productTags;
 
+
+  let categoryArray = [];
+
+  // ✅ NEW FORMAT: [{ parent, tags: [] }]
+  if (Array.isArray(productTags)) {
+    categoryArray = productTags.flatMap(item =>
+      Array.isArray(item?.tags) ? item.tags : []
+    );
+  }
+
+  if (categoryArray.length === 0) {
+    return (
+      <Typography variant="caption" color="black">
+        N/A
+      </Typography>
+    );
+  }
+
+  return (
+    <>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
+        {categoryArray.map((category, index) => (
+          <Chip
+            key={index}
+            label={category}
+            size="small"
+            variant="outlined"
+            sx={{
+              fontSize: isMobile ? "0.65rem" : "0.75rem",
+              height: "24px",
+              backgroundColor: "#ffffffff",
+              borderColor: "#7cd13b",
+              color: "black",
+              "& .MuiChip-label": {
+                padding: "0 8px",
+              },
+            }}
+          />
+        ))}
+      </Box>
+    </>
+  );
+})()}
+
+  </Box>
             {/* Brand details table */}
-            <Box sx={{ width: "100%", overflow: "hidden", mt: 2 }}>
+            <Box sx={{ width: "100%", overflow: "hidden", mt: 2,mb:1 }}>
               <TableContainer
                 component={Paper}
                 sx={{
@@ -304,7 +355,7 @@ const BrandHeader = ({
                   <TableHead>
                     <TableRow
                       sx={{
-                        backgroundColor: "#eedbbcff",
+                        backgroundColor: "#7cd13b",
                         "& th": {
                           padding: isMobile ? "6px 8px" : "10px 12px",
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
@@ -340,7 +391,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
-                          backgroundColor: "#eaf6df",
+                          backgroundColor: "#ffffffff",
                         }}
                       >
                         {brand?.[0]?.brandfranchisedetails?.franchiseDetails
@@ -353,7 +404,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
-                                                    backgroundColor: "#eaf6df",
+                                                    backgroundColor: "#ffffffff",
 
                         }}
                       >
@@ -367,7 +418,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
-                                                    backgroundColor: "#eaf6df",
+                                                    backgroundColor: "#ffffffff",
 
                         }}
                       >
@@ -381,7 +432,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
-                                                    backgroundColor: "#eaf6df",
+                                                    backgroundColor: "#ffffffff",
 
                         }}
                       >
@@ -397,7 +448,7 @@ const BrandHeader = ({
                           fontSize: isMobile ? "0.7rem" : "0.8rem",
                           wordBreak: "break-word",
                           py: isMobile ? "8px" : "12px",
-                                                    backgroundColor: "#eaf6df",
+                                                    backgroundColor: "#ffffffff",
 
                         }}
                       >
@@ -458,57 +509,7 @@ const BrandHeader = ({
   Brand Tags :
   
 </Typography> */}
-<Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 1 }}>
- {(() => {
-  const productTags =
-    brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories
-      ?.productTags;
 
-
-  let categoryArray = [];
-
-  // ✅ NEW FORMAT: [{ parent, tags: [] }]
-  if (Array.isArray(productTags)) {
-    categoryArray = productTags.flatMap(item =>
-      Array.isArray(item?.tags) ? item.tags : []
-    );
-  }
-
-  if (categoryArray.length === 0) {
-    return (
-      <Typography variant="caption" color="black">
-        N/A
-      </Typography>
-    );
-  }
-
-  return (
-    <>
-      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-        {categoryArray.map((category, index) => (
-          <Chip
-            key={index}
-            label={category}
-            size="small"
-            variant="outlined"
-            sx={{
-              fontSize: isMobile ? "0.65rem" : "0.75rem",
-              height: "24px",
-              backgroundColor: "#f8f9fa",
-              borderColor: "#7AD03A",
-              color: "black",
-              "& .MuiChip-label": {
-                padding: "0 8px",
-              },
-            }}
-          />
-        ))}
-      </Box>
-    </>
-  );
-})()}
-
-  </Box>
           </Box>
         </Box>
       </Box>

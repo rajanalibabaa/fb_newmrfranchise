@@ -1,7 +1,7 @@
 import React from "react";
-import { Container } from "@mui/material";
+import  Container  from "@mui/material/Container";
 import CreateRequestForm from "./CreateRequestForm";
-import RequestList from "./RequestList";
+import RequestList from "./RequestList.jsx";
 
 const Dashboard = () => {
   return (

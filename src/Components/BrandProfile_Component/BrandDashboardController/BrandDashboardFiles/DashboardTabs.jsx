@@ -1,16 +1,13 @@
 // components/DashboardTabs.js
 import React, { useState } from "react";
-import {
-  Card,
-  Tabs,
-  Tab,
-  Box,
-  Typography,
-} from "@mui/material";
+
+import Card from "@mui/material/Card";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { useMediaQuery, useTheme } from "@mui/material";
-import {
-  Person,
-} from "@mui/icons-material";
+import Person from "@mui/icons-material/Person";
 import TabContent from "./TabContent";
 
 const colors = {
@@ -24,7 +21,7 @@ const colors = {
   divider: "#ecf0f1",
 };
 
-const DashboardTabs = ({ brandData}) => {
+const DashboardTabs = ({ brandData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
@@ -44,32 +41,39 @@ const DashboardTabs = ({ brandData}) => {
   // };
 
   const renderTabLabel = (label, index) => (
-    <Box sx={{ 
-      display: "flex", 
-      alignItems: "center", 
-      gap: isMobile ? 0.5 : 1, 
-      px: isMobile ? 0.5 : 1, 
-      py: isMobile ? 0.25 : 0.5,
-      flexDirection: isMobile ? "column" : "row",
-      minHeight: isMobile ? 48 : "auto",
-      justifyContent: "center",
-    }}>
-      <Box sx={{ 
-        display: "flex", 
-        alignItems: "center", 
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
         gap: isMobile ? 0.5 : 1,
+        px: isMobile ? 0.5 : 1,
+        py: isMobile ? 0.25 : 0.5,
         flexDirection: isMobile ? "column" : "row",
-      }}>
-        <Person sx={{ 
-          fontSize: isMobile ? "1rem" : "1.25rem",
-          color: tabValue === index ? colors.accent : colors.textSecondary,
-        }} />
+        minHeight: isMobile ? 48 : "auto",
+        justifyContent: "center",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: isMobile ? 0.5 : 1,
+          flexDirection: isMobile ? "column" : "row",
+        }}
+      >
+        <Person
+          sx={{
+            fontSize: isMobile ? "1rem" : "1.25rem",
+            color: tabValue === index ? colors.accent : colors.textSecondary,
+          }}
+        />
         <Typography
           variant={isMobile ? "caption" : "body2"}
           sx={{
             textTransform: "none",
             fontWeight: tabValue === index ? 600 : 400,
-            color: tabValue === index ? colors.textPrimary : colors.textSecondary,
+            color:
+              tabValue === index ? colors.textPrimary : colors.textSecondary,
             fontSize: isMobile ? "0.7rem" : "0.875rem",
             textAlign: "center",
             lineHeight: 1.2,
@@ -165,10 +169,7 @@ const DashboardTabs = ({ brandData}) => {
           minHeight: isMobile ? 400 : 500,
         }}
       >
-        <TabContent
-          tabValue={tabValue}
-          brandData={brandData}
-        />
+        <TabContent tabValue={tabValue} brandData={brandData} />
       </Card>
     </>
   );

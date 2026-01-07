@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import {
-  TextField,
-  Paper,
-  Box,
-  CircularProgress,
-  InputAdornment,
-  IconButton,
-} from "@mui/material";
+
+import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import CircularProgress from "@mui/material/CircularProgress";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+
 import { useLocation, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import SearchIcon from "@mui/icons-material/Search";
@@ -110,7 +110,7 @@ const Search = ({ handleClose }) => {
       }
 
 
-      console.log("value :",value)
+      // console.log("value :",value)
       dispatch(
         fetchFilteredBrands({
           searchTerm: value,
@@ -132,7 +132,7 @@ const Search = ({ handleClose }) => {
       searchValue =
         selectedData.tag || selectedData.industry || selectedData.category;
     }
-          console.log("searchValue :",searchValue)
+          // console.log("searchValue :",searchValue)
 
     handleOnSearch(searchValue);
   };

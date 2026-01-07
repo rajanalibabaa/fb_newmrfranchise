@@ -455,7 +455,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
             sx={{
               display: "grid",
               gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 1.5,
+              gap: 0.7,
             }}
           >
             {allImages.slice(0, 3).map((imageUrl, index) => (
@@ -489,7 +489,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
+                      objectFit: "contain",
                       position: "absolute",
                       top: 0,
                       left: 0,
@@ -511,6 +511,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                   height: getImageBoxSize(),
                   overflow: "hidden",
                   borderRadius: 2,
+                  ml: 0.2,
                   cursor: "pointer",
                   position: "relative",
                   display: "flex",

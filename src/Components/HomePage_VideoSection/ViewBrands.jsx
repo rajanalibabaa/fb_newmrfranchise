@@ -6,16 +6,19 @@ import React, {
   useMemo,
 } from "react";
 import {
-  Box,
-  Typography,
-  Button,
   useTheme,
   useMediaQuery,
-  CircularProgress,
-  Snackbar,
-  Alert,
 } from "@mui/material";
-import { ArrowBack, ArrowForward, ArrowRight } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import ArrowRight from "@mui/icons-material/ArrowRight";
+
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchViewBrandsById } from "../../Redux/Slices/viewSlice";
@@ -192,6 +195,9 @@ const ViewBrands = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          //  backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
         }}
       >
         <Typography
@@ -199,8 +205,9 @@ const ViewBrands = () => {
           fontWeight="bold"
           ml={isMobile ? 2 : 0}
           sx={{
-            color: "black",
+            color: "#f57a00",
             mb: 1,
+            
             textAlign: "left",
             position: "relative",
             "&:after": {

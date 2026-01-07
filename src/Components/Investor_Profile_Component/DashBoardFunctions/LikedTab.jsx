@@ -1,6 +1,11 @@
 import React from "react";
-import { Grid, Box, Typography, LinearProgress, Pagination } from "@mui/material";
-import { Favorite } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
+import Pagination from "@mui/material/Pagination";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import  Favorite  from "@mui/icons-material/Favorite";
 import BrandCard from "../DashBoardFunctions/BrandCard";
 
 const LikedTab = ({ 

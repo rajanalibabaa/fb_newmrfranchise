@@ -9,11 +9,11 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
         mb: 2,
         p: 3,
         borderRadius: "16px",
-        background: "#eaf6df",
+        background: "#ffffffff",
         boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
       }}
     >
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#eedbbcff',padding:'10px',borderRadius:'5px' }}>
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#7cd13b',padding:'10px',borderRadius:'5px' }}>
         Brand Description
       </Typography>
       <Divider sx={{ mb: 2, borderColor: "rgba(0,0,0,0.1)" }} />
@@ -74,7 +74,7 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
               color: "#000000ff",
               fontSize: "1.25rem",
               fontWeight: 600,
-              background:'#eedbbcff'
+              background:'#7cd13b'
             }}
           >
             Unique Points:

@@ -10,7 +10,7 @@ export const likeApiFunction = async(id) => {
     try {
        const res =  await postApi(api.likeApi.post,data)
 
-       console.log("=== ,",res.data)
+    //    console.log("=== ,",res.data)
     } catch (error) {
         console.error(error)
     }

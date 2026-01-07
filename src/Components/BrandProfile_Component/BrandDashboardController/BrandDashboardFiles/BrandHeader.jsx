@@ -1,12 +1,10 @@
 import React from "react";
-import {
-  Card,
-  Box,
-  Typography,
-  Avatar,
-  Grid,
-  CardContent,
-} from "@mui/material";
+import Card from "@mui/material/Card";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Grid from "@mui/material/Grid";
+
 import { useMediaQuery, useTheme } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -52,7 +50,7 @@ const StatCard = ({ icon: Icon, title, value, borderColor }) => (
 const BrandHeader = ({ brandData }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-//  console.log("===brandData=== :",brandData)
+  //  console.log("===brandData=== :",brandData)
   return (
     <Card
       sx={{
@@ -67,7 +65,9 @@ const BrandHeader = ({ brandData }) => {
       }}
     >
       {/* Brand Info */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, flexGrow: 1 }}>
+      <Box
+        sx={{ display: "flex", alignItems: "center", gap: 1.5, flexGrow: 1 }}
+      >
         <Avatar
           src={brandData?.uploads?.logo || "/default-brand.png"}
           sx={{

@@ -79,7 +79,7 @@ const validateBrandDetails = (data) => {
 
 // Validation for Franchise Details
 const validateFranchiseDetails = (data) => {
-  console.log("Validating Franchise Details:", data);
+  // console.log("Validating Franchise Details:", data);
   const errors = {};
 
 //   // Brand Categories Validation
@@ -256,7 +256,7 @@ if (!data.trainingSupport || data.trainingSupport.length === 0) {
 };
 
 const validateExpansionLocationDetails = (data) => {
-  console.log("Validating Expansion Location Details:", data);
+  // console.log("Validating Expansion Location Details:", data);
   const errors = {};  
   
   // 1. Validate "Is your brand expanding internationally?" (required boolean)

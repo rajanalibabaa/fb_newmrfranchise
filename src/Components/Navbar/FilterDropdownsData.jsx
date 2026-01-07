@@ -2,25 +2,26 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  Box,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-  CircularProgress,
+
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+
+
 import SearchIcon from "@mui/icons-material/Search";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchFilterOptions,
-  resetChildCategories,
-  resetDistricts,
-  resetCities,
+ 
   clearErrors,
 } from "../../Redux/Slices/filterDropdownData";
 
@@ -174,10 +175,10 @@ const handleFindBrands = useCallback(() => {
         flexDirection: isMobile ? "column" : "row",
         gap: 2,
         mb: 4,
-        p: 3,
+        p: 2,
         borderRadius: 2,
         alignItems: "center",
-        backgroundColor: "#000000ff",
+        backgroundColor: "#0000007b",
         boxShadow: 1,
       }}
     >

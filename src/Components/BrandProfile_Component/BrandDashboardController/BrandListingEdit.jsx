@@ -4,47 +4,48 @@ import BrandDetailsEdit from "./BrandDetailsEdit";
 import FranchiseDetailsControl from "./FranchiseDetailsEdit";
 import ExpansionLocationControl from "./ExpansionLocationEdit";
 import UploadsEdit from "./UploadsEdit";
-import {
-  Box,
-  Button,
-  Snackbar,
-  Alert,
-  CircularProgress,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  TextField,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-} from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { getApi } from "../../../Api/DefaultApi";
 import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import { token } from "../../../Utils/autherId";
 
-
 const flattenBrandData = (brandDoc) => {
   if (!brandDoc) {
-    console.log("❌ flattenBrandData: No brandDoc provided");
+    // console.log("❌ flattenBrandData: No brandDoc provided");
     return {};
   }
 
-  console.log("🔄 flattenBrandData: Processing brand document");
+  // console.log("🔄 flattenBrandData: Processing brand document");
 
   const franchiseDetails = brandDoc.franchiseDetails || {};
   const franchiseTagsFromAPI = franchiseDetails.franchiseTags || {};
-  
-  console.log("🔄 FranchiseTags from API:", franchiseTagsFromAPI);
-  console.log("🔄 FICO from API:", franchiseDetails.fico);
-  console.log("🔄 FICO type:", typeof franchiseDetails.fico);
-  console.log("🔄 FICO is array?", Array.isArray(franchiseDetails.fico));
+
+  // console.log("🔄 FranchiseTags from API:", franchiseTagsFromAPI);
+  // console.log("🔄 FICO from API:", franchiseDetails.fico);
+  // console.log("🔄 FICO type:", typeof franchiseDetails.fico);
+  // console.log("🔄 FICO is array?", Array.isArray(franchiseDetails.fico));
 
   // Ensure fico is always an array
-  const ficoData = Array.isArray(franchiseDetails.fico) ? franchiseDetails.fico : [];
+  const ficoData = Array.isArray(franchiseDetails.fico)
+    ? franchiseDetails.fico
+    : [];
 
   return {
     // Brand Details
@@ -90,7 +91,8 @@ const flattenBrandData = (brandDoc) => {
     franchiseTags: franchiseTagsFromAPI,
 
     // Expansion Data
-    currentOutletLocations: brandDoc.expansionlocationdata?.currentOutletLocations || {
+    currentOutletLocations: brandDoc.expansionlocationdata
+      ?.currentOutletLocations || {
       domestic: { locations: [] },
       international: { country: [] },
     },
@@ -98,8 +100,9 @@ const flattenBrandData = (brandDoc) => {
       domestic: { locations: [] },
       international: { country: [] },
     },
-    isInternationalExpansion: brandDoc.expansionlocationdata?.isInternationalExpansion || false,
-    
+    isInternationalExpansion:
+      brandDoc.expansionlocationdata?.isInternationalExpansion || false,
+
     // Uploads
     brandLogo: brandDoc.uploads?.logo || [],
     exteriorOutlet: brandDoc.uploads?.exteriorOutlet || [],
@@ -116,24 +119,25 @@ const BrandListingEdit = () => {
   const params = useParams();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-    
-   const uuid = params?.uuid || 
-               location?.state?.uuid || 
-               searchParams.get("uuid") ||
-               localStorage.getItem("brandUUID") || 
-               localStorage.getItem("investorUUID");
 
-  console.log("🔍 UUID from different sources:", {
-    params: params?.uuid,
-    location: location?.state?.uuid,
-    searchParams: searchParams.get("uuid"),
-    localStorageBrand: localStorage.getItem("brandUUID"),
-    localStorageInvestor: localStorage.getItem("investorUUID"),
-    finalUUID: uuid
-  });
-    // if (!uuid) return;
+  const uuid =
+    params?.uuid ||
+    location?.state?.uuid ||
+    searchParams.get("uuid") ||
+    localStorage.getItem("brandUUID") ||
+    localStorage.getItem("investorUUID");
 
-    // setSaveStatus({ loading: true, success: false, error: "" });
+  // console.log("🔍 UUID from different sources:", {
+  //   params: params?.uuid,
+  //   location: location?.state?.uuid,
+  //   searchParams: searchParams.get("uuid"),
+  //   localStorageBrand: localStorage.getItem("brandUUID"),
+  //   localStorageInvestor: localStorage.getItem("investorUUID"),
+  //   finalUUID: uuid,
+  // });
+  // if (!uuid) return;
+
+  // setSaveStatus({ loading: true, success: false, error: "" });
 
   const [formData, setFormData] = useState({});
   const [originalData, setOriginalData] = useState(null);
@@ -217,19 +221,25 @@ const BrandListingEdit = () => {
       }
 
       try {
-        const url = `http://localhost:5000/api/v1/brandlisting/getBrandById/${uuid}`;
+        const url = `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/getBrandById/${uuid}`;
         const response = await getApi(url);
         const brand = response?.data?.data;
 
- console.log("🔍 PARENT - Raw API response:", response);
-      console.log("🔍 PARENT - Fetched brand data:", brand);
-      console.log("🔍 PARENT - Franchise details:", brand?.franchiseDetails);
-      console.log("🔍 PARENT - Franchise tags:", brand?.franchiseDetails?.franchiseTags);
+        // console.log("🔍 PARENT - Raw API response:", response);
+        // console.log("🔍 PARENT - Fetched brand data:", brand);
+        // console.log("🔍 PARENT - Franchise details:", brand?.franchiseDetails);
+        // console.log(
+        //   "🔍 PARENT - Franchise tags:",
+        //   brand?.franchiseDetails?.franchiseTags
+        // );
 
         if (response.data.success) {
           const flatData = flattenBrandData(brand);
-console.log("🔍 PARENT - Flattened brand data:", flatData);
-        console.log("🔍 PARENT - Flattened franchiseTags:", flatData.franchiseTags);
+          // console.log("🔍 PARENT - Flattened brand data:", flatData);
+          // console.log(
+          //   "🔍 PARENT - Flattened franchiseTags:",
+          //   flatData.franchiseTags
+          // );
           setFormData(flatData);
           setOriginalData(brand);
         } else {
@@ -262,56 +272,63 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
     }));
   };
 
- const handleArrayChange = (field, value) => {
-  console.log(`🔄 Updating ${field}:`, value);
-  
-  // Special handling for awards array
-  if (field === "awards") {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  } else {
-    // For all other arrays including fico
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  }
-};
- const handleObjectChange = (field, keyOrValue, maybeValue) => {
-  console.log(`📝 Object change - Field: ${field}, KeyOrValue:`, keyOrValue, "MaybeValue:", maybeValue);
-  
+  const handleArrayChange = (field, value) => {
+    // console.log(`🔄 Updating ${field}:`, value);
 
-  
-  setFormData((prev) => {
-    // Case 1: Replace whole object (FranchiseDetailsEdit passes object for franchiseTags)
-    if (field === "franchiseTags" && typeof keyOrValue === "object" && maybeValue === undefined) {
-      console.log("📦 Updating entire franchiseTags object:", keyOrValue);
+    // Special handling for awards array
+    if (field === "awards") {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    } else {
+      // For all other arrays including fico
+      setFormData((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    }
+  };
+  const handleObjectChange = (field, keyOrValue, maybeValue) => {
+    // console.log(
+    //   `📝 Object change - Field: ${field}, KeyOrValue:`,
+    //   keyOrValue,
+    //   "MaybeValue:",
+    //   maybeValue
+    // );
+
+    setFormData((prev) => {
+      // Case 1: Replace whole object (FranchiseDetailsEdit passes object for franchiseTags)
+      if (
+        field === "franchiseTags" &&
+        typeof keyOrValue === "object" &&
+        maybeValue === undefined
+      ) {
+        // console.log("📦 Updating entire franchiseTags object:", keyOrValue);
+        return {
+          ...prev,
+          [field]: keyOrValue,
+        };
+      }
+
+      // Case 2: Update nested key (for other objects like brandCategories)
+      if (typeof maybeValue !== "undefined") {
+        return {
+          ...prev,
+          [field]: {
+            ...prev[field],
+            [keyOrValue]: maybeValue,
+          },
+        };
+      }
+
+      // Case 3: If only two arguments provided and second is not an object
       return {
         ...prev,
         [field]: keyOrValue,
       };
-    }
-
-    // Case 2: Update nested key (for other objects like brandCategories)
-    if (typeof maybeValue !== 'undefined') {
-      return {
-        ...prev,
-        [field]: {
-          ...prev[field],
-          [keyOrValue]: maybeValue,
-        },
-      };
-    }
-
-    // Case 3: If only two arguments provided and second is not an object
-    return {
-      ...prev,
-      [field]: keyOrValue,
-    };
-  });
-};
+    });
+  };
 
   const handleFileChange = (field, newFiles) => {
     setFiles((prev) => ({
@@ -378,7 +395,7 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
   const sendOtp = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/v1/otpverify/send-otp-email`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/otpverify/send-otp-email`,
         {
           email: formData.email,
         },
@@ -408,7 +425,7 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/v1/otpverify/verify-otp`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/otpverify/verify-otp`,
         {
           identifier: formData.email,
           otp: otp,
@@ -439,11 +456,11 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
   };
 
   const handleSave = async () => {
-  console.log("💾 Save attempted with UUID:", uuid);
-  console.log("💾 FormData being saved:", formData);
-  console.log("💾 FICO data being saved:", formData.fico);
-  console.log("💾 Franchise tags being saved:", formData.franchiseTags);
-      if (!uuid) {
+    // console.log("💾 Save attempted with UUID:", uuid);
+    // console.log("💾 FormData being saved:", formData);
+    // console.log("💾 FICO data being saved:", formData.fico);
+    // console.log("💾 Franchise tags being saved:", formData.franchiseTags);
+    if (!uuid) {
       setSaveStatus({
         loading: false,
         success: false,
@@ -452,25 +469,31 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
       return;
     }
     setSaveStatus({ loading: true, success: false, error: "" });
-     
+
     try {
       // Step 1: Update brand details and franchise details
       const formDataToSend = new FormData();
 
-   const franchiseTagsForBackend = { 
-      PrimaryClassifications: formData.franchiseTags?.PrimaryClassifications || [],
-      ProductServiceTypes: formData.franchiseTags?.ProductServiceTypes || [],
-      TargetAudience: formData.franchiseTags?.TargetAudience || [],
-      ServiceModel: formData.franchiseTags?.ServiceModel || [],
-      PricingValue: formData.franchiseTags?.PricingValue || [],
-      AmbienceExperience: formData.franchiseTags?.AmbienceExperience || [],
-      FeaturesAmenities: formData.franchiseTags?.FeaturesAmenities || [],
-      TechnologyIntegration: formData.franchiseTags?.TechnologyIntegration || [],
-      SustainabilityEthics: formData.franchiseTags?.SustainabilityEthics || [],
-      BusinessOperations: formData.franchiseTags?.BusinessOperations || [],
-    };
+      const franchiseTagsForBackend = {
+        PrimaryClassifications:
+          formData.franchiseTags?.PrimaryClassifications || [],
+        ProductServiceTypes: formData.franchiseTags?.ProductServiceTypes || [],
+        TargetAudience: formData.franchiseTags?.TargetAudience || [],
+        ServiceModel: formData.franchiseTags?.ServiceModel || [],
+        PricingValue: formData.franchiseTags?.PricingValue || [],
+        AmbienceExperience: formData.franchiseTags?.AmbienceExperience || [],
+        FeaturesAmenities: formData.franchiseTags?.FeaturesAmenities || [],
+        TechnologyIntegration:
+          formData.franchiseTags?.TechnologyIntegration || [],
+        SustainabilityEthics:
+          formData.franchiseTags?.SustainabilityEthics || [],
+        BusinessOperations: formData.franchiseTags?.BusinessOperations || [],
+      };
 
-    console.log("💾 Final franchiseTags for backend:", franchiseTagsForBackend);
+      // console.log(
+      //   "💾 Final franchiseTags for backend:",
+      //   franchiseTagsForBackend
+      // );
       // Prepare the data structure that matches the backend expectation
       const updateData = {
         brandDetails: {
@@ -537,13 +560,15 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
         "isInternationalExpansion",
         formData.isInternationalExpansion
       );
-          console.log("Saving franchiseTags:", updateData.franchiseDetails.franchiseTags);
-
+      // console.log(
+      //   "Saving franchiseTags:",
+      //   updateData.franchiseDetails.franchiseTags
+      // );
 
       // First update the brand details
-      console.log("Sending data to API:", { uuid, formDataToSend });
+      // console.log("Sending data to API:", { uuid, formDataToSend });
       const detailsResponse = await axios.patch(
-        `http://localhost:5000/api/v1/brandlisting/updateBrandListingByUUID/${uuid}`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/updateBrandListingByUUID/${uuid}`,
         formDataToSend,
         {
           headers: {
@@ -552,7 +577,7 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
           },
         }
       );
-      console.log("API Response:", detailsResponse.data);
+      // console.log("API Response:", detailsResponse.data);
 
       if (!detailsResponse.data.success) {
         throw new Error(
@@ -607,17 +632,17 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
 
       // Append awards to delete
       if (awardsToDelete.length > 0) {
-        console.log("Awards to delete ========== :", awardsToDelete);
+        // console.log("Awards to delete ========== :", awardsToDelete);
         uploadFormData.append("awardsToDelete", JSON.stringify(awardsToDelete));
         hasFilesToUpload = true;
       }
 
-      console.log("Uploading files:", uploadFormData);
+      // console.log("Uploading files:", uploadFormData);
 
       // Only make the upload request if there are files to upload or delete
       if (hasFilesToUpload) {
         const uploadResponse = await axios.patch(
-          `http://localhost:5000/api/v1/brandlisting/updateBrandImageById/${uuid}`,
+          `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/updateBrandImageById/${uuid}`,
           uploadFormData,
           {
             headers: {
@@ -635,7 +660,7 @@ console.log("🔍 PARENT - Flattened brand data:", flatData);
 
       // Refresh the data after successful update
       const refreshResponse = await getApi(
-        `http://localhost:5000/api/v1/brandlisting/getBrandById/${uuid}`
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/getBrandById/${uuid}`
       );
       const updatedBrand = refreshResponse?.data?.data;
 

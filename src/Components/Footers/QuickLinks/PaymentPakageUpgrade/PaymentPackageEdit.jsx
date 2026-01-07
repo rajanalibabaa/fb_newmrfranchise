@@ -1,43 +1,27 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  TextField,
-  Paper,
-  Divider,
-  Avatar,
-  Grid,
-  InputAdornment,
-  Badge,
-  useTheme,
-  Fade,
-  Slide,
-  Snackbar,
-  Zoom,
-  Grow,
-  Alert,
-  keyframes,
-} from "@mui/material";
-import {
-  ArrowBack,
-  CreditCard,
-  AccountBalance,
-  Payment,
-  QrCode,
-  CheckCircle,
-  Rocket,
-  Star,
-  FlashOn,
-  LocalOffer,
-} from "@mui/icons-material";
+import { useTheme, keyframes } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Divider from "@mui/material/Divider";
+import Fade from "@mui/material/Fade";
+import Slide from "@mui/material/Slide";
+import Zoom from "@mui/material/Zoom";
+import Grow from "@mui/material/Grow";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import LocalOffer from "@mui/icons-material/LocalOffer";
+import Rocket from "@mui/icons-material/Rocket";
+import Star from "@mui/icons-material/Star";
+import FlashOn from "@mui/icons-material/FlashOn";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useParams } from "react-router-dom";
 import axios from "axios";
 import { userId } from "../../../../Utils/autherId";
 
@@ -69,7 +53,7 @@ const gradientShift = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const PaymentPage = ({ selectedMembership, selectedListing,selectedPlan }) => {
+const PaymentPage = ({ selectedMembership, selectedListing, selectedPlan }) => {
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [cardDetails, setCardDetails] = useState({
     number: "",
@@ -82,23 +66,16 @@ const PaymentPage = ({ selectedMembership, selectedListing,selectedPlan }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  
-
   const theme = useTheme();
 
   const location = useLocation();
   const navigate = useNavigate();
-    const  Id  = userId
-    console.log("Brand ID for Payment:", Id);
- 
-
+  const Id = userId;
+  // console.log("Brand ID for Payment:", Id);
 
   // const { selectedPlan } = location.state || {};
 
   const membership = selectedPlan;
-
- 
-
 
   // Orange and Green color scheme
   const primaryOrange = "#FF6B35";
@@ -112,30 +89,26 @@ const PaymentPage = ({ selectedMembership, selectedListing,selectedPlan }) => {
   const darkGreen = "#388E3C";
 
   const handleBack = () => {
-
     navigate(-1);
   };
 
+  const handleSubmit = () => {
+    const PackageName = selectedMembership.packageName;
+    // console.log("Submitting Payment for Package:", PackageName);
+    // console.log("Brand ID:", Id);
 
-
-const handleSubmit = () => {
-  const PackageName = selectedMembership.packageName;
-  console.log("Submitting Payment for Package:", PackageName);
-  console.log("Brand ID:", Id);
-
-  axios.put(`http://localhost:5000/api/v1/leadPackageUpdate/${Id}`, {
-    packageName: PackageName
-  })
-  .then(res => {
-    console.log("Updated Successfully:", res.data);
-      navigate("/brandDashboard");
-  })
-  .catch(err => {
-    console.error("Update Error:", err);
-  });
-
-};
-
+    axios
+      .put(`https://mrfranchisebackend.mrfranchise.in/api/v1/leadPackageUpdate/${Id}`, {
+        packageName: PackageName,
+      })
+      .then((res) => {
+        console.info("Updated Successfully:", res.data);
+        navigate("/brandDashboard");
+      })
+      .catch((err) => {
+        console.error("Update Error:", err);
+      });
+  };
 
   // GUARD CLAUSE: Show fallback if no membership is selected
   if (!membership) {
@@ -532,69 +505,64 @@ const handleSubmit = () => {
                   >
                     ₹{totalAmount.toLocaleString()}
                   </Typography>
-                  
                 </Box>
-                 <Button
-              variant="contained"
-              sx={{
-                background:
-                  "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
-                border: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "12px",
-                color: "#FFFFFF",
-                cursor: "pointer",
-                display: "block",
-                margin: "0 auto",
-                fontFamily:
-                  '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-                fontSize: "16px",
-                fontWeight: 500,
-                lineHeight: 0,
-                outline: "transparent",
-                px: 10, // padding-left and padding-right
-                py: 3, // padding-top and padding-bottom
-                mt: 4,
-                textAlign: "center",
-                textDecoration: "none",
-                transition: "box-shadow .2s ease-in-out",
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                touchAction: "manipulation",
-                whiteSpace: "nowrap",
-                "&:not([disabled]):focus": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
-                },
-                "&:not([disabled]):hover": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
-                },
-              }}
-              onClick={handleSubmit}
-                disabled={isSubmitting}
-                startIcon={
-                  isSubmitting ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : submitSuccess ? (
-                    <CheckCircleIcon />
-                  ) : null
-                }
-           
-            >
-                 {isSubmitting
-                  ? "paying..."
-                  : submitSuccess
-                  ? "Payment Successful"
-                  : "Confirm and Pay"}
-            </Button>
-
+                <Button
+                  variant="contained"
+                  sx={{
+                    background:
+                      "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
+                    border: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    display: "block",
+                    margin: "0 auto",
+                    fontFamily:
+                      '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    lineHeight: 0,
+                    outline: "transparent",
+                    px: 10, // padding-left and padding-right
+                    py: 3, // padding-top and padding-bottom
+                    mt: 4,
+                    textAlign: "center",
+                    textDecoration: "none",
+                    transition: "box-shadow .2s ease-in-out",
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    touchAction: "manipulation",
+                    whiteSpace: "nowrap",
+                    "&:not([disabled]):focus": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
+                    },
+                    "&:not([disabled]):hover": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
+                    },
+                  }}
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  startIcon={
+                    isSubmitting ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : submitSuccess ? (
+                      <CheckCircleIcon />
+                    ) : null
+                  }
+                >
+                  {isSubmitting
+                    ? "paying..."
+                    : submitSuccess
+                    ? "Payment Successful"
+                    : "Confirm and Pay"}
+                </Button>
               </Paper>
-              
             </Grow>
 
-           
             <Zoom in={true} timeout={1200} mt={10}>
               <Button
                 fullWidth
@@ -831,20 +799,17 @@ const handleSubmit = () => {
         )}
       </Box>
 
-           <Snackbar
-            
-                autoHideDuration={6000}
-     
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-              >
-                <Alert
-                //   severity={snackbar.severity}
-                  sx={{ width: "100%" }}
-                >
-                  {/* {snackbar.message} */}
-                </Alert>
-              </Snackbar>
-
+      <Snackbar
+        autoHideDuration={6000}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          //   severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {/* {snackbar.message} */}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

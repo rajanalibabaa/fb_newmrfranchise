@@ -127,7 +127,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
     p: 2,
     position: "sticky",
     top: 0,
-    bgcolor: "#eaf6df",
+    bgcolor: "#7cd13b",
     zIndex: 2,
     borderBottom: "1px solid #e0e0e0",
     display: "flex",
@@ -135,7 +135,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
     justifyContent: "center", // horizontal center
   }}
 >
-  <Place sx={{ mr: 1, color: "#ff9800" }} />
+  <Place sx={{ mr: 1, color: "#ffffffff" }} />
   States
 </Typography>
 
@@ -271,7 +271,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                   p: 2,
                   position: "sticky",
                   top: 0,
-                  bgcolor: "#eedbbcff",
+                  bgcolor: "#ff9800",
                   zIndex: 2,
                   borderBottom: "1px solid #e0e0e0",
                   display: "flex",
@@ -279,7 +279,7 @@ const getCitiesOrDistrict = (stateIndex, districtIndex) => {
                   justifyContent: "center",
                 }}
               >
-                <Map sx={{ mr: 1, color: "#4caf50" }} />
+                <Map sx={{ mr: 1, color: "#ffffffff" }} />
                 Cities
                 {isMobile && expandedState !== null && (
                   <IconButton

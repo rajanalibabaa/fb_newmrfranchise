@@ -1,6 +1,17 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { Box, Typography, Avatar, IconButton, Divider, CircularProgress, LinearProgress, Pagination, Grid } from "@mui/material";
-import { Business, Favorite, AssignmentTurnedIn, Bookmark, Close } from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Divider from "@mui/material/Divider";
+import CircularProgress from "@mui/material/CircularProgress";
+
+import Business from "@mui/icons-material/Business";
+import Favorite from "@mui/icons-material/Favorite";
+import AssignmentTurnedIn from "@mui/icons-material/AssignmentTurnedIn";
+import Bookmark from "@mui/icons-material/Bookmark";
+import Close from "@mui/icons-material/Close";
+
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -16,14 +27,13 @@ import ViewedBrands from "./DashBoardFunctions/ViewedBrands";
 import LikedTab from "./DashBoardFunctions/LikedTab";
 import AppliedTab from "./DashBoardFunctions/AppliedTab";
 import ShortlistedTab from "./DashBoardFunctions/ShortlistedTab";
-import { loginSuccess } from "../../Redux/Slices/navbarSlice";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [appliedBrands, setAppliedBrands] = useState([]);
-  console.log("Applied brands data view",appliedBrands);
+  // console.log("Applied brands data view",appliedBrands);
   
   const [likedStates, setLikedStates] = useState({});
   const [shortlistedStates, setShortlistedStates] = useState({});
@@ -100,8 +110,8 @@ const Dashboard = () => {
       dispatch(fetchViewBrandsById({ userId: investorUUID, page: 1, limit: 10 })),
     ]);
 
-    console.log("📌 Applied Response:", appliedRes.data);
-    console.log("📌 User Response:", userRes.data);
+    // console.log("📌 Applied Response:", appliedRes.data);
+    // console.log("📌 User Response:", userRes.data);
 
 const allDocs = appliedRes.data?.data?.results?.flatMap(result => result.data) || [];
     // Enhance applied brands

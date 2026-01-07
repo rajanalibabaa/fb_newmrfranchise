@@ -7,13 +7,14 @@ import React, {
   useLayoutEffect,
 } from "react";
 import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
+ 
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import ArrowRight from "@mui/icons-material/ArrowRight";
@@ -196,7 +197,7 @@ useEffect(() => {
       <Box
         ref={containerRef}
         sx={{
-          py: isMobile ? 1 : 2,
+          py: isMobile ? 1 : 0,
           px: isMobile ? 0 : 2,
           maxWidth: isMobile ? "100%" : 1400,
           mx: "auto",
@@ -210,6 +211,10 @@ useEffect(() => {
             alignItems: "center",
             mb: 1,
             px: isMobile ? 2 : 0,
+            gap: 2,
+            //  backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
           }}
         >
           <Typography
@@ -218,6 +223,7 @@ useEffect(() => {
             sx={{
               color: "#f57a00",
               mb: 1,
+              
               textAlign: "left",
               position: "relative",
               "&:after": {

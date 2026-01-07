@@ -16,11 +16,7 @@ import BrandCategroyViewPage from './Pages/AllCategoryPage/BrandCategroyViewPage
 import { autoLogOut } from './Api/autologout.jsx';
 import BrandActionManagement from './Components/BrandProfile_Component/BrandRequestHandle/BrandActionManagement.jsx';
 import MembershipPackagesEdit from './Components/Footers/QuickLinks/PaymentPakageUpgrade/MembershipPackagesEdit.jsx';
-// Lazy-loaded components with prefetching
-// const  = lazy(() => import(/* webpackPrefetch: true */ ));
-// const  = lazy(() => import(/* webpackPrefetch: true */ ''));
 
-// Authentication
 const InvestorRegister = lazy(() => import('./Pages/Registration/InvestorsRegister'));
 const LoginPage = lazy(() => import('./Pages/LoginPage/LoginPage'));
 const RegisterHandleUser = lazy(() => import('./Pages/Registration/RegisterHandlePage'));
@@ -63,6 +59,7 @@ const AboutUs = lazy(() => import('./Components/Footers/HelpAndSupport/AboutUs')
 const ContactUs = lazy(() => import('./Components/Footers/HelpAndSupport/ContactUs'));
 const FAQs = lazy(() => import('./Components/Footers/HelpAndSupport/FAQs'));
 const Help = lazy(() => import('./Components/Footers/HelpAndSupport/Help'));
+const Contactus = lazy(() => import('./Components/Footers/HelpAndSupport/ContactUs'));
 const PrivacyPolicy = lazy(() => import('./Components/Footers/HelpAndSupport/PrivacyPolicy'));
 const TermsAndConditions = lazy(() => import('./Components/Footers/HelpAndSupport/TermsAndConditions'));
 const AdvertiseWithUs = lazy(() => import('./Components/Footers/QuickLinks/AdvertiseWithUs'));
@@ -193,7 +190,7 @@ const App = () => {
 
               {/* Footer Routes */}
               <Route path="/aboutus" element={<AboutUs />} />
-              <Route path="/contactus" element={<ContactUs />} />
+              <Route path="/Contactus" element={<ContactUs />} />
               <Route path="/faq" element={<FAQs />} />
               <Route path="/help" element={<Help />} />
               <Route path="/privacypolicy" element={<PrivacyPolicy />} />

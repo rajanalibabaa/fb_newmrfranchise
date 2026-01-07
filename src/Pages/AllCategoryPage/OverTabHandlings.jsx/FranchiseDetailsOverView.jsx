@@ -139,8 +139,8 @@ const visibleColumns = columns.filter(col =>
 
   return (
     <Box sx={{ mb: 2 }}>
-       {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#eedbbcff',padding:'10px',borderRadius:'5px' }}>
-       Franchise Details :
+       {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#ffffffff',padding:'10px',borderRadius:'5px' }}>
+       Franchise Overview Details :
       </Typography>  */}
       {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 1.5, color: "#7ad03a" }}>
         Franchise Details
@@ -160,12 +160,12 @@ const visibleColumns = columns.filter(col =>
     cursor: "grab",                   // show grab cursor
     "&:active": { cursor: "grabbing" },
     "&::-webkit-scrollbar": {
-      height: "4px",
+      height: "5px",
       backgroundColor: "#ffffffff",
       borderRadius: "7px",
     },
     "&::-webkit-scrollbar-thumb": {
-      backgroundColor: "#7ad03a",
+      backgroundColor: "#7cd13b",
 
       borderRadius: "7px",
     },
@@ -218,7 +218,7 @@ const visibleColumns = columns.filter(col =>
                   key={col.key}
                   align="center"
                   sx={{
-                    backgroundColor: "#eaf6df",
+                    backgroundColor: "#7cd13b",
                     color: "black",
                     fontWeight: 700,
                     fontSize: "0.8rem",
@@ -250,7 +250,8 @@ const visibleColumns = columns.filter(col =>
               minWidth: j === 0 ? "180px" : "170px",
               maxWidth: "200px",
               wordBreak: "break-word",
-              backgroundColor: "#eedbbcff",
+              // backgroundColor: "#eedbbcff",
+              backgroundColor:'#ffffffff',
               fontWeight:
                 (col.key === "roi" && row.roi !== "N/A") ||
                 (col.key === "margin" && row.margin !== "N/A")

@@ -1,21 +1,19 @@
 // components/FilterDialog.js
 import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-  Box,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { Close } from "@mui/icons-material";
+
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import IconButton from "@mui/material/IconButton";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import { useMediaQuery, useTheme } from "@mui/material";
+import Close from "@mui/icons-material/Close";
 
 const colors = {
   cardBackground: "#ffffff",
@@ -29,29 +27,21 @@ const colors = {
 const FilterDialog = ({
   open,
   onClose,
-  investmentFilter,
-  setInvestmentFilter,
-  categoryFilter,
-  setCategoryFilter,
-  locationFilter,
-  setLocationFilter,
+
   dateFilter,
   setDateFilter,
-  uniqueInvestmentRanges,
-  uniqueCategories,
-  uniqueLocations,
+
   dateFilters,
   onReset,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      fullWidth 
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullWidth
       maxWidth="xs"
       fullScreen={isMobile}
       PaperProps={{
@@ -59,7 +49,7 @@ const FilterDialog = ({
           borderRadius: isMobile ? 0 : 2,
           minHeight: isMobile ? "100vh" : "auto",
           maxHeight: isMobile ? "100vh" : "80vh",
-        }
+        },
       }}
     >
       {/* Header */}
@@ -74,9 +64,9 @@ const FilterDialog = ({
           backgroundColor: colors.cardBackground,
         }}
       >
-        <DialogTitle 
-          sx={{ 
-            color: colors.textPrimary, 
+        <DialogTitle
+          sx={{
+            color: colors.textPrimary,
             backgroundColor: colors.cardBackground,
             p: 0,
             fontSize: isMobile ? "1.25rem" : "1.5rem",
@@ -87,7 +77,7 @@ const FilterDialog = ({
         </DialogTitle>
         <IconButton
           onClick={onClose}
-          sx={{ 
+          sx={{
             color: colors.textSecondary,
             p: isMobile ? 1 : 1.5,
           }}
@@ -98,16 +88,22 @@ const FilterDialog = ({
       </Box>
 
       {/* Content */}
-      <DialogContent 
-        sx={{ 
+      <DialogContent
+        sx={{
           backgroundColor: colors.cardBackground,
           p: isMobile ? 2 : 3,
-          '&:first-of-type': {
+          "&:first-of-type": {
             pt: isMobile ? 2 : 3,
-          }
+          },
         }}
       >
-        <Box sx={{ display: "flex", flexDirection: "column", gap: isMobile ? 2 : 3 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: isMobile ? 2 : 3,
+          }}
+        >
           {/* Investment Range Filter - Commented but kept for future use */}
           {/* <FormControl fullWidth size={isMobile ? "small" : "medium"}>
             <InputLabel 
@@ -197,8 +193,8 @@ const FilterDialog = ({
 
           {/* Date Filter - Active */}
           <FormControl fullWidth size={isMobile ? "small" : "medium"}>
-            <InputLabel 
-              sx={{ 
+            <InputLabel
+              sx={{
                 color: colors.textSecondary,
                 fontSize: isMobile ? "0.875rem" : "1rem",
               }}
@@ -210,14 +206,20 @@ const FilterDialog = ({
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
               sx={{
-                "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.divider },
-                "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.accent },
-                "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: colors.accent },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.divider,
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.accent,
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: colors.accent,
+                },
               }}
             >
               {dateFilters.map((option) => (
-                <MenuItem 
-                  key={option.value} 
+                <MenuItem
+                  key={option.value}
                   value={option.value}
                   sx={{
                     fontSize: isMobile ? "0.875rem" : "1rem",
@@ -233,8 +235,8 @@ const FilterDialog = ({
       </DialogContent>
 
       {/* Footer Actions */}
-      <DialogActions 
-        sx={{ 
+      <DialogActions
+        sx={{
           backgroundColor: colors.cardBackground,
           p: isMobile ? 2 : 3,
           pt: isMobile ? 1 : 2,
@@ -243,9 +245,9 @@ const FilterDialog = ({
           flexDirection: isMobile ? "column" : "row",
         }}
       >
-        <Button 
-          onClick={onReset} 
-          sx={{ 
+        <Button
+          onClick={onReset}
+          sx={{
             color: colors.textSecondary,
             fontSize: isMobile ? "0.875rem" : "1rem",
             py: isMobile ? 1 : 1.25,
@@ -267,7 +269,7 @@ const FilterDialog = ({
             px: isMobile ? 3 : 4,
             width: isMobile ? "100%" : "auto",
             order: isMobile ? 1 : 2,
-            "&:hover": { 
+            "&:hover": {
               backgroundColor: colors.secondary,
               transform: isMobile ? "none" : "translateY(-1px)",
             },

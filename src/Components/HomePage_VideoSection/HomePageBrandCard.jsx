@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  IconButton,
-  Chip,
-  Divider,
-  Stack,
-  Tooltip,
-} from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+
 import { motion } from "framer-motion";
 import Favorite from "@mui/icons-material/Favorite";
 import Business from "@mui/icons-material/Business";
@@ -33,7 +33,7 @@ import {
   addSortlist,
   removeSortList,
   toggleSortlistBrandLike,
-  fetchShortListedById
+  fetchShortListedById,
 } from "../../Redux/Slices/shortlistslice.jsx";
 import {
   toggleBrandLike,
@@ -228,7 +228,6 @@ const HomePageBrandCard = React.memo(
           }}
         >
           <VideoPlayer
-          
             id={brand.uuid}
             videoUrl={brand.franchiseVideos || brand.logo}
             poster={brand.logo}
@@ -292,12 +291,12 @@ const HomePageBrandCard = React.memo(
                   disabled={likeProcessing[brandId]}
                   whileTap={{ scale: 0.8 }}
                   whileHover={{ scale: 1.2 }}
-                  animate={brand.isLiked ? { scale: [1, 1.4, 1] } : { scale: 1 }}
+                  animate={
+                    brand.isLiked ? { scale: [1, 1.4, 1] } : { scale: 1 }
+                  }
                   transition={{ duration: 0.3 }}
                   sx={{
-                    color: brand?.isLiked
-                      ? "#f44336"
-                      : "rgba(0, 0, 0, 0.23)",
+                    color: brand?.isLiked ? "#f44336" : "rgba(0, 0, 0, 0.23)",
                   }}
                 >
                   {likeProcessing[brandId] ? (

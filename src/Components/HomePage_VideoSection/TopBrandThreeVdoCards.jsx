@@ -1,19 +1,21 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  Avatar,
-  IconButton,
   useMediaQuery,
-  Chip,
-  Tooltip,
-  Stack,
-  CircularProgress,
+  
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CircularProgress from "@mui/material/CircularProgress";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import IconButton from '@mui/material/IconButton'
+import Tooltip from "@mui/material/Tooltip";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
@@ -226,7 +228,7 @@ function TopBrandVdoCards() {
                     setInitialAutoplayDone(true);
                   })
                   .catch(err => {
-                    console.log("Autoplay completely prevented:", err);
+                    console.error("Autoplay completely prevented:", err);
                   });
               });
           }
@@ -493,6 +495,9 @@ const triggerCelebration = (e, color = "#f44336") => {
           fontWeight="bold"
           sx={{
             color: theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+            // backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
             textAlign: "left",
             position: "relative",
             "&:after": {
@@ -1030,7 +1035,7 @@ const triggerCelebration = (e, color = "#f44336") => {
             flex: isMobile ? "1 1 auto" : "0 0 30%",
             display: "flex",
             flexDirection: "column",
-            gap: isMobile ? 3 : isTablet ? 3 : 4,
+            gap: isMobile ? 3 : isTablet ? 3 : 3.5,
             minWidth: isMobile ? "100%" : "32%",
           }}
         >

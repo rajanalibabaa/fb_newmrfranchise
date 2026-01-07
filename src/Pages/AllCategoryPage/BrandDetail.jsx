@@ -142,7 +142,7 @@ const BrandDetails = ({ brandData }) => {
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [userData, setUserData] = useState(null);
-  console.log("User Data direct:", userData);
+  // console.log("User Data direct:", userData);
   const [anchorEl, setAnchorEl] = useState(null);
   const [locationData, setLocationData] = useState({
     states: [],
@@ -315,7 +315,7 @@ const handleSubmit = useCallback(
  
       // Make API request
       const response = await axios.post(
-        "http://localhost:5000/api/v1/instantapply/postApplication",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/instantapply/postApplication",
         payload,
         {
           headers: {
@@ -396,7 +396,7 @@ const handleSubmit = useCallback(
     if (!investorUUID || !AccessToken) return;
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/v1/investor/getInvestorByUUID/${investorUUID}`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/investor/getInvestorByUUID/${investorUUID}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -583,7 +583,7 @@ const handleSubmit = useCallback(
             getOutletRange={getOutletRange}
           />
 
-        <Divider sx={{ my: 1 }} />
+        <Divider sx={{ my: 1, }} />
 
           <MediaSection
             allVideos={allVideos}
@@ -629,7 +629,7 @@ const handleSubmit = useCallback(
       </Suspense>
 
       {/* EXPANSION LOCATIONS LAZY ON SCROLL */}
-      <Box
+      {/* <Box
         sx={{
           width: "90%",
           maxWidth: 1200,
@@ -652,7 +652,7 @@ const handleSubmit = useCallback(
           isSmallDesktop={isSmallDesktop}
           isLargeDesktop={isLargeDesktop}
         />
-      </Box>
+      </Box> */}
       <Disclaimer isMobile={isMobile} />
 
       <Suspense fallback={null}>

@@ -40,7 +40,7 @@ import {
   setPage,
 } from "../../Redux/Slices/FilterBrandSlice.jsx";
 import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData.jsx";
-
+import img1 from '../../assets/Images/bg21.jpeg'
 // Memoized components
 const BrandCardSkeleton = React.memo(() => (
   <Box sx={{ height: 350, bgcolor: "rgba(0, 0, 0, 0.04)", borderRadius: 2 }} />
@@ -249,7 +249,17 @@ const toggleBrandComparison = useCallback((brand) => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ mt: 0, mb: 6 ,background:'#000000ff'}}>
+    <Container maxWidth="xl" sx={{ mt: 0, mb: 0 ,
+  
+                    backgroundImage: `url(${img1})`,
+                   backgroundSize: "400px auto",        // fill entire box
+                   // backgroundPosition: "center",   // center image
+                   backgroundRepeat: "repeat",
+                   minHeight: "87vh",             // full screen height
+                   width: "100%",
+                
+  
+  }}>
 
 
       {/* Comparison Button */}
@@ -391,29 +401,30 @@ const toggleBrandComparison = useCallback((brand) => {
             </Box>
           ) : (
             <>
-              <Typography
-                sx={{ ml: 2 }}
+              {/* <Typography
+                sx={{ ml: 2, }}
                 variant={isMobile ? "h5" : "h4"}
                 gutterBottom
-                color="#f57a00"
+                color="#ffffffff"
+                
               >
                 Food & Beverage Brands
-              </Typography>
-              <Typography sx={{ ml: 2, mb: 0 ,color: "#f57a00"}} variant="body2" gutterBottom>
+              </Typography> */}
+              {/* <Typography sx={{ ml: 2, mb: 0 ,color: "#ffffffff"}} variant="body2" gutterBottom>
                 Showing {brands.length} of {pagination.total} brands
-              </Typography>
+              </Typography> */}
 
               <Box
                 sx={{
                   display: "grid",
                   gridTemplateColumns: {
-                    xs: "repeat(1, 1fr)", // Mobile: 1 column
-                    sm: "repeat(1, 1fr)", // Small devices: 2 columns
-                    md: "repeat(3, 1fr)", // Tablets: 3 columns
-                    lg: "repeat(3, 1fr)", // Desktop: 4 columns
-                    xl: "repeat(4, 1fr)", // Extra large screens: 5 columns
+                    xs: "repeat(1, 1fr)", 
+                    sm: "repeat(1, 1fr)",
+                    md: "repeat(3, 1fr)", 
+                    lg: "repeat(3, 1fr)", 
+                    xl: "repeat(4, 1fr)", 
                   },
-                  gap: 1, // theme spacing (8px * 2 = 16px)
+                  gap: 0, 
                 }}
               >
                 {brands.map((brand) => (
@@ -439,7 +450,7 @@ const toggleBrandComparison = useCallback((brand) => {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <Box display="flex" justifyContent="center" mt={4}>
+                <Box display="flex" justifyContent="center" mt={4} mb={2} backgroundColor="white" p={1}>
                   <Pagination
                     count={pagination.totalPages}
                     page={pagination.currentPage}

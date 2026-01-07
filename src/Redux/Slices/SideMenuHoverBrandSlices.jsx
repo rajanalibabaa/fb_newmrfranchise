@@ -21,7 +21,7 @@ export const fetchBrandsBySubCategory = createAsyncThunk(
       }
 
       const response = await axios.get(
-        `http://localhost:5000/api/v1/brandlisting/getBrandsByChildCategory`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/getBrandsByChildCategory`,
         {
           params: { subCategory, id, page, limit },
         }
@@ -117,7 +117,7 @@ const initialState = {
   },
   prefetched: [],
 };
-console.log("Initial State:", initialState);
+// console.log("Initial State:", initialState);
 
 const brandCategorySlice = createSlice({
   name: "brandCategory",

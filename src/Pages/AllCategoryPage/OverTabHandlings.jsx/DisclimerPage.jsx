@@ -10,7 +10,7 @@ const Disclaimer = ({ isMobile }) => {
         ml: { xs: 2, md: 10.5 },
         mr: { xs: 2, md: 10.5 },
         mb: 4,
-        mt: 4,
+        mt: 0,
         p: 2,
         borderRadius: "12px",
         bgcolor: "rgba(255, 255, 255, 1)",

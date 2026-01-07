@@ -22,7 +22,7 @@ import SEO from "../../Components/SEO/Seo.jsx";
 import HomeBanner from "../../assets/Images/HomeBanner.avif";
 import CompareButton from "./CompareButtonsCompenents.jsx";
 import BrandComparison from "../AllCategoryPage/BrandCompariosn.jsx";
-
+import img1 from '../../assets/Images/bg21.jpeg'
 // --- ErrorBoundary ---
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };
@@ -383,7 +383,7 @@ const useDynamicComponents = () => {
 
     entries.forEach(({ key, file }) => {
       const path = `../../Components/HomePage_VideoSection/${file}`;
-      console.log("Checking for module:", path);
+      // console.log("Checking for module:", path);
 
       // Only if the module exists, create a lazy component
       if (path in modules) {
@@ -417,7 +417,7 @@ const LazySection = ({
     }
   }, [inView, Component]);
   return (
-    <Box ref={ref} py={8} bgcolor={background}>
+    <Box ref={ref} py={0} bgcolor={background}>
       <Container maxWidth="xl">
         {inView ? (
           <ComponentLoader
@@ -427,7 +427,7 @@ const LazySection = ({
             {...props}
           />
         ) : (
-          <Box minHeight={200} />
+          <Box minHeight={100} />
         )}
       </Container>
     </Box>
@@ -698,7 +698,14 @@ const HomeBannerSec = () => {
             componentKey={section.component}
             dynamicComponents={dynamicComponents}
             // background={section.background || "#d5e7ddac"}
-            background={'black'}
+            background={{ 
+                 backgroundImage: `url(${img1})`,
+                backgroundSize: "400px auto",        // fill entire box
+                // backgroundPosition: "center",   // center image
+                backgroundRepeat: "repeat",
+                minHeight: "87vh",             // full screen height
+                width: "100%",
+              }}
             isMobile={isMobile}
           />
         ))}

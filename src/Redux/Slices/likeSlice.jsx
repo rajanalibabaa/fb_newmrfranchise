@@ -55,7 +55,7 @@ export const fetchLikedBrandsById = createAsyncThunk(
     
 
       const query = { page, limit, main: "Food & Beverages" };
-      const baseUrl = "http://localhost:5000/api/v1/like";
+      const baseUrl = "https://mrfranchisebackend.mrfranchise.in/api/v1/like";
 
       const queryString = new URLSearchParams(query).toString();
 
@@ -65,7 +65,7 @@ export const fetchLikedBrandsById = createAsyncThunk(
 
       const response = await getApi(url, token);
 
-      console.log("...", response.data?.data)
+      // console.log("...", response.data?.data)
 
       const responseData = response.data?.data;
       if (!responseData) throw new Error("No data received");

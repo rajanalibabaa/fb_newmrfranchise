@@ -1,27 +1,22 @@
 import React from "react";
-import { Link as RouterLink } from 'react-router-dom';
-import {
-  Box,
-  Typography,
-  Grid,
-  Container,
-  Card,
-  Link,         
-  CardContent,
-  Button,
-  useTheme,
-  useMediaQuery
-} from "@mui/material";
-import BusinessIcon from '@mui/icons-material/Business';
-import  ExpandBrand from "../../../assets/Images/ExpandBusiness.jpg";
-import GroupsIcon from '@mui/icons-material/Groups';
-import BuildCircleIcon from '@mui/icons-material/BuildCircle';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import PhoneIcon from '@mui/icons-material/Phone';
-import EmailIcon from '@mui/icons-material/Email';
-import Navbar from '../../Navbar/NavBar';
-import Footer from '../Footer';
+import { Link as RouterLink } from "react-router-dom";
+import { useTheme, useMediaQuery } from "@mui/material";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 
+import BusinessIcon from "@mui/icons-material/Business";
+import ExpandBrand from "../../../assets/Images/ExpandBusiness.jpg";
+import GroupsIcon from "@mui/icons-material/Groups";
+import PhoneIcon from "@mui/icons-material/Phone";
+import EmailIcon from "@mui/icons-material/Email";
+import Navbar from "../../Navbar/NavBar";
+import Footer from "../Footer";
 
 // Inject custom styles for the page
 const customStyle = `
@@ -91,8 +86,7 @@ const customStyle = `
 }
 `;
 
-
-if (!document.head.querySelector('style[data-expand-custom]')) {
+if (!document.head.querySelector("style[data-expand-custom]")) {
   const styleTag = document.createElement("style");
   styleTag.setAttribute("data-expand-custom", "true");
   styleTag.innerText = customStyle;
@@ -100,11 +94,24 @@ if (!document.head.querySelector('style[data-expand-custom]')) {
 }
 
 // Section component with ul/li, no map
-const Section = ({ title, icon, items, image, description }) => (
+const Section = ({ title, icon, items, image, description }) =>
   image ? (
-    <Grid container spacing={3} alignItems="center" className="section-box" sx={{ mb: 2 }}>
-      <Grid  xs={12} md={5}>
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+    <Grid
+      container
+      spacing={3}
+      alignItems="center"
+      className="section-box"
+      sx={{ mb: 2 }}
+    >
+      <Grid xs={12} md={5}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
           <img
             src={image}
             loading="lazy"
@@ -112,18 +119,18 @@ const Section = ({ title, icon, items, image, description }) => (
             style={{
               maxWidth: "100%",
               maxHeight: 300,
-              mr:3,
-             marginLeft:16,
+              mr: 3,
+              marginLeft: 16,
               borderRadius: 16,
               boxShadow: "0 4px 24px #ffe08255",
               objectFit: "contain",
-              background: "#fffbe7"
+              background: "#fffbe7",
             }}
           />
         </Box>
       </Grid>
-      <Grid  xs={12} md={7} >
-        <span className="section-title" >
+      <Grid xs={12} md={7}>
+        <span className="section-title">
           {icon}
           <Box ml={1}>{title}</Box>
         </span>
@@ -156,17 +163,16 @@ const Section = ({ title, icon, items, image, description }) => (
         )}
       </ul>
     </Box>
-  )
-);
+  );
 
 const ExpandYourBrand = () => {
-   const theme = useTheme();
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   // const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
   return (
     <Box className="expand-bg">
-      <Box sx={{ position: 'fixed', top: 0, width: '100%', zIndex: 10 }}>
+      <Box sx={{ position: "fixed", top: 0, width: "100%", zIndex: 10 }}>
         <Navbar />
       </Box>
 
@@ -181,7 +187,7 @@ const ExpandYourBrand = () => {
             borderRadius: 4,
             px: { xs: 2, md: 6 },
             py: { xs: 3, md: 4 },
-            mt: {xs:5, sm:15, lg:8}
+            mt: { xs: 5, sm: 15, lg: 8 },
 
             // background: "rgba(255,255,255,0.98)",
             // boxShadow: "0 4px 32px #ffe08255"
@@ -201,13 +207,16 @@ const ExpandYourBrand = () => {
             gutterBottom
             sx={{ color: "#7ad03a", fontWeight: 600, letterSpacing: 0.5 }}
           >
-            Transform Your Business into a Scalable Franchise with MrFranchise.in
+            Transform Your Business into a Scalable Franchise with
+            MrFranchise.in
           </Typography>
           <Typography variant="body1" color="text.secondary" mt={2}>
-            Are you running a successful business and ready to take it to the next level?
+            Are you running a successful business and ready to take it to the
+            next level?
           </Typography>
           <Typography variant="body1" color="text.secondary" mt={1}>
-            At <Link
+            At{" "}
+            <Link
               component={RouterLink}
               to="/"
               underline="hover"
@@ -215,22 +224,27 @@ const ExpandYourBrand = () => {
               fontWeight="bold"
             >
               MrFranchise.in
-            </Link>{" "}, we specialize in helping business owners expand their brand through franchising — strategically, professionally, and profitably. Whether you own a local outlet, a regional chain, or an emerging startup, we help you structure your model, position your brand, and attract serious investors across Tamil Nadu and beyond.
+            </Link>{" "}
+            , we specialize in helping business owners expand their brand
+            through franchising — strategically, professionally, and profitably.
+            Whether you own a local outlet, a regional chain, or an emerging
+            startup, we help you structure your model, position your brand, and
+            attract serious investors across Tamil Nadu and beyond.
           </Typography>
         </Box>
 
         {/* Why Franchise */}
         <Section
-  title="Why Franchise Your Business?"
-  description="Franchising is the smartest way to grow without losing control or investing all your own capital. With the right model and strategy, you can:"
-  icon={<BusinessIcon color="primary" />}
-  items={[
-    "Multiply your presence across locations",
-    "Build brand equity and recognition",
-    "Generate recurring franchise income",
-    "Attract investor capital without dilution"
-  ]}
-/>
+          title="Why Franchise Your Business?"
+          description="Franchising is the smartest way to grow without losing control or investing all your own capital. With the right model and strategy, you can:"
+          icon={<BusinessIcon color="primary" />}
+          items={[
+            "Multiply your presence across locations",
+            "Build brand equity and recognition",
+            "Generate recurring franchise income",
+            "Attract investor capital without dilution",
+          ]}
+        />
 
         {/* Who Is This For? */}
         <Section
@@ -241,7 +255,7 @@ const ExpandYourBrand = () => {
             "Business owners ready to grow beyond one location",
             "Regional brands aiming to enter new cities or states",
             "Startups with a proven concept and scalable model",
-            "Professionals looking to replicate a niche service business"
+            "Professionals looking to replicate a niche service business",
           ]}
         />
 
@@ -255,75 +269,90 @@ const ExpandYourBrand = () => {
           sx={{
             mb: 2,
             mt: 4,
-            animation: "fadeInUp 1.2s"
-         
+            animation: "fadeInUp 1.2s",
           }}
         >
           {/* <BuildCircleIcon color="primary" sx={{ mr: 1 }} /> */}
           ⚙️ What We Do
         </Typography>
-        <Typography variant="body1" textAlign="center" color="text.secondary" mb={3} sx={{ animation: "fadeInUp 1.2s" }}>
-          As your franchise consulting partner, we provide an end-to-end solution:
+        <Typography
+          variant="body1"
+          textAlign="center"
+          color="text.secondary"
+          mb={3}
+          sx={{ animation: "fadeInUp 1.2s" }}
+        >
+          As your franchise consulting partner, we provide an end-to-end
+          solution:
         </Typography>
 
-       <Grid container spacing={2} sx={{alignItems: "center", display: "flex", justifyContent: "center"}} alignItems="stretch">
+        <Grid
+          container
+          spacing={2}
+          sx={{
+            alignItems: "center",
+            display: "flex",
+            justifyContent: "center",
+          }}
+          alignItems="stretch"
+        >
           {/* First row - 3 sections */}
-          <Grid  xs={12} sm={8} md={4} >
+          <Grid xs={12} sm={8} md={4}>
             <Section
               title="1. Strategic Franchise Planning"
               items={[
                 "Business model evaluation",
                 "Franchise structure, revenue models & roles",
                 "Territory, training, and support setup",
-                ""
+                "",
               ]}
             />
           </Grid>
-          <Grid  xs={12} md={4}>
+          <Grid xs={12} md={4}>
             <Section
               title="2. Legal & Financial Documentation"
               items={[
                 "Franchise Agreement",
                 "Franchise Disclosure Document (FDD)",
                 "SOPs and brand guidelines",
-                ""
+                "",
               ]}
             />
           </Grid>
-          <Grid  xs={12} md={4}>
+          <Grid xs={12} md={4}>
             <Section
               title="3. Franchise Kit & Investor Pitch Deck"
               items={[
                 "Visual brand pitch",
                 "Unit economics & ROI projections",
                 "Franchisee onboarding workflow",
-                ""
+                "",
               ]}
             />
           </Grid>
-          
+
           {/* Second row - 2 centered sections */}
-          <Grid  xs={12}>
+          <Grid xs={12}>
             <Grid container justifyContent="center" spacing={4}>
-              <Grid  xs={12} md={6} lg={5}>
+              <Grid xs={12} md={6} lg={5}>
                 <Section
                   title="4. Brand Promotion & Investor Outreach"
                   items={[
                     "Franchise listing on MrFranchise.in",
                     "Targeted investor lead generation",
                     "WhatsApp & CRM-integrated communications",
-                    ""
+                    "",
                   ]}
                 />
               </Grid>
-              <Grid  xs={12} md={6} lg={5}>
+              <Grid xs={12} md={6} lg={5}>
                 <Section
                   title="5. Franchisee Screening & Growth Support"
                   items={[
                     "Shortlisting qualified leads",
                     "Initial interviews & support",
                     "Regional expansion planning",
-                    ""
+                    "",
                   ]}
                 />
               </Grid>
@@ -339,7 +368,7 @@ const ExpandYourBrand = () => {
             mb: 4,
             background: "linear-gradient(90deg, #fffde7 60%, #e8f5e9 100%)",
             boxShadow: "0 2px 12px #aed58133",
-            animation: "fadeInUp 1.3s"
+            animation: "fadeInUp 1.3s",
           }}
         >
           <CardContent>
@@ -347,7 +376,10 @@ const ExpandYourBrand = () => {
               🧑‍💼 Led by Experts, Built for Scale
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              Under the leadership of <strong>Suresh Muthuvel</strong>, senior franchise consultant and CEO of MrFranchise, we’ve helped businesses across Tamil Nadu grow into successful multi-location franchises.
+              Under the leadership of <strong>Suresh Muthuvel</strong>, senior
+              franchise consultant and CEO of MrFranchise, we’ve helped
+              businesses across Tamil Nadu grow into successful multi-location
+              franchises.
             </Typography>
           </CardContent>
         </Card>
@@ -362,14 +394,15 @@ const ExpandYourBrand = () => {
             borderRadius: 4,
             boxShadow: "0 4px 24px #ffe08233",
             px: { xs: 2, md: 6 },
-            py: { xs: 3, md: 4 }
+            py: { xs: 3, md: 4 },
           }}
         >
           <Typography variant="h5" fontWeight="bold" gutterBottom>
             📞 Ready to Expand?
           </Typography>
           <Typography variant="body1" mb={3}>
-            Let our experts build your franchise model and connect you with serious investors.
+            Let our experts build your franchise model and connect you with
+            serious investors.
           </Typography>
 
           <Grid container spacing={2} justifyContent="center">
@@ -384,19 +417,20 @@ const ExpandYourBrand = () => {
                   fontWeight: 700,
                   px: 3,
                   borderRadius: 3,
-                                  background: "linear-gradient(90deg, #ff9800 60%, #ffd54f 100%)",
+                  background:
+                    "linear-gradient(90deg, #ff9800 60%, #ffd54f 100%)",
                   color: "#fff",
                   "&:hover": {
-                    background: "linear-gradient(90deg, #ffd54f 60%, #ff9800 100%)"
-
-                  }
+                    background:
+                      "linear-gradient(90deg, #ffd54f 60%, #ff9800 100%)",
+                  },
                 }}
                 href="tel:+919841323388"
               >
                 Call Now: +91 98413 23388
               </Button>
             </Grid>
-            <Grid >
+            <Grid>
               <Button
                 variant="outlined"
                 size="large"
@@ -409,15 +443,15 @@ const ExpandYourBrand = () => {
                   color: "#ff9800",
                   "&:hover": {
                     background: "#fff3e0",
-                    borderColor: "#ff9800"
-                  }
+                    borderColor: "#ff9800",
+                  },
                 }}
                 href="mailto:ceo@MrFranchise.in"
               >
                 Email: ceo@MrFranchise.in
               </Button>
             </Grid>
-            <Grid >
+            <Grid>
               <Button
                 variant="contained"
                 color="secondary"
@@ -426,11 +460,13 @@ const ExpandYourBrand = () => {
                   fontWeight: 700,
                   px: 3,
                   borderRadius: 3,
-                  background: "linear-gradient(90deg, #ff9800 60%, #ffd54f 100%)",
+                  background:
+                    "linear-gradient(90deg, #ff9800 60%, #ffd54f 100%)",
                   color: "#fff",
                   "&:hover": {
-                    background: "linear-gradient(90deg, #ffd54f 60%, #ff9800 100%)"
-                  }
+                    background:
+                      "linear-gradient(90deg, #ffd54f 60%, #ff9800 100%)",
+                  },
                 }}
                 href="/brand-listing"
               >

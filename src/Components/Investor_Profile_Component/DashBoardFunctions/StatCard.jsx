@@ -1,5 +1,8 @@
 import React, { memo } from "react";
-import { Box, Typography, Card } from "@mui/material";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/material/Card';
+
 import { useTheme, useMediaQuery } from '@mui/material';
 
 const StatCard = memo(({ icon, title, value, color, isSelected, onClick }) => {

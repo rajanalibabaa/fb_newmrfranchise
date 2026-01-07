@@ -139,19 +139,18 @@ import {
   Typography,
   Divider,
   Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 
 const FranchiseTagsOverView = ({ serviceTags }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
+
   if (!Array.isArray(serviceTags) || serviceTags.length === 0) return null;
 
-  console.log("serviceTags", serviceTags);
+  // console.log("serviceTags", serviceTags);
 
   return (
     <Box
@@ -159,31 +158,33 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
         mb: 2,
         borderRadius: 2,
         width: "100%",
+        px: { xs: 0, sm: 2, md: 0 },
       }}
     >
-      {/* <Typography
+      {/* Optional Title Section */}
+      {/* 
+      <Typography
         variant="h6"
         fontWeight={700}
-        sx={{ mb: 1.5, color: "#7ad03a" }}
+        sx={{ 
+          mb: 1.5, 
+          color: "#7ad03a",
+          fontSize: { xs: '1rem', sm: '1.25rem' }
+        }}
       >
         Tags
       </Typography>
- <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#eaf6df',padding:'10px',borderRadius:'5px' }}>
-        Tags
-      </Typography> */}
-      {/* <Divider sx={{ mb: 2, borderColor: "rgba(255, 255, 255, 1)" }} /> */}
+      */}
 
-      {/* PROPER TABLE COMPONENT */}
+      {/* Main Container */}
       <Box
-        // component={Paper}
         sx={{
-          // border: "3px solid #7ad03a",
-          borderRadius: 4,
-          overflow: "hidden",
+          borderRadius: { xs: 2, md: 4 },
           width: "100%",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ minWidth: 650 }}>
+        <Box sx={{ width: "100%" }}>
           <Box>
             {serviceTags.map((item, index) => {
               const tags = Array.isArray(item?.tags) ? item.tags : [];
@@ -194,26 +195,35 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
                   key={item._id || index}
                   sx={{
                     "&:last-child td, &:last-child th": { borderBottom: 0 },
-                    backgroundColor: index % 2 === 0 ? "#eedbbcff" : "#eaf6df",
+                    backgroundColor: "#ffffffff",
                     "&:hover": {
-                      // backgroundColor: "#f0f8ff",
                       cursor: "pointer",
                     },
+                    // Responsive flex direction
                     display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    // Add gap between items on mobile
+                    mb: { xs: 0, sm: 0 },
+                    // Add border on mobile for separation
+                    borderRadius: { xs: 0, sm: 0 },
+                    boxShadow: { 
+                      xs: "0 1px 3px rgba(0,0,0,0.08)", 
+                      sm: "none" 
+                    },
                   }}
                 >
                   {/* LEFT CELL - PARENT/CATEGORY */}
                   <Box
                     sx={{
-                      width: { xs: "35%", sm: "30%", md: "25%" },
-                      py: 2,
-                      px: 3,
-
-                      // backgroundColor: "#ffffff",
+                      // Responsive width
+                      width: { xs: "100%", sm: "35%", md: "30%", lg: "25%" },
+                      py: { xs: 1.5, sm: 2 },
+                      px: { xs: 2, sm: 3 },
+                      backgroundColor: "#ffffff",
                       border: "none",
-                      // borderLeft: "2px solid #26d023", // left accent border
-                      borderRight: "1px solid #e0e0e0",
-
+                      // Responsive border
+                      borderRight: { xs: "none", sm: "1px solid #e0e0e0" },
+                      borderBottom: { xs: "1px solid #e0e0e0", sm: "none" },
                       fontWeight: 600,
                       color: "#000000",
                       textTransform: "capitalize",
@@ -221,33 +231,25 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
                     }}
                   >
                     <Box
-                      size="small"
-                      variant="outlined"
                       sx={{
-                        height: "38px",
+                        height: { xs: "34px", sm: "38px" },
                         backgroundColor: "white",
-                        border: "none", // remove default border
-                        borderLeft: "5px solid #7ad03a", // left border only
-                        borderRadius: "4px", // box shape
+                        border: "1px solid #e0e0e0",
+                        borderLeft: { xs: "4px solid #7ad03a", sm: "5px solid #7ad03a" },
+                        borderRadius: "4px",
                         color: "#000000ff",
                         fontWeight: 500,
-                        alignContent: "center",
-                        pl: 2,
-
+                        display: "flex",
+                        alignItems: "center",
+                        pl: { xs: 1.5, sm: 2 },
+                        fontSize: { xs: "0.75rem", sm: "0.875rem", md: "1rem" },
                         "&:hover": {
                           backgroundColor: "#ffffffff",
                           color: "#000000ff",
                           borderLeft: "2px solid #5fb52a",
                         },
-
-                        "& .MuiChip-label": {
-                          padding: "0 10px",
-                          whiteSpace: "nowrap",
-                          fontSize: "0.8125rem",
-                        },
                       }}
                     >
-                      {" "}
                       {item.parent}
                     </Box>
                   </Box>
@@ -255,9 +257,10 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
                   {/* RIGHT CELL - TAGS */}
                   <Box
                     sx={{
-                      width: { xs: "65%", sm: "70%", md: "75%" },
-                      py: 2,
-                      px: 3,
+                      // Responsive width
+                      width: { xs: "100%", sm: "65%", md: "70%", lg: "75%" },
+                      py: { xs: 1.5, sm: 2 },
+                      px: { xs: 2, sm: 3 },
                       verticalAlign: "top",
                     }}
                   >
@@ -265,8 +268,10 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
                       sx={{
                         display: "flex",
                         flexWrap: "wrap",
-                        gap: 1,
+                        gap: { xs: 0.75, sm: 1 },
                         alignItems: "center",
+                        // Justify content on mobile
+                        justifyContent: { xs: "flex-start", sm: "flex-start" },
                       }}
                     >
                       {tags.map((tag, i) => (
@@ -276,24 +281,34 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
                           size="small"
                           variant="outlined"
                           sx={{
-                            height: "38px",
+                            // Responsive height
+                            height: { xs: "32px", sm: "36px", md: "38px" },
                             backgroundColor: "#ffffffff",
-                            border: "none", // remove default border
-                            borderLeft: "5px solid #ff9800", // left border only
-                            borderRadius: "4px", // box shape
+                            border: "1px solid #e0e0e0",
+                            borderLeft: { 
+                              xs: "4px solid #ff9800", 
+                              sm: "5px solid #ff9800" 
+                            },
+                            borderRadius: "4px",
                             color: "#000000ff",
                             fontWeight: 500,
-
+                            // Limit max width on mobile
+                            maxWidth: { xs: "calc(50% - 8px)", sm: "none" },
                             "&:hover": {
                               backgroundColor: "#fff3e0",
                               color: "#333333",
                               borderLeft: "2px solid #ff9800",
                             },
-
                             "& .MuiChip-label": {
-                              padding: "0 10px",
+                              padding: { xs: "0 8px", sm: "0 10px" },
                               whiteSpace: "nowrap",
-                              fontSize: "0.8125rem",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                              fontSize: { 
+                                xs: "0.7rem", 
+                                sm: "0.75rem", 
+                                md: "0.8125rem" 
+                              },
                             },
                           }}
                         />
@@ -306,8 +321,6 @@ const FranchiseTagsOverView = ({ serviceTags }) => {
           </Box>
         </Box>
       </Box>
-
-      {/* <Divider sx={{ mt: 2 }} /> */}
     </Box>
   );
 };
