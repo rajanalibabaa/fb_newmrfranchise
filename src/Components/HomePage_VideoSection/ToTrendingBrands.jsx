@@ -169,9 +169,9 @@ const navigate = useNavigate();
         sx={{
           color: "#f29624",
           mb: 3.5,
-          // backgroundColor:'white',
+          backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
             display: "inline-block",
           textAlign: "left",
           position: "relative",
@@ -181,7 +181,7 @@ const navigate = useNavigate();
             width: "80px",
             height: "4px",
             background:
-              theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+              theme.palette.mode === "dark" ? "#ffb74d" : "#31f500ff",
             mt: 1,
             borderRadius: 2,
           },
@@ -449,7 +449,7 @@ const navigate = useNavigate();
 
   {!hasMore && (
     <>
-      <Box
+      {/* <Box
         sx={{
           mb: 1,
           fontSize: 16,
@@ -458,7 +458,7 @@ const navigate = useNavigate();
         }}
       >
         Would you like to browse more brands?
-      </Box>
+      </Box> */}
 
       <Box
         sx={{

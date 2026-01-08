@@ -191,9 +191,9 @@ const ShortlistBrands = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
-          //  backgroundColor:'white',
+           backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
         }}
       >
         <Typography
@@ -201,7 +201,7 @@ const ShortlistBrands = () => {
           fontWeight="bold"
           ml={isMobile ? 2 : 0}
           sx={{
-            color: "#f57a00",
+            color: "#000000ff",
             mb: 1,
             
             textAlign: "left",
@@ -211,7 +211,7 @@ const ShortlistBrands = () => {
               display: "block",
               width: "80px",
               height: "4px",
-              background: theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+              background: theme.palette.mode === "dark" ? "#ffb74d" : "#2df500ff",
               mt: 1,
               borderRadius: 2,
             },

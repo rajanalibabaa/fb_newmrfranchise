@@ -205,16 +205,16 @@ useEffect(() => {
             mb: 1,
             px: isMobile ? 2 : 0,
             gap: 2,
-            //  backgroundColor:'white',
+             backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
           }}
         >
           <Typography
             variant={isMobile ? "body1" : "h5"}
             fontWeight="bold"
             sx={{
-              color: "#f57a00",
+              color: "#000000ff",
               mb: 1,
               
               textAlign: "left",

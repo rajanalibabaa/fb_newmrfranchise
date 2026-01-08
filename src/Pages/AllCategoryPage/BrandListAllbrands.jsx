@@ -40,7 +40,7 @@ import {
   setPage,
 } from "../../Redux/Slices/FilterBrandSlice.jsx";
 import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData.jsx";
-import img1 from '../../assets/Images/bg21.jpeg'
+import img1 from '../../assets/Images/bg25.jpeg'
 // Memoized components
 const BrandCardSkeleton = React.memo(() => (
   <Box sx={{ height: 350, bgcolor: "rgba(0, 0, 0, 0.04)", borderRadius: 2 }} />

@@ -5,7 +5,7 @@ import { CircularProgress, Box } from "@mui/material";
 import axios from "axios";
 import { userId } from "../../Utils/autherId.jsx";
 import SEO from "../../Components/SEO/Seo";
-import img1 from '../../assets/Images/bg21.jpeg'
+import img1 from '../../assets/Images/bg25.jpeg'
 const BrandDetails = lazy(() => import("./BrandDetail.jsx"));
 
 function BrandDetailsPage() {
@@ -284,7 +284,9 @@ function BrandDetailsPage() {
   sx={{
     
                     backgroundImage: `url(${img1})`,
-                   backgroundSize: "400px auto",        // fill entire box
+                   backgroundSize: "400px auto",  
+                   backgroundAttachment: "fixed",
+                   // fill entire box
                    // backgroundPosition: "center",   // center image
                    backgroundRepeat: "repeat",
                    minHeight: "87vh",             // full screen height

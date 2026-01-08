@@ -138,7 +138,7 @@ const visibleColumns = columns.filter(col =>
 
 
   return (
-    <Box sx={{ mb: 2 }}>
+    <Box sx={{ mb: 2,mt:1 }}>
        {/* <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#ffffffff',padding:'10px',borderRadius:'5px' }}>
        Franchise Overview Details :
       </Typography>  */}

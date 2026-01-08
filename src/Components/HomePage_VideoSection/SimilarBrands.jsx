@@ -211,13 +211,13 @@ const SimilarBrands = ({ brandData }) => {
       <Box
         ref={containerRef}
         sx={{
-          py: isMobile ? 1 : 1,
+          py: isMobile ? 1 : 0,
           px: isMobile ? 0 : 2,
           maxWidth: isMobile ? "100%" : 1400,
           mx: "auto",
           position: "relative",
-          borderTop: `1px solid ${theme.palette.divider}`,
-          mt: 4
+          // borderTop: `1px solid ${theme.palette.divider}`,
+          mt: 0
         }}
       >
         {removeMsg && (
@@ -245,9 +245,9 @@ const SimilarBrands = ({ brandData }) => {
             alignItems: "center",
             mb: 1,
             px: isMobile ? 2 : 0,
-            //  backgroundColor:'white',
+             backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
           }}
         >
           <Typography

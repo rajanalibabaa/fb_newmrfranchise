@@ -22,7 +22,7 @@ import SEO from "../../Components/SEO/Seo.jsx";
 import HomeBanner from "../../assets/Images/HomeBanner.avif";
 import CompareButton from "./CompareButtonsCompenents.jsx";
 import BrandComparison from "../AllCategoryPage/BrandCompariosn.jsx";
-import img1 from '../../assets/Images/bg21.jpeg'
+import img1 from '../../assets/Images/bg25.jpeg'
 // --- ErrorBoundary ---
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };
@@ -700,11 +700,13 @@ const HomeBannerSec = () => {
             // background={section.background || "#d5e7ddac"}
             background={{ 
                  backgroundImage: `url(${img1})`,
+                 backgroundAttachment: "fixed",
                 backgroundSize: "400px auto",        // fill entire box
                 // backgroundPosition: "center",   // center image
                 backgroundRepeat: "repeat",
                 minHeight: "87vh",             // full screen height
                 width: "100%",
+                
               }}
             isMobile={isMobile}
           />

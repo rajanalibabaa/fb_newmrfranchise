@@ -494,10 +494,10 @@ const triggerCelebration = (e, color = "#f44336") => {
           variant={isMobile ? "h6" : "h5"}
           fontWeight="bold"
           sx={{
-            color: theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
-            // backgroundColor:'white',
+            color: theme.palette.mode === "dark" ? "#ffb74d" : "#000000ff",
+            backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
             textAlign: "left",
             position: "relative",
             "&:after": {
@@ -505,7 +505,7 @@ const triggerCelebration = (e, color = "#f44336") => {
               display: "block",
               width: "80px",
               height: "4px",
-              background: theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+              background: theme.palette.mode === "dark" ? "#ffb74d" : "#29f500ff",
               mt: 1,
               borderRadius: 2,
             },

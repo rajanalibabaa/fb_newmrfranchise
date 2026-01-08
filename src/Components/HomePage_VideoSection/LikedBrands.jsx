@@ -198,9 +198,9 @@ const LikedBrands = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
-          //  backgroundColor:'white',
+           backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
         }}
       >
         <Typography
@@ -208,7 +208,7 @@ const LikedBrands = () => {
           fontWeight="bold"
           ml={isMobile ? 2 : 0}
           sx={{
-            color: "#f57a00",
+            color: "#000000ff",
             mb: 1,
            
             textAlign: "left",

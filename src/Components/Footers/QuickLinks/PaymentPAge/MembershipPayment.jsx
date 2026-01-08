@@ -29,7 +29,7 @@ import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import StarIcon from "@mui/icons-material/Star";
 import BoltIcon from "@mui/icons-material/Bolt";
-import img1 from "../../../../assets/Images/bg21.jpeg";
+import img1 from "../../../../assets/Images/bg25.jpeg";
 import img2 from "../../../../assets/Images/paymentcart.jpg";
 
 // import Navbar from '../../../Navbar/NavBar';

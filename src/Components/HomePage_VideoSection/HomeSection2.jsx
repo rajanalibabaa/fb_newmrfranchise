@@ -245,16 +245,16 @@ const HomeSection2 = () => {
             mb: 1,
             px: isMobile ? 2 : 0,
             gap: 2,
-            //  backgroundColor:'white',
+             backgroundColor:'white',
             p: 1.5,
-            // borderRadius: 2,
+            borderRadius: 2,
           }}
         >
           <Typography
             variant={isMobile ? "body1" : "h5"}
             fontWeight="bold"
             sx={{
-              color: "#f57a00",
+              color: "#000000ff",
               mb: 1,
              
               textAlign: "left",
@@ -265,7 +265,7 @@ const HomeSection2 = () => {
                 width: "80px",
                 height: "4px",
                 background:
-                  theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+                  theme.palette.mode === "dark" ? "#ffb74d" : "#50ee2cff",
                 mt: 1,
                 borderRadius: 2,
               },

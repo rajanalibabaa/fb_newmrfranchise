@@ -583,7 +583,7 @@ const handleSubmit = useCallback(
             getOutletRange={getOutletRange}
           />
 
-        <Divider sx={{ my: 1, }} />
+        {/* <Divider sx={{ my: 1, }} /> */}
 
           <MediaSection
             allVideos={allVideos}
@@ -594,7 +594,7 @@ const handleSubmit = useCallback(
             handleImageOpen={handleImageOpen}
           />
         {/* </Suspense> */}
-        <Divider sx={{ my: 1 }} />
+        {/* <Divider sx={{ my: 1 }} /> */}
 
         <Suspense fallback={<Box minHeight={180}><CircularProgress /></Box>}>
           <LazyOverviewTab brand={selectedBrand} />
