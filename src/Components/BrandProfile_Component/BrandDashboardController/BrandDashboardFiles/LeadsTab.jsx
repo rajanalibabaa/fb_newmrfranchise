@@ -1,30 +1,23 @@
 // components/LeadsTab.js
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  TextField,
-  InputAdornment,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Button,
-  useMediaQuery,
-  useTheme,
-  IconButton,
-} from "@mui/material";
-import {
-  Search,
-  FilterList,
-} from "@mui/icons-material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import { useMediaQuery, useTheme } from "@mui/material";
+import TableContainer from "@mui/material/TableContainer";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableBody from "@mui/material/TableBody";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+
+import FilterList from "@mui/icons-material/FilterList";
 import LeadTableRow from "./LeadTableRow";
 import FilterDialog from "./FilterDialog";
 
@@ -51,7 +44,7 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const isTablet = useMediaQuery(theme.breakpoints.between("sm", "md"));
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [investmentFilter, setInvestmentFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -61,22 +54,36 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
 
   // Get unique values for filters
   const uniqueInvestmentRanges = [
-    ...new Set((Array.isArray(Leads) ? Leads : []).map((lead) => lead.investmentRange).filter(Boolean))
+    ...new Set(
+      (Array.isArray(Leads) ? Leads : [])
+        .map((lead) => lead.investmentRange)
+        .filter(Boolean)
+    ),
   ];
 
   const uniqueCategories = [
-    ...new Set((Array.isArray(Leads) ? Leads : []).map((lead) => lead.category).filter(Boolean))
+    ...new Set(
+      (Array.isArray(Leads) ? Leads : [])
+        .map((lead) => lead.category)
+        .filter(Boolean)
+    ),
   ];
 
   const uniqueLocations = [
-    ...new Set((Array.isArray(Leads) ? Leads : []).map((lead) => lead.state).filter(Boolean))
+    ...new Set(
+      (Array.isArray(Leads) ? Leads : [])
+        .map((lead) => lead.state)
+        .filter(Boolean)
+    ),
   ];
 
   const filterByDate = (items) => {
     if (dateFilter === "all" || !items || !Array.isArray(items)) return items;
     const daysAgo = new Date();
     daysAgo.setDate(daysAgo.getDate() - parseInt(dateFilter));
-    return items.filter((item) => item.createdAt && new Date(item.createdAt) >= daysAgo);
+    return items.filter(
+      (item) => item.createdAt && new Date(item.createdAt) >= daysAgo
+    );
   };
 
   const filteredData = filterByDate(Leads).filter((lead) => {
@@ -84,15 +91,21 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
     const matchesSearch =
       !searchTerm ||
       (lead.fullName && lead.fullName.toLowerCase().includes(searchLower)) ||
-      (lead.investorMobileNumber && lead.investorMobileNumber.includes(searchTerm)) ||
+      (lead.investorMobileNumber &&
+        lead.investorMobileNumber.includes(searchTerm)) ||
       (lead.state && lead.state.toLowerCase().includes(searchLower)) ||
       (lead.district && lead.district.toLowerCase().includes(searchLower));
 
-    const matchesCategory = categoryFilter === "all" || lead.category === categoryFilter;
-    const matchesLocation = locationFilter === "all" || lead.state === locationFilter;
-    const matchesInvestment = investmentFilter === "all" || lead.investmentRange === investmentFilter;
+    const matchesCategory =
+      categoryFilter === "all" || lead.category === categoryFilter;
+    const matchesLocation =
+      locationFilter === "all" || lead.state === locationFilter;
+    const matchesInvestment =
+      investmentFilter === "all" || lead.investmentRange === investmentFilter;
 
-    return matchesSearch && matchesCategory && matchesLocation && matchesInvestment;
+    return (
+      matchesSearch && matchesCategory && matchesLocation && matchesInvestment
+    );
   });
 
   const handleResetFilters = () => {
@@ -106,17 +119,19 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
   return (
     <Box mt={4}>
       {/* Header with Total Leads on left and Filter on right in single row */}
-      <Box sx={{ 
-        display: "flex", 
-        justifyContent: "space-between", 
-        alignItems: "center", 
-        mb: 2,
-        width: "100%",
-      }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+          width: "100%",
+        }}
+      >
         {/* Left side - Total Leads */}
-        <Typography 
+        <Typography
           variant={isMobile ? "subtitle1" : "h6"}
-          sx={{ 
+          sx={{
             color: colors.textPrimary,
             fontSize: isMobile ? "1rem" : "1.25rem",
             fontWeight: 600,
@@ -126,11 +141,13 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
         </Typography>
 
         {/* Right side - Filter controls */}
-        <Box sx={{ 
-          display: "flex", 
-          alignItems: "center", 
-          gap: 1,
-        }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+          }}
+        >
           {/* Search field - shown on desktop and tablet */}
           {/* {!isMobile && (
             <TextField
@@ -158,14 +175,20 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
           {/* Date filter dropdown - shown on desktop and tablet */}
           {!isMobile && (
             <FormControl sx={{ minWidth: 200 }} size="medium">
-              <InputLabel sx={{ color: colors.textSecondary }}>Time Period</InputLabel>
+              <InputLabel sx={{ color: colors.textSecondary }}>
+                Time Period
+              </InputLabel>
               <Select
                 label="Time Period"
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
                 sx={{
-                  "& .MuiOutlinedInput-notchedOutline": { borderColor: colors.divider },
-                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: colors.accent },
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: colors.divider,
+                  },
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: colors.accent,
+                  },
                 }}
               >
                 {dateFilters.map((option) => (
@@ -180,7 +203,7 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
           {/* Filter icon button - always visible */}
           <IconButton
             onClick={() => setFilterDialogOpen(true)}
-            sx={{ 
+            sx={{
               color: colors.accent,
               border: `1px solid ${colors.divider}`,
               backgroundColor: colors.cardBackground,
@@ -251,12 +274,33 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
           <Table>
             <TableHead>
               <TableRow sx={{ backgroundColor: colors.primary }}>
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>Full Name</TableCell>
-                {!isMobile && <TableCell sx={{ color: "#fff", fontWeight: 600 }}>Mobile</TableCell>}
-                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>Location</TableCell>
-                {!isTablet && <TableCell sx={{ color: "#fff", fontWeight: 600 }}>Category</TableCell>}
-                {!isTablet && <TableCell sx={{ color: "#fff", fontWeight: 600 }}>Investment</TableCell>}
-                <TableCell align="right" sx={{ color: "#fff", fontWeight: 600 }}>Actions</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
+                  Full Name
+                </TableCell>
+                {!isMobile && (
+                  <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
+                    Mobile
+                  </TableCell>
+                )}
+                <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
+                  Location
+                </TableCell>
+                {!isTablet && (
+                  <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
+                    Category
+                  </TableCell>
+                )}
+                {!isTablet && (
+                  <TableCell sx={{ color: "#fff", fontWeight: 600 }}>
+                    Investment
+                  </TableCell>
+                )}
+                <TableCell
+                  align="right"
+                  sx={{ color: "#fff", fontWeight: 600 }}
+                >
+                  Actions
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -290,7 +334,11 @@ const LeadsTab = ({ Leads, onViewDetails }) => {
             No leads found
           </Typography>
           <Typography variant="body2" color={colors.textSecondary}>
-            {searchTerm || investmentFilter !== "all" || categoryFilter !== "all" || locationFilter !== "all" || dateFilter !== "all"
+            {searchTerm ||
+            investmentFilter !== "all" ||
+            categoryFilter !== "all" ||
+            locationFilter !== "all" ||
+            dateFilter !== "all"
               ? "Try adjusting your search or filters"
               : "No leads have been recorded yet"}
           </Typography>

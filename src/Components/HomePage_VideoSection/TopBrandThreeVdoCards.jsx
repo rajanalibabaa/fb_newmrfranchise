@@ -1,19 +1,21 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Box,
-  Typography,
-  Card,
-  CardContent,
-  Button,
-  Avatar,
-  IconButton,
   useMediaQuery,
-  Chip,
-  Tooltip,
-  Stack,
-  CircularProgress,
+  
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Card from "@mui/material/Card";
+import CircularProgress from "@mui/material/CircularProgress";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import IconButton from '@mui/material/IconButton'
+import Tooltip from "@mui/material/Tooltip";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import FavoriteBorder from "@mui/icons-material/FavoriteBorder";
@@ -226,7 +228,7 @@ function TopBrandVdoCards() {
                     setInitialAutoplayDone(true);
                   })
                   .catch(err => {
-                    console.log("Autoplay completely prevented:", err);
+                    console.error("Autoplay completely prevented:", err);
                   });
               });
           }
@@ -493,6 +495,9 @@ const triggerCelebration = (e, color = "#f44336") => {
           fontWeight="bold"
           sx={{
             color: theme.palette.mode === "dark" ? "#ffb74d" : "#f57c00",
+            // backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
             textAlign: "left",
             position: "relative",
             "&:after": {
@@ -559,7 +564,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                     height: CARD_SIZES.main.videoHeight,
                     position: "relative",
                     cursor: "pointer",
-                    backgroundColor: "#000",
+                    backgroundColor: "white",
                     overflow: "hidden",
                   }}
                   onClick={(e) => {
@@ -587,7 +592,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                         sx={{
                           textTransform: "none",
                           color:
-                            theme.palette.mode === "dark" ? "white" : "white",
+                            "black",
                           borderColor:
                             theme.palette.mode === "dark"
                               ? "#43ea5e"
@@ -637,7 +642,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                           sx={{
                             textTransform: "none",
                             color:
-                              theme.palette.mode === "dark" ? "black" : "black",
+                              "black",
                             borderColor:
                               theme.palette.mode === "dark"
                                 ? "#ffb74d"
@@ -678,7 +683,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                           sx={{
                             textTransform: "none",
                             color:
-                              theme.palette.mode === "dark" ? "white" : "white",
+                              "black",
                             borderColor:
                               theme.palette.mode === "dark"
                                 ? "#ffb74d"
@@ -880,8 +885,8 @@ const triggerCelebration = (e, color = "#f44336") => {
                               "&:hover": {
                                 background:
                                   theme.palette.mode === "dark"
-                                    ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                                    : "linear-gradient(45deg, #ff9800, #f57c00)",
+                                    ? "linear-gradient(45deg, #000000ff, #000000ff)"
+                                    : "linear-gradient(45deg, #000000ff, #000000ff)",
                                 boxShadow: theme.shadows[4],
                               },
                             }}
@@ -900,6 +905,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                             sx={{
                               px: 3,
                               fontWeight: 600,
+                              fontSize: '1rem',
                               textTransform: "none",
                               color: "#fff",
                               background:
@@ -909,8 +915,8 @@ const triggerCelebration = (e, color = "#f44336") => {
                               "&:hover": {
                                 background:
                                   theme.palette.mode === "dark"
-                                    ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                                    : "linear-gradient(45deg, #ff9800, #f57c00)",
+                                    ? "linear-gradient(45deg, #000000ffrgba(0, 0, 0, 1)4d)"
+                                    : "linear-gradient(45deg, #000000ff, #000000ff)",
                                 boxShadow: theme.shadows[4],
                               },
                             }}
@@ -1029,7 +1035,7 @@ const triggerCelebration = (e, color = "#f44336") => {
             flex: isMobile ? "1 1 auto" : "0 0 30%",
             display: "flex",
             flexDirection: "column",
-            gap: isMobile ? 3 : isTablet ? 3 : 4,
+            gap: isMobile ? 3 : isTablet ? 3 : 3.5,
             minWidth: isMobile ? "100%" : "32%",
           }}
         >
@@ -1062,7 +1068,7 @@ const triggerCelebration = (e, color = "#f44336") => {
                     height: "100%",
                     position: "relative",
                     cursor: "pointer",
-                    backgroundColor: "#000",
+                    backgroundColor: "white",
                     flexShrink: 0,
                   }}
                   // Modified: Changed onClick to use handleSideVideoClick instead of togglePlayPause
@@ -1403,15 +1409,16 @@ const triggerCelebration = (e, color = "#f44336") => {
                           ? "linear-gradient(45deg, #ffb74d, #ff9800)"
                           : "linear-gradient(45deg, #f57c00, #ff9800)",
                       textTransform: "none",
-                      fontSize: "0.75rem",
+                      fontSize: "1rem",
                       color: "#fff",
                       fontWeight: 600,
+                      
                       minWidth: 100,
                       "&:hover": {
                         background:
                           theme.palette.mode === "dark"
-                            ? "linear-gradient(45deg, #ff9800, #ffb74d)"
-                            : "linear-gradient(45deg, #ff9800, #f57c00)",
+                            ? "linear-gradient(45deg, #000000ff, #000000ff)"
+                            : "linear-gradient(45deg, #000000ff, #000000ff)",
                         boxShadow: theme.shadows[2],
                       },
                     }}

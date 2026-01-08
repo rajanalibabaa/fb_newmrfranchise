@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  CircularProgress,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField, 
-  Snackbar,
-  IconButton,
-  MenuItem,
-} from "@mui/material";
+
+import Paper from '@mui/material/Paper';
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import Typography  from "@mui/material/Typography";
+import Avatar from '@mui/material/Avatar';
+import CircularProgress from '@mui/material/CircularProgress';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogActions from '@mui/material/DialogActions';
+import Snackbar from '@mui/material/Snackbar';
+import IconButton from '@mui/material/IconButton';
+
+import MenuItem from '@mui/material/MenuItem';
+
 import CloseIcon from '@mui/icons-material/Close';
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
@@ -209,7 +210,7 @@ const ManageProfile = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://localhost:5000/api/v1/investor/getInvestorByUUID/${investorUUID}`,
+          `https://mrfranchisebackend.mrfranchise.in/api/v1/investor/getInvestorByUUID/${investorUUID}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -297,7 +298,7 @@ const ManageProfile = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/otp/existingEmailOTP",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/otp/existingEmailOTP",
         { email: investorData.email },
         { headers: { "Content-Type": "application/json" } }
       );
@@ -342,7 +343,7 @@ const ManageProfile = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/otp/verifyExistingEmailOTP",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/otp/verifyExistingEmailOTP",
         {
           email: investorData.email,
           verifyOTP: otp,
@@ -708,7 +709,7 @@ const ManageProfile = () => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/v1/investor/updateInvestor/${investorUUID}`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/investor/updateInvestor/${investorUUID}`,
         formData,
         {
           headers: {
@@ -1062,7 +1063,7 @@ const ManageProfile = () => {
       setSnackbarOpen(false);
       
       const response = await axios.patch(
-        `http://localhost:5000/api/v1/investor/deleteInvestorProfileImage/${investorUUID}`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/investor/deleteInvestorProfileImage/${investorUUID}`,
         { removeProfileImage: true },
         {
           headers: {

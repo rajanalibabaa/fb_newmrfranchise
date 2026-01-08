@@ -6,22 +6,20 @@ import React, {
   useMemo,
 } from "react";
 import {
-  Box,
-  Typography,
-  Button,
-  IconButton,
   useTheme,
   useMediaQuery,
-  CircularProgress,
-  Snackbar,
-  Alert,
 } from "@mui/material";
-import {
-  ArrowBack,
-  ArrowForward,
-  ArrowRight,
-  Close,
-} from "@mui/icons-material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import ArrowRight from "@mui/icons-material/ArrowRight";
+
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchLikedBrandsById } from "../../Redux/Slices/likeSlice.jsx";
@@ -172,7 +170,7 @@ const LikedBrands = () => {
     <Box
       ref={containerRef}
       sx={{
-        py: isMobile ? 1 : 2,
+        py: isMobile ? 1 : 0,
         px: isMobile ? 0 : 2,
         maxWidth: isMobile ? "100%" : 1400,
         mx: "auto",
@@ -200,6 +198,9 @@ const LikedBrands = () => {
           justifyContent: "space-between",
           alignItems: "center",
           mb: 1,
+          //  backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
         }}
       >
         <Typography
@@ -207,8 +208,9 @@ const LikedBrands = () => {
           fontWeight="bold"
           ml={isMobile ? 2 : 0}
           sx={{
-            color: "black",
+            color: "#f57a00",
             mb: 1,
+           
             textAlign: "left",
             position: "relative",
             "&:after": {
@@ -259,16 +261,17 @@ const LikedBrands = () => {
           disabled={!showStartShadow}
           sx={{
             position: "absolute",
-            left: isMobile ? 2 : 8,
-            top: "55%",
+            left: isMobile ? 2 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            backgroundColor: "#ff9800",
             boxShadow: 2,
-            "&:hover": { backgroundColor: "action.hover" },
+            color:"black",
+            "&:hover": { backgroundColor: "#c28223ff" },
             "&:disabled": { opacity: 0, pointerEvents: "none" },
           }}
         >
@@ -280,16 +283,17 @@ const LikedBrands = () => {
           disabled={!showEndShadow}
           sx={{
             position: "absolute",
-            right: isMobile ? 4 : 8,
-            top: "55%",
+            right: isMobile ? 4 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            backgroundColor: "#ff9800",
+            color:"black",
             boxShadow: 2,
-            "&:hover": { backgroundColor: "action.hover" },
+            "&:hover": { backgroundColor: "#c28223ff" },
             "&:disabled": { opacity: 0, pointerEvents: "none" },
           }}
         >

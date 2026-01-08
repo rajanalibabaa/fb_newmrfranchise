@@ -1,18 +1,24 @@
 import React from "react";
-import { Box, Container, Typography, Divider, Link,useMediaQuery, useTheme } from "@mui/material";
+import { useMediaQuery, useTheme } from "@mui/material";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Link from "@mui/material/Link";
+
 import { Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "../../Navbar/NavBar";
 import Footer from "../Footer";
-import { Email, Phone } from '@mui/icons-material';
+import Email from "@mui/icons-material/Email";
+import Phone from "@mui/icons-material/Phone";
 
 const FONT_FAMILY = "'Poppins', 'Roboto', 'Arial', sans-serif";
-
 
 // Animation variants for sections
 const sectionVariants = {
   hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
 const Section = ({ title, children }) => (
@@ -28,12 +34,12 @@ const Section = ({ title, children }) => (
         pl: { xs: 2, md: 4 },
         py: 2,
         mb: 3,
-        borderLeft: '5px solid #ffba00',
-        background: 'transparent',
+        borderLeft: "5px solid #ffba00",
+        background: "transparent",
         fontFamily: FONT_FAMILY,
         transition: "border-color 0.3s",
-        '&:hover': {
-          borderLeft: '7px solid #ff9800',
+        "&:hover": {
+          borderLeft: "7px solid #ff9800",
         },
       }}
     >
@@ -52,7 +58,11 @@ const Section = ({ title, children }) => (
           {title}
         </Typography>
       )}
-      <Typography variant="body1" color="#8e8e8e" sx={{ fontFamily: FONT_FAMILY }}>
+      <Typography
+        variant="body1"
+        color="#8e8e8e"
+        sx={{ fontFamily: FONT_FAMILY }}
+      >
         {children}
       </Typography>
       <Divider sx={{ mt: 2 }} />
@@ -74,24 +84,23 @@ const TermsAndConditions = () => {
       <Box sx={{ position: "fixed", top: 0, width: "100%", zIndex: 10 }}>
         <Navbar />
       </Box>
-<Container sx={{ py: 3, pt: isMobile ? 11 : 15, maxWidth: "lg" }}>
+      <Container sx={{ py: 3, pt: isMobile ? 11 : 15, maxWidth: "lg" }}>
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <Typography
- variant={isMobile ? "h5" : "h4"}
-             align="center"
+            variant={isMobile ? "h5" : "h4"}
+            align="center"
             fontWeight={800}
-            
             gutterBottom
             sx={{
               color: "#ffba00",
               fontFamily: FONT_FAMILY,
               letterSpacing: 1,
-             
-              textShadow: "0 2px 8px rgba(255,186,0,0.08)"
+
+              textShadow: "0 2px 8px rgba(255,186,0,0.08)",
             }}
           >
             Terms and Conditions
@@ -110,10 +119,15 @@ const TermsAndConditions = () => {
         </Section>
 
         <Section title="1. Definitions">
-          <ul style={{ paddingLeft: "2.2em",  }}>
+          <ul style={{ paddingLeft: "2.2em" }}>
             <li>
               “We”, “Us”, “Our” refers to{" "}
-              <Link component={RouterLink} to="/" underline="hover" color="black">
+              <Link
+                component={RouterLink}
+                to="/"
+                underline="hover"
+                color="black"
+              >
                 MrFranchise.in
               </Link>
               , its team, and consultants.
@@ -124,7 +138,12 @@ const TermsAndConditions = () => {
             </li>
             <li>
               “Platform” means the website
-              <Link component={RouterLink} to="/" underline="hover" color="black">
+              <Link
+                component={RouterLink}
+                to="/"
+                underline="hover"
+                color="black"
+              >
                 {" "}
                 www.MrFranchise.in
               </Link>{" "}
@@ -218,7 +237,8 @@ const TermsAndConditions = () => {
             <li>Accuracy of third-party content.</li>
             <li>Any direct, indirect, incidental, or consequential damages</li>
           </ul>
-          We do not guarantee the success of any franchise arrangement or investment.
+          We do not guarantee the success of any franchise arrangement or
+          investment.
         </Section>
 
         <Section title="9. Intellectual Property">
@@ -226,7 +246,8 @@ const TermsAndConditions = () => {
           <Link component={RouterLink} to="/" underline="hover" color="black">
             MrFranchise.in
           </Link>{" "}
-          are the intellectual property of the company and may not be reproduced or used without permission.
+          are the intellectual property of the company and may not be reproduced
+          or used without permission.
         </Section>
 
         <Section title="10. Third-Party Links">
@@ -235,15 +256,15 @@ const TermsAndConditions = () => {
         </Section>
 
         <Section title="11. Modifications">
-          We reserve the right to update or modify these Terms at any time. Updates
-          will be reflected with a new “Effective Date.” Continued use of the platform
-          implies acceptance of changes.
+          We reserve the right to update or modify these Terms at any time.
+          Updates will be reflected with a new “Effective Date.” Continued use
+          of the platform implies acceptance of changes.
         </Section>
 
         <Section title="12. Governing Law">
-          These Terms are governed by the laws of the Republic of India. Any disputes
-          shall be subject to the exclusive jurisdiction of courts in Chennai, Tamil
-          Nadu.
+          These Terms are governed by the laws of the Republic of India. Any
+          disputes shall be subject to the exclusive jurisdiction of courts in
+          Chennai, Tamil Nadu.
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 30 },
@@ -252,7 +273,7 @@ const TermsAndConditions = () => {
                 y: 0,
                 transition: {
                   duration: 0.8,
-                  ease: 'easeOut',
+                  ease: "easeOut",
                 },
               },
             }}
@@ -265,13 +286,13 @@ const TermsAndConditions = () => {
                 mt: 6,
                 p: 4,
                 borderRadius: 4,
-                background: 'rgba(255, 255, 255, 0.75)',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 186, 0, 0.4)',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.08)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  boxShadow: '0 10px 28px rgba(0, 0, 0, 0.15)',
+                background: "rgba(255, 255, 255, 0.75)",
+                backdropFilter: "blur(10px)",
+                border: "1px solid rgba(255, 186, 0, 0.4)",
+                boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  boxShadow: "0 10px 28px rgba(0, 0, 0, 0.15)",
                 },
               }}
             >
@@ -280,31 +301,43 @@ const TermsAndConditions = () => {
                 fontWeight={700}
                 color="text.primary"
                 gutterBottom
-                sx={{ textAlign: 'center', color: '#ff9800' }}
+                sx={{ textAlign: "center", color: "#ff9800" }}
               >
-                📞  Contact Us
+                📞 Contact Us
               </Typography>
 
               <Typography
                 variant="body1"
                 textAlign="center"
-                sx={{ color: 'text.secondary', mb: 2 }}
+                sx={{ color: "text.secondary", mb: 2 }}
               >
                 For any questions regarding these Terms, please contact:
               </Typography>
 
-              <Typography variant="body1" textAlign="center" sx={{ color: '#FF6F00' }}>
-                <Email sx={{ verticalAlign: 'middle', mr: 1 }} />
-                <Link href="mailto:ceo@MrFranchise.in" color="inherit" underline="hover">
+              <Typography
+                variant="body1"
+                textAlign="center"
+                sx={{ color: "#FF6F00" }}
+              >
+                <Email sx={{ verticalAlign: "middle", mr: 1 }} />
+                <Link
+                  href="mailto:ceo@MrFranchise.in"
+                  color="inherit"
+                  underline="hover"
+                >
                   Email: ceo@MrFranchise.in
                 </Link>
                 <br />
-                <Phone sx={{ verticalAlign: 'middle', mr: 1 }} />
-                <Link href="tel:+919841323388" color="#FF6F00" underline="hover">
+                <Phone sx={{ verticalAlign: "middle", mr: 1 }} />
+                <Link
+                  href="tel:+919841323388"
+                  color="#FF6F00"
+                  underline="hover"
+                >
                   Phone: +91 98413 23388
                 </Link>
                 <br />
-                📍 Head Office:{' '}
+                📍 Head Office:{" "}
                 <Link
                   href="https://www.google.com/maps/place/Chennai,+Tamil+Nadu"
                   target="_blank"

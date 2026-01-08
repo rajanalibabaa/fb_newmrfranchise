@@ -12,7 +12,9 @@ const CompareButton = () => {
   const buttonFontSize = isMobile ? "12px" : isTablet ? "14px" : "16px";
 
   const handleClick = () => {
-    // ✅ Open in a **new tab** immediately
+    // Set flag to enable comparison on the target page
+    localStorage.setItem('enableComparison', 'true');
+    // Open in a new tab
     window.open("/brandviewpage", "_blank", "noopener,noreferrer");
   };
 

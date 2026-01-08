@@ -1,48 +1,46 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Typography,
-  List,
-  ListItemButton,
-  ListItemText,
-  Collapse,
-  Divider,
-  Paper,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Rating,
-} from "@mui/material";
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import StarIcon from '@mui/icons-material/Star';
-import axios from 'axios';
+import React, { useState } from "react";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import List from "@mui/material/List";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Collapse from "@mui/material/Collapse";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
+import Rating from "@mui/material/Rating";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import StarIcon from "@mui/icons-material/Star";
+import axios from "axios";
 
 const labels = {
-  0.5: 'Useless',
-  1: 'Useless+',
-  1.5: 'Poor',
-  2: 'Poor+',
-  2.5: 'Ok',
-  3: 'Ok+',
-  3.5: 'Good',
-  4: 'Good+',
-  4.5: 'Excellent',
-  5: 'Excellent+',
+  0.5: "Useless",
+  1: "Useless+",
+  1.5: "Poor",
+  2: "Poor+",
+  2.5: "Ok",
+  3: "Ok+",
+  3.5: "Good",
+  4: "Good+",
+  4.5: "Excellent",
+  5: "Excellent+",
 };
 
 function getLabelText(value) {
-  return `${value} Star${value !== 1 ? 's' : ''}, ${labels[value]}`;
+  return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
 }
 
 const FeedBack = () => {
   const [value, setValue] = useState(2);
   const [hover, setHover] = useState(-1);
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [feedbackText, setFeedbackText] = useState('');
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [feedbackText, setFeedbackText] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -55,29 +53,53 @@ const FeedBack = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/feedback/createFeedback",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/feedback/createFeedback",
         formattedData,
         { headers: { "Content-Type": "application/json" } }
       );
       // console.log("Feedback submitted:", response.data);
-      setFeedbackText('');
-      setSelectedTopic('');
+      setFeedbackText("");
+      setSelectedTopic("");
       setValue(2);
-      alert('Feedback submitted successfully!');
+      alert("Feedback submitted successfully!");
     } catch (error) {
       console.error("Submission error:", error);
-      alert('Failed to submit feedback.');
+      alert("Failed to submit feedback.");
     }
   };
 
   return (
     <Box sx={{ p: 2 }}>
-      <Paper elevation={4} sx={{ p: 4, maxWidth: 700, mx: "auto", borderRadius: 3, backgroundColor: "#ffffff" }}>
-        <Typography variant="h4" sx={{ fontWeight: "bold", mb: 3, textAlign: "center", color: "#ffa000" }}>
+      <Paper
+        elevation={4}
+        sx={{
+          p: 4,
+          maxWidth: 700,
+          mx: "auto",
+          borderRadius: 3,
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: "bold",
+            mb: 3,
+            textAlign: "center",
+            color: "#ffa000",
+          }}
+        >
           Submit Your Feedback
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            mb: 4,
+          }}
+        >
           <Rating
             name="hover-feedback"
             value={value}
@@ -95,7 +117,11 @@ const FeedBack = () => {
           </Box>
         </Box>
 
-        <Box component="form" sx={{ display: "flex", flexDirection: "column", gap: 3 }} onSubmit={handleSubmit}>
+        <Box
+          component="form"
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+          onSubmit={handleSubmit}
+        >
           <FormControl required fullWidth size="medium">
             <InputLabel id="topic-label">Topic</InputLabel>
             <Select
@@ -132,7 +158,12 @@ const FeedBack = () => {
             variant="contained"
             color="primary"
             aria-label="submit feedback"
-            sx={{ alignSelf: "flex-end", borderRadius: 2, px: 4, backgroundColor: "#558b2f" }}
+            sx={{
+              alignSelf: "flex-end",
+              borderRadius: 2,
+              px: 4,
+              backgroundColor: "#558b2f",
+            }}
           >
             Submit Your Feedback
           </Button>
@@ -143,8 +174,8 @@ const FeedBack = () => {
 };
 
 const ComplaintContent = () => {
-  const [selectedTopic, setSelectedTopic] = useState('');
-  const [complaintText, setComplaintText] = useState('');
+  const [selectedTopic, setSelectedTopic] = useState("");
+  const [complaintText, setComplaintText] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,14 +187,14 @@ const ComplaintContent = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/complaint/createComplaint",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/complaint/createComplaint",
         formattedData,
         { headers: { "Content-Type": "application/json" } }
       );
       // console.log("Complaint submitted:", response.data);
       alert("Complaint submitted successfully!");
-      setSelectedTopic('');
-      setComplaintText('');
+      setSelectedTopic("");
+      setComplaintText("");
     } catch (error) {
       console.error("Submission error:", error);
       alert("Failed to submit complaint.");
@@ -172,8 +203,19 @@ const ComplaintContent = () => {
 
   return (
     <Box sx={{ mt: 4, px: 2 }}>
-      <Paper elevation={4} sx={{ p: 4, maxWidth: 700, mx: "auto", borderRadius: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: "bold", mb: 3, textAlign: "center", color: "#ffa000" }}>
+      <Paper
+        elevation={4}
+        sx={{ p: 4, maxWidth: 700, mx: "auto", borderRadius: 3 }}
+      >
+        <Typography
+          variant="h5"
+          sx={{
+            fontWeight: "bold",
+            mb: 3,
+            textAlign: "center",
+            color: "#ffa000",
+          }}
+        >
           Submit a Complaint
         </Typography>
 
@@ -190,7 +232,7 @@ const ComplaintContent = () => {
               value={selectedTopic}
               label="Topic"
               onChange={(e) => setSelectedTopic(e.target.value)}
-            > 
+            >
               <MenuItem value="Service Issue">Service Issue</MenuItem>
               <MenuItem value="Technical Bug">Technical Bug</MenuItem>
               <MenuItem value="Payment Problem">Payment Problem</MenuItem>
@@ -213,7 +255,13 @@ const ComplaintContent = () => {
           />
 
           <Box sx={{ textAlign: "right" }}>
-            <Button type="submit" variant="contained"  aria-label="submit complaint" color="primary" sx={{ backgroundColor: "#558b2f" }}>
+            <Button
+              type="submit"
+              variant="contained"
+              aria-label="submit complaint"
+              color="primary"
+              sx={{ backgroundColor: "#558b2f" }}
+            >
               Submit Your Complaint
             </Button>
           </Box>
@@ -226,20 +274,21 @@ const ComplaintContent = () => {
 const ContactUs = () => {
   return (
     <Box sx={{ mt: 4, px: 2 }}>
-      <Paper elevation={4} sx={{ p: 4, maxWidth: 700, mx: "auto", borderRadius: 3 }}>
+      <Paper
+        elevation={4}
+        sx={{ p: 4, maxWidth: 700, mx: "auto", borderRadius: 3 }}
+      >
         <Typography variant="body1" sx={{ textAlign: "center" }}>
-  You can reach us by email at{' '}
- 
-  <a
-    href="https://mail.google.com/mail/?view=cm&fs=1&to=mrfranchisc22@gmail.com"
-    target="_blank"
-    rel="noopener noreferrer"
-    style={{ color: "#1976d2", textDecoration: "underline" }}
-  >
-   mrfranchisc22@gmail.com
-  </a>
-</Typography>
-
+          You can reach us by email at{" "}
+          <a
+            href="https://mail.google.com/mail/?view=cm&fs=1&to=mrfranchisc22@gmail.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "#1976d2", textDecoration: "underline" }}
+          >
+            mrfranchisc22@gmail.com
+          </a>
+        </Typography>
       </Paper>
     </Box>
   );
@@ -254,7 +303,7 @@ const BrandSearchus = () => {
   const [selectedItem, setSelectedItem] = useState(null);
 
   const handleToggle = (category) => {
-    setOpenCategory(prev => (prev === category ? null : category));
+    setOpenCategory((prev) => (prev === category ? null : category));
     setSelectedItem(null);
   };
 
@@ -284,22 +333,28 @@ const BrandSearchus = () => {
 
       <Box
         sx={{
-          display: 'flex',
-          border: '1px solid #ddd',
+          display: "flex",
+          border: "1px solid #ddd",
           borderRadius: 2,
           maxHeight: 600,
-          overflow: 'hidden',
+          overflow: "hidden",
         }}
       >
         {/* Sidebar */}
-        <Box sx={{ width: 250, borderRight: '1px solid #ccc', overflowY: 'auto' }}>
+        <Box
+          sx={{ width: 250, borderRight: "1px solid #ccc", overflowY: "auto" }}
+        >
           <List disablePadding>
             <ListItemButton onClick={() => handleToggle("Category")}>
               <ListItemText primary="Category" />
               {openCategory === "Category" ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
 
-            <Collapse in={openCategory === "Category"} timeout="auto" unmountOnExit>
+            <Collapse
+              in={openCategory === "Category"}
+              timeout="auto"
+              unmountOnExit
+            >
               <List component="div" disablePadding>
                 {data.Category.map((item, index) => (
                   <ListItemButton
@@ -317,9 +372,19 @@ const BrandSearchus = () => {
         </Box>
 
         {/* Right Side Content */}
-        <Box sx={{ flexGrow: 1, p: 2, overflowY: 'auto' }}>
-          {selectedItem ? renderContent(selectedItem) : (
-            <Typography sx={{ textAlign: 'center', mt: 1,backgroundColor:"#e2faa7",color:"#f29724" }} color="text.secondary">
+        <Box sx={{ flexGrow: 1, p: 2, overflowY: "auto" }}>
+          {selectedItem ? (
+            renderContent(selectedItem)
+          ) : (
+            <Typography
+              sx={{
+                textAlign: "center",
+                mt: 1,
+                backgroundColor: "#e2faa7",
+                color: "#f29724",
+              }}
+              color="text.secondary"
+            >
               Select a category to view its content.
             </Typography>
           )}
@@ -328,6 +393,5 @@ const BrandSearchus = () => {
     </Box>
   );
 };
-
 
 export default BrandSearchus;

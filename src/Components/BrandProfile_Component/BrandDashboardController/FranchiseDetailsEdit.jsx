@@ -1,47 +1,46 @@
 import React, { useState, useEffect } from "react";
-import {
-  TextField,
-  Chip,
-  Stack,
-  Collapse,
-  FormControl,
-  FormLabel,
-  FormControlLabel,
-  Radio,
-  RadioGroup,
-  InputAdornment,
-  Grid,
-  Drawer,
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Select,
-  MenuItem,
-  InputLabel,
-  Paper,
-  Button,
-  FormHelperText,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  FormGroup,
-  Checkbox,
-  List,
-  ListItem,
-  ListItemText,
-  IconButton,
-  Tooltip,
-  Autocomplete,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from "@mui/material";
+
+import Chip from "@mui/material/Chip";
+import Drawer from "@mui/material/Drawer";
+import FormControl from "@mui/material/FormControl";
+import FormLabel from "@mui/material/FormLabel";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Radio from "@mui/material/Radio";
+import RadioGroup from "@mui/material/RadioGroup";
+import InputAdornment from "@mui/material/InputAdornment";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import FormHelperText from "@mui/material/FormHelperText";
+import Typography from "@mui/material/Typography";
+import Divider from "@mui/material/Divider";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import FormGroup from "@mui/material/FormGroup";
+import Checkbox from "@mui/material/Checkbox";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import IconButton from "@mui/material/IconButton";
+import Tooltip from "@mui/material/Tooltip";
+import Autocomplete from "@mui/material/Autocomplete";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import Stack from "@mui/material/Stack";
+import Collapse from "@mui/material/Collapse";
 import CloseIcon from "@mui/icons-material/Close";
 import { Delete as DeleteIcon, Edit as EditIcon, InfoOutlined, ExpandMore, ExpandLess } from "@mui/icons-material";
 import AddIcon from '@mui/icons-material/Add';
@@ -71,7 +70,7 @@ const FranchiseDetailsEdit = ({
   ];
 
 
-  console.log("")
+  // console.log("")
 
   // State for API data
   const [industries, setIndustries] = useState([]);
@@ -141,7 +140,7 @@ const FranchiseDetailsEdit = ({
   const fetchIndustries = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5000/api/v1/admin/getIndustryByIndustryName');
+      const response = await fetch('https://mrfranchisebackend.mrfranchise.in/api/v1/admin/getIndustryByIndustryName');
       const result = await response.json();
    
       if (result.success && result.data.Industry) {
@@ -158,12 +157,12 @@ const FranchiseDetailsEdit = ({
   const fetchIndustryDetails = async (industryName) => {
     // if (!industryName) return;
     const  industry =  industryName || data.brandCategories.main
-    console.log("industry",industry)
+    // console.log("industry",industry)
  
     try {
       setLoadingIndustryDetails(true);
       const response = await fetch(
-        `http://localhost:5000/api/v1/admin/getIndustryByIndustryName?industry=${encodeURIComponent(industry)}`
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/admin/getIndustryByIndustryName?industry=${encodeURIComponent(industry)}`
       );
       const result = await response.json();
    

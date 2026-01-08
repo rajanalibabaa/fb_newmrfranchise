@@ -1,23 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Drawer,
-  Avatar,
-  Box,
-  Typography,
-  Button,
-  MenuItem,
-  useMediaQuery,
-  useTheme,
-  Menu,
-  Divider
-} from "@mui/material";
+
+import AppBar from "@mui/material/AppBar";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Drawer from "@mui/material/Drawer";
+import Avatar from "@mui/material/Avatar";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import MenuItem from "@mui/material/MenuItem";
+import Divider from "@mui/material/Divider";
+import { useMediaQuery, useTheme } from "@mui/material";
+import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
 import { User, LogOut, LogIn, UserPlus, Home, Plus, Search } from "lucide-react";
-import SideViewContent from "../SideViewContentMenu/SideHoverMenu";
+import SideViewContent from "../SideViewContentMenu/SideHoverMenu.jsx";
 import LoginPage from "../../Pages/LoginPage/LoginPage";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -101,7 +99,7 @@ function Navbar() {
     setlogoutLoading(true);
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/v1/logout/${ID}`,
+        `https://mrfranchisebackend.mrfranchise.in/api/v1/logout/${ID}`,
         {},
         {
           headers: {
@@ -200,7 +198,7 @@ function Navbar() {
           position: 'relative',
           zIndex: 1
         }}>
-          {['Expand Your Franchise', 'Investor', 'Advertise','Other Industries',"Blogs"].map((text) => (
+          {['Expand Your Franchise', 'Investor', 'Advertise',"Blogs"].map((text) => (
             <motion.div
               key={text}
               whileHover={{ scale: 1.05 }}
@@ -212,7 +210,7 @@ function Navbar() {
                   text === 'Expand Your Franchise' ? '/expandyourbrand' :
                   text === 'Investor' ? '/investfranchise' :
                   text === 'Advertise' ? '/advertisewithus' :
-                  text === 'Other Industries' ? '/otherindustries' : 
+                  // text === 'Other Industries' ? '/otherindustries' : 
                   text === 'Blogs' ? '/blogs' : '/'
                 }
                 size="small"

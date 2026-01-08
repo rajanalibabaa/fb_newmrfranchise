@@ -2,26 +2,29 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import Drawer from "@mui/material/Drawer";
 import {
-  Box,
-  Typography,
-  Avatar,
-  IconButton,
+ 
   useMediaQuery,
   useTheme,
-  Grid,
-  Divider,
-  Chip,
-  Tabs,
-  Tab,
-  AppBar,
-  Paper,
-  Fade,
-  Grow,
-  Button,
-  Skeleton,
-  Alert,
-  Snackbar,
+  
 } from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import IconButton from "@mui/material/IconButton";
+import Grid from "@mui/material/Grid";
+import Divider from "@mui/material/Divider";
+import Chip from "@mui/material/Chip";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import AppBar from "@mui/material/AppBar";
+import Paper from "@mui/material/Paper";
+import Fade from "@mui/material/Fade";
+import Grow from "@mui/material/Grow";
+import Button from "@mui/material/Button";
+import Skeleton from "@mui/material/Skeleton";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import CloseIcon from "@mui/icons-material/Close";
 import ErrorIcon from "@mui/icons-material/Error";
 import { motion } from "framer-motion";
@@ -29,7 +32,7 @@ import { useNavigate } from "react-router-dom";
 
 // Create axios instance with base config
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/v1/",
+  baseURL: "https://mrfranchisebackend.mrfranchise.in/api/v1/",
   headers: {
     "Content-Type": "application/json",
   },
@@ -112,9 +115,10 @@ const BrandCard = React.memo(
               src={brandLogo}
               alt={brandName}
               sx={{
+                objectFit: "contain",
                 width: "100%",
                 height: "100%",
-                fontSize: isMobile ? 22 : 26,
+                // fontSize: isMobile ? 22 : 26,
                 bgcolor: "#ffe0b2",
                 color: "#ff6d00",
               }}
@@ -561,6 +565,20 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
       fetchInitialData();
     }
   }, [hoverCategory, fetchInitialData]);
+  
+//industries only make this categorires show 
+
+  useEffect(() => {
+    if (industries.length > 0 && activeIndustry === null && !loading.industries) {
+      const foodIndex = industries.findIndex(ind => ind === "Food & Beverages");
+      if (foodIndex !== -1) {
+        handleIndustryHover(foodIndex, "Food & Beverages");
+        if (isMobile) {
+          setMobileTabValue(1);
+        }
+      }
+    }
+  }, [industries, activeIndustry, loading.industries, isMobile, handleIndustryHover]);
 
   // Clear data when drawer closes
   useEffect(() => {
@@ -1081,7 +1099,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
           {!isMobile && (
             <>
               {/* Industries Column - Fixed */}
-              <Box
+              {/* <Box
                 sx={{
                   width: 300,
                   borderRight: `1px solid ${theme.palette.divider}`,
@@ -1149,7 +1167,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
                     No industries available
                   </Typography>
                 )}
-              </Box>
+              </Box> */}
 
               {/* Subcategories Column - Fixed */}
               {activeIndustry !== null && (

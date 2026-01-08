@@ -21,7 +21,8 @@ import Navbar from "../../Components/Navbar/NavBar.jsx";
 import SEO from "../../Components/SEO/Seo.jsx";
 import HomeBanner from "../../assets/Images/HomeBanner.avif";
 import CompareButton from "./CompareButtonsCompenents.jsx";
-
+import BrandComparison from "../AllCategoryPage/BrandCompariosn.jsx";
+import img1 from '../../assets/Images/bg21.jpeg'
 // --- ErrorBoundary ---
 class ErrorBoundary extends React.Component {
   state = { hasError: false, error: null };
@@ -311,10 +312,10 @@ const pageConfig = {
     { component: "HomeSection2", background: "#fff" },
     { component: "HomeSection3", background: "#fff" },
     { component: "HomeSection4", background: "#fff" },
-    // { component: "HomeSection5", background: "#fff" },
+    { component: "HomeSection5", background: "#fff" },
     { component: "HomeSection7", background: "#fff" },
     { component: "HomeSection6", background: "#fff" },
-    // { component: "HomeSection8", background: "#fff" },
+    { component: "HomeSection8", background: "#fff" },
     // { component: "HomeSection9", background: "#fff" },
     // { component: "HomeSection10", background: "#fff" },
 
@@ -368,10 +369,10 @@ const useDynamicComponents = () => {
       { key: "HomeSection2", file: "HomeSection2.jsx" },
       { key: "HomeSection3", file: "HomeSection3.jsx" },
       { key: "HomeSection4", file: "HomeSection4.jsx" },
-      // { key: "HomeSection5", file: "HomeSection5.jsx" },
+      { key: "HomeSection5", file: "HomeSection5.jsx" },
       { key: "HomeSection7", file: "HomeSection7.jsx" },
       { key: "HomeSection6", file: "HomeSection6.jsx" },
-      // { key: "HomeSection8", file: "HomeSection8.jsx" },
+      { key: "HomeSection8", file: "HomeSection8.jsx" },
       // { key: "HomeSection9", file: "HomeSection9.jsx" },
       // { key: "HomeSection10", file: "HomeSection10.jsx" },
       { key: "ToTrendingBrands", file: "ToTrendingBrands.jsx" },
@@ -382,7 +383,7 @@ const useDynamicComponents = () => {
 
     entries.forEach(({ key, file }) => {
       const path = `../../Components/HomePage_VideoSection/${file}`;
-      console.log("Checking for module:", path);
+      // console.log("Checking for module:", path);
 
       // Only if the module exists, create a lazy component
       if (path in modules) {
@@ -416,7 +417,7 @@ const LazySection = ({
     }
   }, [inView, Component]);
   return (
-    <Box ref={ref} py={8} bgcolor={background}>
+    <Box ref={ref} py={0} bgcolor={background}>
       <Container maxWidth="xl">
         {inView ? (
           <ComponentLoader
@@ -426,7 +427,7 @@ const LazySection = ({
             {...props}
           />
         ) : (
-          <Box minHeight={200} />
+          <Box minHeight={100} />
         )}
       </Container>
     </Box>
@@ -696,13 +697,22 @@ const HomeBannerSec = () => {
             key={index}
             componentKey={section.component}
             dynamicComponents={dynamicComponents}
-            background={section.background || "#d5e7ddac"}
+            // background={section.background || "#d5e7ddac"}
+            background={{ 
+                 backgroundImage: `url(${img1})`,
+                backgroundSize: "400px auto",        // fill entire box
+                // backgroundPosition: "center",   // center image
+                backgroundRepeat: "repeat",
+                minHeight: "87vh",             // full screen height
+                width: "100%",
+              }}
             isMobile={isMobile}
           />
         ))}
 
       {/* 👇 Add here, before Footer */}
       <CompareButton />
+      <BrandComparison />
 
       <Footer />
     </>

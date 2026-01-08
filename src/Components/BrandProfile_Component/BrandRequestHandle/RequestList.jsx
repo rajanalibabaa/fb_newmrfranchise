@@ -1,29 +1,26 @@
 import React, { useEffect, useMemo, useCallback } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  IconButton,
-  Tooltip,
-  CircularProgress,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableContainer,
-  Chip,
-  Stack,
-  Fade,
-  Button,
-} from "@mui/material";
-import {
-  Refresh as RefreshIcon,
-  Visibility as VisibilityIcon,
-  Delete as DeleteIcon,
-  CheckCircle as CheckCircleIcon,
-  HighlightOff as HighlightOffIcon,
-} from "@mui/icons-material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
+import Fade from "@mui/material/Fade";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import Chip from "@mui/material/Chip";
+
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+
+import RefreshIcon from "@mui/icons-material/Refresh";
+import DeleteIcon from "@mui/icons-material/Delete";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import HighlightOffIcon from "@mui/icons-material/HighlightOff";
+
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchRequestById,
@@ -36,13 +33,13 @@ const RequestTable = () => {
   const dispatch = useDispatch();
   const { singleRequest, loading } = useSelector((state) => state.requests);
   console.log("Single Request:", singleRequest);
-  
+
   const brandUUID = localStorage.getItem("brandUUID");
 
   // Socket connection
   const socket = useMemo(() => {
     if (brandUUID) {
-      return io("http://localhost:5000", {
+      return io("https://mrfranchisebackend.mrfranchise.in", {
         transports: ["websocket"],
         upgrade: false,
       });
@@ -124,8 +121,7 @@ const RequestTable = () => {
           sx={{
             textTransform: "none",
             borderRadius: 2,
-            background:
-              "linear-gradient(90deg, #d25419bf 0%, #f5e342ff 100%)",
+            background: "linear-gradient(90deg, #d25419bf 0%, #f5e342ff 100%)",
           }}
         >
           {loading ? "Refreshing..." : "Refresh"}
@@ -166,12 +162,24 @@ const RequestTable = () => {
                 }}
               >
                 <TableRow>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>#</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>Type</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>Message</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>Created At</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>Status</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: 600 }}>Active  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    #
+                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    Type
+                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    Message
+                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    Created At
+                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    Status
+                  </TableCell>
+                  <TableCell sx={{ color: "white", fontWeight: 600 }}>
+                    Active{" "}
+                  </TableCell>
                   {/* <TableCell sx={{ color: "white", fontWeight: 600 }}>Actions</TableCell> */}
                 </TableRow>
               </TableHead>
@@ -194,24 +202,27 @@ const RequestTable = () => {
                       {new Date(req.createdAt).toLocaleString()}
                     </TableCell>
                     <TableCell>
-  <Stack direction="row" spacing={1}>
-    {req.isActive === false ? (
-      <Chip label="Solved" color="error" size="small" />
-    ) : req.isOpened ? (
-      <Chip label="Under Process" color="success" size="small" />
-    ) : req.isViewed ? (
-      <Chip label="Viewed" color="warning" size="small" />
-    ) : (
-      <Chip label="Pending" color="warning" size="small" />
-    )}
-  </Stack>
-</TableCell>
+                      <Stack direction="row" spacing={1}>
+                        {req.isActive === false ? (
+                          <Chip label="Solved" color="error" size="small" />
+                        ) : req.isOpened ? (
+                          <Chip
+                            label="Under Process"
+                            color="success"
+                            size="small"
+                          />
+                        ) : req.isViewed ? (
+                          <Chip label="Viewed" color="warning" size="small" />
+                        ) : (
+                          <Chip label="Pending" color="warning" size="small" />
+                        )}
+                      </Stack>
+                    </TableCell>
 
                     <TableCell>
                       {req.isActive ? (
                         <>
                           <CheckCircleIcon color="success" /> Active
-                          
                         </>
                       ) : (
                         <>

@@ -7,13 +7,14 @@ import React, {
   useLayoutEffect,
 } from "react";
 import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
+  
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import ArrowBack from "@mui/icons-material/ArrowBack";
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import ArrowRight from "@mui/icons-material/ArrowRight";
@@ -194,7 +195,7 @@ const HomeSection6 = () => {
        <Box
          ref={containerRef}
          sx={{
-           py: isMobile ? 1 : 2,
+           py: isMobile ? 1 : 0,
            px: isMobile ? 0 : 2,
            maxWidth: isMobile ? "100%" : 1400,
            mx: "auto",
@@ -208,14 +209,19 @@ const HomeSection6 = () => {
              alignItems: "center",
              mb: 1,
              px: isMobile ? 2 : 0,
+             gap: 2,
+              // backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
            }}
          >
            <Typography
              variant={isMobile ? "body1" : "h5"}
              fontWeight="bold"
              sx={{
-               color: "black",
+               color: "#f57a00",
                mb: 1,
+              
                textAlign: "left",
                position: "relative",
                "&:after": {
@@ -230,7 +236,7 @@ const HomeSection6 = () => {
                },
              }}
            >
-             Top Cloud Kitchen
+             Top Cloud Kitchens & Food Delivery
            </Typography>
  
            <Button
@@ -268,17 +274,18 @@ const HomeSection6 = () => {
              disabled={!showStartShadow}
              sx={{
                position: "absolute",
-               left: isMobile ? 2 : 8,
-               top: "50%",
+               left: isMobile ? 2 : -10,
+               top: "63.5%",
                transform: "translateY(-50%)",
                zIndex: 1,
                minWidth: 40,
                height: 40,
                borderRadius: "50%",
-               backgroundColor: "background.paper",
+               color:"black",
+               backgroundColor: "#ff9800",
                boxShadow: 2,
                "&:hover": {
-                 backgroundColor: "action.hover",
+                 backgroundColor: "#c28223ff",
                },
                "&:disabled": {
                  opacity: 0,
@@ -295,17 +302,18 @@ const HomeSection6 = () => {
              disabled={!showEndShadow}
              sx={{
                position: "absolute",
-               right: isMobile ? 4 : 8,
-               top: "50%",
+               right: isMobile ? 4 : -10,
+               top: "63.5%",
                transform: "translateY(-50%)",
                zIndex: 1,
                minWidth: 40,
                height: 40,
                borderRadius: "50%",
-               backgroundColor: "background.paper",
+               color:"black",
+               backgroundColor: "#ff9800",
                boxShadow: 2,
                "&:hover": {
-                 backgroundColor: "action.hover",
+                 backgroundColor: "#c28223ff",
                },
                "&:disabled": {
                  opacity: 0,

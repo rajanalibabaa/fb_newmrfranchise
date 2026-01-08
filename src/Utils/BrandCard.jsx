@@ -16,6 +16,9 @@ import {
 import { motion } from "framer-motion";
 import Favorite from "@mui/icons-material/Favorite";
 import PlaylistAddCheckCircleOutlined from "@mui/icons-material/PlaylistAddCheckCircleOutlined";
+import RadioButtonUnchecked from "@mui/icons-material/RadioButtonUnchecked";
+import Block from "@mui/icons-material/Block";
+import CheckCircle from "@mui/icons-material/CheckCircle";
 import Business from "@mui/icons-material/Business";
 import MonetizationOn from "@mui/icons-material/MonetizationOn";
 import AreaChart from "@mui/icons-material/AreaChart";
@@ -30,6 +33,11 @@ const BrandCard = ({
   width,
   height,
   theme,
+  // Comparison props (optional)
+  isSelectedForComparison = false,
+  onToggleBrandComparison = () => {},
+  maxComparisonReached = false,
+  enableComparison = false,
 }) => {
   const videoRef = useRef(null);
   const [isVisible, setIsVisible] = useState(false);
@@ -102,6 +110,51 @@ const BrandCard = ({
           border: "1px solid #eee",
         }}
       >
+        {/* Compare Toggle */}
+        {enableComparison && (
+          <Tooltip
+            title={
+              maxComparisonReached && !isSelectedForComparison
+                ? "Maximum 3 brands can be compared"
+                : isSelectedForComparison
+                ? "Already selected"
+                : "Click to add to comparison"
+            }
+            placement="right"
+            arrow
+          >
+            <span>
+              <IconButton
+                sx={{
+                  position: "absolute",
+                  top: 8,
+                  right: 8,
+                  zIndex: 2,
+                  backgroundColor: isSelectedForComparison
+                    ? "#ff9800"
+                    : maxComparisonReached
+                    ? "rgba(244, 67, 54, 0.75)"
+                    : "rgba(255,255,255,0.85)",
+                  color: isSelectedForComparison ? "#fff" : "#ff8914ff",
+                  width: 36,
+                  height: 36,
+                  borderRadius: "50%",
+                }}
+                onClick={() => onToggleBrandComparison(brand)}
+                disabled={maxComparisonReached && !isSelectedForComparison}
+              >
+                {isSelectedForComparison ? (
+                  <CheckCircle fontSize="small" />
+                ) : maxComparisonReached ? (
+                  <Block fontSize="small" />
+                ) : (
+                  <RadioButtonUnchecked fontSize="small" />
+                )}
+              </IconButton>
+            </span>
+          </Tooltip>
+        )}
+
         <Box
           ref={videoRef}
           sx={{

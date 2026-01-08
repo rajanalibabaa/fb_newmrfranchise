@@ -4,8 +4,7 @@ import {
   Box,
   Typography,
   Button,
-  TextField,
-  FormControl,
+
   Divider,
   Radio,
   RadioGroup,
@@ -14,9 +13,7 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Collapse,
-  Breadcrumbs,
-  Link,
+ 
 } from "@mui/material";
 import {
   Clear as ClearIcon,
@@ -88,13 +85,12 @@ const FilterPanel = React.memo(
       city: "",
     });
     const [expandedSections, setExpandedSections] = useState({
-      mainCategory: true,
-      subCategory: true,
-      modelType: true,
-      areaRequired: true,
-      location: true,
-      investment: true,
-      areaRequired: true,
+      mainCategory: false,
+      subCategory: false,
+      modelType: false,
+      areaRequired: false,
+      location: false,
+      investment: false,
     });
 
     // Fetch initial filter data
@@ -160,7 +156,17 @@ const FilterPanel = React.memo(
     }, [onFilterChange]);
 
     const toggleSection = (section) => {
-      setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+      setExpandedSections((prev) => {
+        const newState = { ...prev };
+        // If opening this section, close others
+        if (!prev[section]) {
+          Object.keys(newState).forEach(key => {
+            if (key !== section) newState[key] = false;
+          });
+        }
+        newState[section] = !prev[section];
+        return newState;
+      });
     };
 
     const handleSearchTermChange = (field) => (e) => {
@@ -292,72 +298,82 @@ const FilterPanel = React.memo(
 
     return (
       <Box sx={{ pr: 2, height: "calc(100vh - 120px)", overflowY: "auto" }}>
+ <Typography
+          variant="body2"
+          sx={{ color: "#000000ff", background: "#7cd13b",display:'block', textAlign: "center",padding:'10px',borderRadius:'5px' ,mb:1,mt:4}}
+        >
+          Showing {resultStats.showing || 0} of {resultStats.total || 0} brands
+        </Typography>
+        
         <Box
           display="flex"
           justifyContent="space-between"
           alignItems="center"
           mb={2}
+          mt={3}
+        sx={{background:'white',p:1,borderRadius:'5px'}}
         >
-          <Typography variant="h6">Filters</Typography>
+          <Typography variant="h6"sx={{ color: "#000000ff" }} >Filters</Typography>
           <Button
             size="small"
             variant="outlined"
             onClick={onClearFilters}
             disabled={activeFilterCount === 0}
             startIcon={<ClearIcon />}
-            sx={{ color: "#ff9800" }}
+            sx={{ color: "#ff0000ff", borderColor: "#ff0000ff" }}
           >
             Clear 
           </Button>
         </Box>
-
+{/* 
         <Breadcrumbs
           separator="|"
-          sx={{ mb: 2, fontSize: "0.875rem" }}
+          sx={{ mb: 2, fontSize: "0.875rem",color: "#ff9800" ,background: "white",padding:'7px',borderRadius:'5px' }}
           aria-label="filter sections"
         >
           <Link
             underline="hover"
             color="black"
             onClick={() => scrollToSection(mainCategoryRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#000000ff" }}
           >
             Industries
           </Link>
-  
-          <Link
-            underline="hover"
-            color="black"
-            onClick={() => scrollToSection(modelTypeRef)}
-            sx={{ cursor: "pointer" }}
-          >
-            Model Type
-          </Link>
-          <Link
-            underline="hover"
-            color="black"
-            onClick={() => scrollToSection(locationRef)}
-            sx={{ cursor: "pointer" }}
-          >
-            Location Filter
-          </Link>
-          <Link
+  <Link
             underline="hover"
             color="black"
             onClick={() => scrollToSection(investmentRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#000000ff" }}
           >
-            Investment Range
+            Investment
           </Link>
            <Link
             underline="hover"
             color="black"
             onClick={() => scrollToSection(areaRequiredRef)}
-            sx={{ cursor: "pointer" }}
+            sx={{ cursor: "pointer",color: "#000000ff" }}
           >
-            Area Required
+            Area
           </Link>
-        </Breadcrumbs>
+          <Link
+            underline="hover"
+            color="black"
+            onClick={() => scrollToSection(locationRef)}
+            sx={{ cursor: "pointer",color: "#000000ff" }}
+          >
+            Location
+          </Link>
+          <Link
+            underline="hover"
+            color="black"
+            onClick={() => scrollToSection(modelTypeRef)}
+            sx={{ cursor: "pointer",color: "#000000ff" }}
+          >
+            Model
+          </Link>
+          
+          
+        </Breadcrumbs> */}
 
         {/* <TextField
           fullWidth
@@ -370,6 +386,8 @@ const FilterPanel = React.memo(
           }}
           sx={{ mb: 3 }}
         /> */}
+
+
         {/* Main Category Filter */}
         <Accordion
           ref={mainCategoryRef}
@@ -377,7 +395,7 @@ const FilterPanel = React.memo(
           onChange={() => toggleSection("mainCategory")}
           disableGutters
           elevation={0}
-          sx={{ mb: 2, "&:before": { display: "none" } }}
+          sx={{ mb: 2, borderRadius: "5px", "&:before": { display: "none" } }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
@@ -543,73 +561,6 @@ const FilterPanel = React.memo(
             </Box>
           </AccordionDetails>
         </Accordion>
-
-        {/* Model Type Filter */}
-        <Accordion
-          ref={modelTypeRef}
-          expanded={expandedSections.modelType}
-          onChange={() => toggleSection("modelType")}
-          disableGutters
-          elevation={0}
-          sx={{ mb: 2, "&:before": { display: "none" } }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
-            sx={{
-              px: 1,
-              "&.Mui-expanded": { minHeight: "48px" },
-            }}
-          >
-            <Typography
-              sx={{
-                color: "#4caf50",
-                fontWeight: "bold",
-                fontSize: "0.875rem",
-              }}
-            >
-              Model Type
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails sx={{ p: 0 }}>
-            <Box sx={{ px: 1 }}>
-              {/* <TextField
-                fullWidth
-                size="small"
-                placeholder="Search model types..."
-                value={searchTerms.modelType}
-                onChange={handleSearchTermChange("modelType")}
-                sx={{ mb: 1 }}
-                InputProps={{
-                  startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: "#ff9800" }} />,
-                }}
-              /> */}
-              <RadioGroup
-                value={filters.modelType || ""}
-                onChange={(e) => onFilterChange("modelType", e.target.value)}
-              >
-                {filteredModelTypes.map((type) => (
-                  <FormControlLabel
-                    key={`modeltype-${type}`}
-                    value={type}
-                    control={
-                      <Radio
-                        size="small"
-                        sx={{
-                          color: "#ff9800",
-                          "&.Mui-checked": { color: "#4caf50" },
-                          padding: "6px",
-                        }}
-                      />
-                    }
-                    label={<Typography fontSize="0.8125rem">{type}</Typography>}
-                    sx={{ mb: 0, mr: 0 }}
-                  />
-                ))}
-              </RadioGroup>
-            </Box>
-          </AccordionDetails>
-        </Accordion>
-
  {/* Investment Range Filter */}
         <Accordion
           ref={investmentRef}
@@ -617,7 +568,7 @@ const FilterPanel = React.memo(
           onChange={() => toggleSection("investment")}
           disableGutters
           elevation={0}
-          sx={{ mb: 2, "&:before": { display: "none" } }}
+          sx={{ mb: 2,borderRadius: "5px", "&:before": { display: "none" } }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
@@ -688,7 +639,7 @@ const FilterPanel = React.memo(
   onChange={() => toggleSection("areaRequired")}
   disableGutters
   elevation={0}
-  sx={{ mb: 2, "&:before": { display: "none" } }}
+  sx={{ mb: 2,borderRadius: "5px", "&:before": { display: "none" } }}
 >
   <AccordionSummary
     expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
@@ -778,6 +729,73 @@ const FilterPanel = React.memo(
   </AccordionDetails>
 </Accordion>
 
+        {/* Model Type Filter */}
+        <Accordion
+          ref={modelTypeRef}
+          expanded={expandedSections.modelType}
+          onChange={() => toggleSection("modelType")}
+          disableGutters
+          elevation={0}
+          sx={{ mb: 2,borderRadius: "5px", "&:before": { display: "none" } }}
+        >
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
+            sx={{
+              px: 1,
+              "&.Mui-expanded": { minHeight: "48px" },
+            }}
+          >
+            <Typography
+              sx={{
+                color: "#4caf50",
+                fontWeight: "bold",
+                fontSize: "0.875rem",
+              }}
+            >
+              Model Type
+            </Typography>
+          </AccordionSummary>
+          <AccordionDetails sx={{ p: 0 }}>
+            <Box sx={{ px: 1 }}>
+              {/* <TextField
+                fullWidth
+                size="small"
+                placeholder="Search model types..."
+                value={searchTerms.modelType}
+                onChange={handleSearchTermChange("modelType")}
+                sx={{ mb: 1 }}
+                InputProps={{
+                  startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1, color: "#ff9800" }} />,
+                }}
+              /> */}
+              <RadioGroup
+                value={filters.modelType || ""}
+                onChange={(e) => onFilterChange("modelType", e.target.value)}
+              >
+                {filteredModelTypes.map((type) => (
+                  <FormControlLabel
+                    key={`modeltype-${type}`}
+                    value={type}
+                    control={
+                      <Radio
+                        size="small"
+                        sx={{
+                          color: "#ff9800",
+                          "&.Mui-checked": { color: "#4caf50" },
+                          padding: "6px",
+                        }}
+                      />
+                    }
+                    label={<Typography fontSize="0.8125rem">{type}</Typography>}
+                    sx={{ mb: 0, mr: 0 }}
+                  />
+                ))}
+              </RadioGroup>
+            </Box>
+          </AccordionDetails>
+        </Accordion>
+
+
 
 
         {/* Location Filters */}
@@ -787,7 +805,7 @@ const FilterPanel = React.memo(
           onChange={() => toggleSection("location")}
           disableGutters
           elevation={0}
-          sx={{ mb: 2, "&:before": { display: "none" } }}
+          sx={{ mb: 2,borderRadius: "5px", "&:before": { display: "none" } }}
         >
           <AccordionSummary
             expandIcon={<ExpandMoreIcon sx={{ color: "#4caf50" }} />}
@@ -997,12 +1015,7 @@ const FilterPanel = React.memo(
 
        
         <Divider sx={{ my: 2 }} />
-        <Typography
-          variant="body2"
-          sx={{ color: "#4caf50", textAlign: "center" }}
-        >
-          Showing {resultStats.showing || 0} of {resultStats.total || 0} brands
-        </Typography>
+       
       </Box>
     );
   }

@@ -1,40 +1,23 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Typography,
-  Button,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  TextField,
-  Paper,
-  Divider,
-  Avatar,
-  Grid,
-  InputAdornment,
-  Badge,
-  useTheme,
-  Fade,
-  Slide,
-  Snackbar,
-  Zoom,
-  Grow,
-  Alert,
-  keyframes,
-} from "@mui/material";
-import {
-  ArrowBack,
-  CreditCard,
-  AccountBalance,
-  Payment,
-  QrCode,
-  CheckCircle,
-  Rocket,
-  Star,
-  FlashOn,
-  LocalOffer,
-} from "@mui/icons-material";
+import { useTheme, keyframes } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Paper from "@mui/material/Paper";
+import Divider from "@mui/material/Divider";
+import Fade from "@mui/material/Fade";
+import Slide from "@mui/material/Slide";
+import Zoom from "@mui/material/Zoom";
+import Grow from "@mui/material/Grow";
+
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import LocalOffer from "@mui/icons-material/LocalOffer";
+import Rocket from "@mui/icons-material/Rocket";
+import Star from "@mui/icons-material/Star";
+import FlashOn from "@mui/icons-material/FlashOn";
+
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CircularProgress from "@mui/material/CircularProgress";
 // Keyframe animations
@@ -65,7 +48,18 @@ const gradientShift = keyframes`
   100% { background-position: 0% 50%; }
 `;
 
-const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPlan, onBack , snackbar, handleCloseSnackbar, isSubmitting, setSnackbar,submitSuccess }) => {
+const PaymentPage = ({
+  onSubmit,
+  selectedMembership,
+  selectedListing,
+  selectedPlan,
+  onBack,
+  snackbar,
+  handleCloseSnackbar,
+  isSubmitting,
+  setSnackbar,
+  submitSuccess,
+}) => {
   const [paymentMethod, setPaymentMethod] = useState("upi");
   const [cardDetails, setCardDetails] = useState({
     number: "",
@@ -84,24 +78,17 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
 
   const membership = selectedPlan;
 
- 
-
-
   // Orange and Green color scheme
   const primaryOrange = "#FF6B35";
-  const secondaryOrange = "#FF8C42";
-  const lightOrange = "#FFA726";
   const darkOrange = "#E65100";
 
   const primaryGreen = "#4CAF50";
-  const secondaryGreen = "#66BB6A";
-  const lightGreen = "#81C784";
   const darkGreen = "#388E3C";
 
   const handleBack = () => {
     // If a parent provided an onBack callback (inline rendering), use it.
     // Otherwise, fall back to navigation history.
-    if (typeof onBack === 'function') {
+    if (typeof onBack === "function") {
       onBack();
       return;
     }
@@ -109,9 +96,7 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
   };
 
   const handleSubmit = () => {
-     onSubmit(selectedMembership,selectedListing);
-    
-     
+    onSubmit(selectedMembership, selectedListing);
   };
 
   // GUARD CLAUSE: Show fallback if no membership is selected
@@ -509,70 +494,70 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
                   >
                     ₹{totalAmount.toLocaleString()}
                   </Typography>
-                  
                 </Box>
-                 <Button
-              variant="contained"
-              sx={{
-                background:
-                  "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
-                border: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "12px",
-                color: "#FFFFFF",
-                cursor: "pointer",
-                display: "block",
-                margin: "0 auto",
-                fontFamily:
-                  '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-                fontSize: "16px",
-                fontWeight: 500,
-                lineHeight: 0,
-                outline: "transparent",
-                px: 10, // padding-left and padding-right
-                py: 3, // padding-top and padding-bottom
-                mt: 4,
-                textAlign: "center",
-                textDecoration: "none",
-                transition: "box-shadow .2s ease-in-out",
-                userSelect: "none",
-                WebkitUserSelect: "none",
-                touchAction: "manipulation",
-                whiteSpace: "nowrap",
-                "&:not([disabled]):focus": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
-                },
-                "&:not([disabled]):hover": {
-                  boxShadow:
-                    "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
-                },
-              }}
-              onClick={handleSubmit}
-                disabled={isSubmitting}
-                startIcon={
-                  isSubmitting ? (
-                    <CircularProgress size={20} color="inherit" />
-                  ) : submitSuccess ? (
-                    <CheckCircleIcon />
-                  ) : null
-                }
-           
-            >
-                 {isSubmitting
-                  ? "paying..."
-                  : submitSuccess
-                  ? "Payment Successful"
-                  : "Confirm and Pay"}
-            </Button>
-
+                <Button
+                  variant="contained"
+                  sx={{
+                    background:
+                      "linear-gradient(to bottom right,rgb(82, 209, 105),rgb(132, 237, 47))",
+                    border: 0,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    borderRadius: "12px",
+                    color: "#FFFFFF",
+                    cursor: "pointer",
+                    display: "block",
+                    margin: "0 auto",
+                    fontFamily:
+                      '-apple-system, system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: "16px",
+                    fontWeight: 500,
+                    lineHeight: 0,
+                    outline: "transparent",
+                    px: 10, // padding-left and padding-right
+                    py: 3, // padding-top and padding-bottom
+                    mt: 4,
+                    textAlign: "center",
+                    textDecoration: "none",
+                    transition: "box-shadow .2s ease-in-out",
+                    userSelect: "none",
+                    WebkitUserSelect: "none",
+                    touchAction: "manipulation",
+                    whiteSpace: "nowrap",
+                    "&:not([disabled]):focus": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(192, 230, 123, 0.5)",
+                    },
+                    "&:not([disabled]):hover": {
+                      boxShadow:
+                        "0 0 .25rem rgba(0, 0, 0, 0.5), -.125rem -.125rem 1rem rgb(82, 209, 105), .125rem .125rem 1rem rgba(175, 203, 122, 0.5)",
+                    },
+                  }}
+                  onClick={handleSubmit}
+                  disabled={isSubmitting}
+                  startIcon={
+                    isSubmitting ? (
+                      <CircularProgress size={20} color="inherit" />
+                    ) : submitSuccess ? (
+                      <CheckCircleIcon />
+                    ) : null
+                  }
+                >
+                  {isSubmitting
+                    ? "paying..."
+                    : submitSuccess
+                    ? "Payment Successful"
+                    : "Confirm and Pay"}
+                </Button>
               </Paper>
-              
             </Grow>
 
-           
-            <Zoom in={true} timeout={1200} mt={10}>
+            <Zoom
+              in={true}
+              timeout={1200}
+              mt={10}
+              onClick={() => navigate("/contactus")}
+            >
               <Button
                 fullWidth
                 variant="contained"
@@ -582,6 +567,8 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
                   borderRadius: 3,
                   fontSize: "1.3rem",
                   fontWeight: 800,
+                  //data occur with mail at updations @ mrfranchise
+                  // onClick: () => navigate("/contactus"),
                   background: `linear-gradient(135deg, ${primaryOrange} 0%, ${primaryGreen} 100%)`,
                   backgroundSize: "200% 200%",
                   animation: `${gradientShift} 3s ease infinite, ${pulseAnimation} 2s ease-in-out infinite`,
@@ -594,7 +581,7 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
                   transition: "all 0.3s ease",
                 }}
               >
-                🎯 Please Contact support.team@mrfranchise.in To Buy 🎯
+                🎯 Please Contact support@mrfranchise.in To Buy 🎯
               </Button>
             </Zoom>
           </>
@@ -808,8 +795,8 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
         )}
       </Box>
 
-           <Snackbar
-                open={snackbar.open}
+      {/* <Snackbar
+                open={snackbar}
                 autoHideDuration={6000}
                 onClose={handleCloseSnackbar}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -821,8 +808,7 @@ const PaymentPage = ({ onSubmit, selectedMembership, selectedListing,selectedPla
                 >
                   {snackbar.message}
                 </Alert>
-              </Snackbar>
-
+              </Snackbar> */}
     </Box>
   );
 };

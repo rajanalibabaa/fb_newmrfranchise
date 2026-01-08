@@ -1,7 +1,13 @@
 import React from "react";
-import { Box, Typography, Paper, Button, Divider, Grid, useTheme, useMediaQuery } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import Divider from "@mui/material/Divider";
+import Grid from "@mui/material/Grid";
+import { useTheme, useMediaQuery } from "@mui/material";
 import { Link as RouterLink } from 'react-router-dom';
-import {Link} from '@mui/material';
+import Link from '@mui/material/Link';
 import { motion } from "framer-motion";
 import Navbar from "../../Navbar/NavBar";
 import Footer from "../Footer";

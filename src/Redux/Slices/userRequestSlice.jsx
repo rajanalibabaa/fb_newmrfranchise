@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 // Backend base URL — adjust if needed
-const BASE_URL = "http://localhost:5000/api/v1/brandlisting";
+const BASE_URL = "https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting";
 
 // ----------------------
 // Async Thunks (Direct API Calls)
@@ -13,11 +13,11 @@ export const addRequest = createAsyncThunk(
   "requests/add",
   async (formData, { rejectWithValue }) => {
     try {
-      console.log("Submitting new request:", formData);
+      // console.log("Submitting new request:", formData);
 
       const { data } = await axios.post(`${BASE_URL}/userRequestNotification`, formData);
 
-      console.log("Response from backend:", data);
+      // console.log("Response from backend:", data);
 
       // The backend returns: { success, message, data: newRequest }
       return data.data;

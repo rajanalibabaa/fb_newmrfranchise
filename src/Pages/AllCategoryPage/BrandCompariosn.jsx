@@ -37,8 +37,8 @@ import { toggleHomeCardShortlist } from "../../Redux/Slices/TopCardFetchingSlice
 import { toggleBrandShortListfilter } from "../../Redux/Slices/FilterBrandSlice";
 import { postView } from "../../Utils/function/view.jsx";
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
-
-
+ 
+ 
 const BrandComparison = ({
   open,
   onClose,
@@ -50,34 +50,34 @@ const BrandComparison = ({
   const [loading, setLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const dispatch = useDispatch();
-
+ 
   useEffect(() => {
     const fetchBrandDetails = async () => {
       if (selectedBrands.length === 0) return;
-
+ 
       setLoading(true);
       try {
         const promises = selectedBrands.map((brand) =>
-  axios.get(`http://localhost:5000/api/v1/brandlisting/getBrandListingByUUID/${brand.uuid}`, {
+  axios.get(`https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/getBrandListingByUUID/${brand.uuid}`, {
     params: {
       userId: userId
     }
   })
 );
-        
-
+       
+ 
         const responses = await Promise.all(promises);
-
+ 
         // Flatten each response's data if it's an array
         const details = responses.map((res) => {
           const data = res.data.data;
-
-
+ 
+ 
           return Array.isArray(data) ? data[0] : data;
         });
-
+ 
         setBrandDetails(details); // Now this will be an array of objects, not arrays
-
+ 
         // Initialize current model indexes
         const indexes = {};
         details.forEach((brand) => {
@@ -90,10 +90,10 @@ const BrandComparison = ({
         setLoading(false);
       }
     };
-
+ 
     fetchBrandDetails();
   }, [selectedBrands]);
-
+ 
   const getNestedValue = (obj, path) => {
     try {
       return (
@@ -112,7 +112,7 @@ const BrandComparison = ({
       return "-";
     }
   };
-
+ 
   const handleToggleShortList = async (brand) => {
     if (!token) {
       setShowLogin(true);
@@ -124,10 +124,10 @@ const BrandComparison = ({
       dispatch(toggleHomeCardShortlist(brandId));
       dispatch(toggleBrandShortListfilter(brandId));
       await handleShortList(brandId);
-      
+     
       // Update local state
-      setBrandDetails(prev => 
-        prev.map(b => 
+      setBrandDetails(prev =>
+        prev.map(b =>
           b.uuid === brandId ? { ...b, isShortListed: !b.isShortListed } : b
         )
       );
@@ -135,17 +135,17 @@ const BrandComparison = ({
       console.error("Error toggling shortlist:", error);
     }
   };
-
+ 
  
  const handleApply = (brand) => {
        postView(brand?.uuid);
        dispatch(openBrandDialog(brand));
      };
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
   const basicInfoFields = [
     { label: "Brand Name", field: "brandDetails.brandName" },
     { label: "Company Name", field: "brandDetails.companyName" },
@@ -162,7 +162,7 @@ const BrandComparison = ({
     },
     { label: "Requirement Support", field: "brandfranchisedetails.franchiseDetails.consultationOrAssistance" },
   ];
-
+ 
   const franchiseModelFields = [
     { label: "Franchise Model", field: "franchiseModel" },
     { label: "Franchise Type", field: "franchiseType" },
@@ -179,7 +179,7 @@ const BrandComparison = ({
     { label: "Require Working Captial", field: "requireWorkingCapital" },
     { label: "Margin On Sales", field: "marginOnSales" },
   ];
-
+ 
   return (
     <Box>
       <Box>
@@ -265,7 +265,7 @@ const BrandComparison = ({
                                 p: 0.5,
                               }}
                             />
-                            
+                           
                             <Tooltip title={brand?.isShortListed ? "Remove from Shortlist" : "Add to Shortlist"}>
                               <IconButton
                                 onClick={(e) => {
@@ -290,7 +290,7 @@ const BrandComparison = ({
                               </IconButton>
                             </Tooltip>
                           </Box>
-
+ 
                           <Typography
                             variant="subtitle1"
                             sx={{ fontWeight: "bold", color: "#4caf50" }}
@@ -299,7 +299,7 @@ const BrandComparison = ({
                           </Typography>
                           <Typography display='flex' space='between' flexDirection='row'>
                                                       <Chip label="Apply Brand" size="small" onClick={() => handleApply(brand)} sx={{ mt: 1, bgcolor: "#ff9800", color: "white", "&:hover": { bgcolor: "#fb8c00", }, }} />
-
+ 
                           <Chip
                             label="Remove"
                             size="small"
@@ -314,7 +314,7 @@ const BrandComparison = ({
                             }}
                           />
                           </Typography>
-                          
+                         
                         </Box>
                       </TableCell>
                     ))}
@@ -332,14 +332,14 @@ const BrandComparison = ({
                       </TableCell>
                       {brandDetails.map((brand) => {
                         let value = getNestedValue(brand, field.field);
-
+ 
                         if (
                           field.label === "Requirement Support" &&
                           Array.isArray(value)
                         ) {
                           value = value.join(", ");
                         }
-
+ 
                         return (
                           <TableCell
                             key={`${brand.uuid}-${field.field}`}
@@ -358,7 +358,7 @@ const BrandComparison = ({
                       })}
                     </TableRow>
                   ))}
-
+ 
                   {franchiseModelFields.map((field) => (
                     <TableRow key={field.label} hover>
                       <TableCell
@@ -372,7 +372,7 @@ const BrandComparison = ({
                         const models = brand?.brandfranchisedetails?.franchiseDetails?.fico || [];
                         const currentIndex = currentModelIndexes[brand.uuid] || 0;
                         const currentModel = models[currentIndex];
-
+ 
                         return (
                           <TableCell
                             key={`${brand.uuid}-${field.field}-${currentIndex}`}
@@ -429,10 +429,10 @@ const BrandComparison = ({
 >
   Close Comparison
 </Button>
-
+ 
         </DialogActions>
       </Dialog>
-
+ 
       {/* Login Dialog */}
       {showLogin && (
         <LoginPage open={showLogin} onClose={() => setShowLogin(false)} />
@@ -440,5 +440,6 @@ const BrandComparison = ({
     </Box>
   );
 };
-
+ 
 export default BrandComparison;
+ 

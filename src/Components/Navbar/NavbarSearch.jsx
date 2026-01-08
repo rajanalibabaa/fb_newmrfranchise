@@ -1,52 +1,46 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Dialog,
-  DialogContent,
-  TextField,
-  IconButton,
-  InputAdornment,
-  Tabs,
-  Tab,
-  Box,
-  Button,
-  Typography,
-  FormControl,
-  Paper,
-  List,
-  ListItemText,
-  Divider,
-  Chip,
-  CircularProgress,
-  Autocomplete,
-  ListItemButton,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+
+
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import TextField from "@mui/material/TextField";
+import IconButton from "@mui/material/IconButton";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import FormControl from "@mui/material/FormControl";
+import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
+import Autocomplete from "@mui/material/Autocomplete";
+
 import CloseIcon from "@mui/icons-material/Close";
 import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData";
-import { setFilter, resetFilters } from "../../Redux/Slices/FilterBrandSlice";
+import {  resetFilters } from "../../Redux/Slices/FilterBrandSlice";
 import Search from "./Search";
 
-const highlightMatch = (text, searchTerm) => {
-  if (!searchTerm || !text) return text;
+// const highlightMatch = (text, searchTerm) => {
+//   if (!searchTerm || !text) return text;
 
-  const regex = new RegExp(`(${searchTerm})`, "gi");
-  const parts = text.split(regex);
+//   const regex = new RegExp(`(${searchTerm})`, "gi");
+//   const parts = text.split(regex);
 
-  return parts.map((part, index) =>
-    part.toLowerCase() === searchTerm.toLowerCase() ? (
-      <span
-        key={index}
-        style={{ fontWeight: "bold", backgroundColor: "yellow" }}
-      >
-        {part}
-      </span>
-    ) : (
-      part
-    )
-  );
-};
+//   return parts.map((part, index) =>
+//     part.toLowerCase() === searchTerm.toLowerCase() ? (
+//       <span
+//         key={index}
+//         style={{ fontWeight: "bold", backgroundColor: "yellow" }}
+//       >
+//         {part}
+//       </span>
+//     ) : (
+//       part
+//     )
+//   );
+// };
 
 const NavbarSearch = ({ open, handleClose }) => {
   const navigate = useNavigate();

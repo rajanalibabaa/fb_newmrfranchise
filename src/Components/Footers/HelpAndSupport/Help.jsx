@@ -1,32 +1,17 @@
 import React from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Link,
-} from "@mui/material";
-import {
-  Email,
-  Phone,
-} from '@mui/icons-material';
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Link from "@mui/material/Link";
+import Email from '@mui/icons-material/Email';
+import Phone from '@mui/icons-material/Phone';
+
 import Navbar from "../../Navbar/NavBar";
-import { Link as RouterLink } from "react-router-dom";
 import Footer from "../Footer";
 import { motion } from "framer-motion";
 
-const paperStyle = {
-  p: 3,
-  mb: 4,
-  borderRadius: 3,
-  boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-  transition: "transform 0.3s ease, box-shadow 0.3s ease",
-  cursor: "default",
-  ":hover": {
-    transform: "translateY(-5px)",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-    backgroundColor: "rgba(25, 118, 210, 0.04)",
-  },
-};
+
 
 const titleStyle = {
   display: "flex",

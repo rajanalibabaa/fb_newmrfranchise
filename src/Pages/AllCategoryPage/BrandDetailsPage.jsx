@@ -5,7 +5,7 @@ import { CircularProgress, Box } from "@mui/material";
 import axios from "axios";
 import { userId } from "../../Utils/autherId.jsx";
 import SEO from "../../Components/SEO/Seo";
-
+import img1 from '../../assets/Images/bg21.jpeg'
 const BrandDetails = lazy(() => import("./BrandDetail.jsx"));
 
 function BrandDetailsPage() {
@@ -73,11 +73,11 @@ function BrandDetailsPage() {
     (async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/v1/brandlisting/getBrandListingByUUID/${brandId}`,
+          `https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/getBrandListingByUUID/${brandId}`,
           { params: { userId } }
         );
         let brand = res.data?.data;
-        console.log("brand coming data ",brand);
+        // console.log("brand coming data ",brand);
         
         // Guarantee always array for BrandDetails
         setBrandData(Array.isArray(brand) ? brand : [brand]);
@@ -277,13 +277,28 @@ function BrandDetailsPage() {
           <Box sx={{ minHeight: 220, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CircularProgress color="warning" size={40} />
           </Box>
+          
         }
       >
-        <BrandDetails
-          brandData={brandData}
-          fromSession={true}
-          key={brandCacheKey}
-        />
+        <Box
+  sx={{
+    
+                    backgroundImage: `url(${img1})`,
+                   backgroundSize: "400px auto",        // fill entire box
+                   // backgroundPosition: "center",   // center image
+                   backgroundRepeat: "repeat",
+                   minHeight: "87vh",             // full screen height
+                   width: "100%",
+                
+  }}
+>
+  <BrandDetails
+    brandData={brandData}
+    fromSession={true}
+    key={brandCacheKey}
+  />
+</Box>
+
       </Suspense>
     </>
   );

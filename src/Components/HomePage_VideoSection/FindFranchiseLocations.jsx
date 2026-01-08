@@ -6,19 +6,16 @@ import React, {
   useLayoutEffect,
   useMemo,
 } from "react";
-import {
-  Typography,
-  Box,
-  Button,
-  CircularProgress,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  useMediaQuery,
-  useTheme,
-  IconButton,
-} from "@mui/material";
+
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { useMediaQuery, useTheme } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import { motion } from "framer-motion";
 import ArrowRight from "@mui/icons-material/ArrowRight";
 import ArrowForward from "@mui/icons-material/ArrowForward";
@@ -236,7 +233,7 @@ const FindFranchiseLocations = () => {
     <Box
       ref={containerRef}
       sx={{
-        py: isMobile ? 1 : 2,
+        py: isMobile ? 1 : 0,
         px: isMobile ? 0 : 2,
         maxWidth: isMobile ? "100%" : 1400,
         mx: "auto",
@@ -268,14 +265,19 @@ const FindFranchiseLocations = () => {
           alignItems: "center",
           mb: 1,
           px: isMobile ? 2 : 0,
+          gap: 2,
+          //  backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
         }}
       >
         <Typography
           variant={isMobile ? "body1" : "h5"}
           fontWeight="bold"
           sx={{
-            color: "black",
+            color: "#f57a00",
             mb: 1,
+            
             textAlign: "left",
             position: "relative",
             "&:after": {
@@ -293,9 +295,19 @@ const FindFranchiseLocations = () => {
           {selectedState ? `Franchise Opportunities in ${selectedState}` : "All Franchise Opportunities"}
         </Typography>
  
-        <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-          <FormControl sx={{ minWidth: isMobile ? 120 : 200 }} size="small">
-            <InputLabel id="state-filter-label">Filter by expansion Location</InputLabel>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2, alignItems: "center",}}>
+          <FormControl sx={{ minWidth: isMobile ? 120 : 200,backgroundColor: '#f57a00' }} size="small">
+{/* <InputLabel
+  id="state-filter-label"
+  sx={{
+    color: "#000000ff",
+    "&.Mui-focused": {
+      color: "#fff",
+    },
+  }}
+>
+  Filter by State
+</InputLabel> */}
             <Select
               labelId="state-filter-label"
               value={selectedState || ""}
@@ -351,17 +363,18 @@ const FindFranchiseLocations = () => {
           disabled={!showStartShadow}
           sx={{
             position: "absolute",
-            left: isMobile ? 2 : 8,
-            top: "55%",
+            left: isMobile ? 2 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            backgroundColor: "#ff9800",
+            color:"black",
             boxShadow: 2,
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#c28223ff",
             },
             "&:disabled": {
               opacity: 0,
@@ -378,17 +391,18 @@ const FindFranchiseLocations = () => {
           aria-label="next"
           sx={{
             position: "absolute",
-            right: isMobile ? 4 : 8,
-            top: "55%",
+            right: isMobile ? 4 : -10,
+            top: "63.5%",
             transform: "translateY(-50%)",
             zIndex: 1,
             minWidth: 40,
             height: 40,
             borderRadius: "50%",
-            backgroundColor: "background.paper",
+            color:"black",
+            backgroundColor: "#ff9800",
             boxShadow: 2,
             "&:hover": {
-              backgroundColor: "action.hover",
+              backgroundColor: "#c28223ff",
             },
             "&:disabled": {
               opacity: 0,

@@ -1,16 +1,14 @@
 import React, { memo,useCallback } from "react";
-import {
-  Box,
-  Typography,
-  Card,
-  Button,
-  IconButton,
-  Stack,
-  Tooltip,
-  useMediaQuery,
-  useTheme
-} from "@mui/material";
-import { Favorite, Close } from "@mui/icons-material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
+import { useTheme, useMediaQuery } from "@mui/material";
+import  Favorite  from "@mui/icons-material/Favorite";
 import { motion } from "framer-motion";
 import { RiBookmark3Fill } from "react-icons/ri";
 import img from "../../../assets/Images/logo.png";
@@ -91,13 +89,13 @@ const dispatch = useDispatch();
 
     const onToggleLike = async(brandId) => {
 
-      console.log("brand id",brandId)
+      // console.log("brand id",brandId)
       dispatch(removeLikedBrand(brandId))
        await likeApiFunction(brandId);
     }
 
     const onToggleShortlist = async(brandId) => {
-        console.log("brand id",brandId)
+        // console.log("brand id",brandId)
         dispatch(removeSortList(brandId))
         await handleShortList(brandId)
     }

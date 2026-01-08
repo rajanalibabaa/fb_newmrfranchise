@@ -1,15 +1,15 @@
 // BrandDashboard.js
 import React, { useEffect, useState } from "react";
-import { Box, useMediaQuery, useTheme } from "@mui/material";
+import {  useMediaQuery, useTheme } from "@mui/material";
+import Box from "@mui/material/Box";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import BrandHeader from "./BrandDashboardController/BrandDashboardFiles/BrandHeader";
 import DashboardTabs from "./BrandDashboardController/BrandDashboardFiles/DashboardTabs";
-import TabContent from "./BrandDashboardController/BrandDashboardFiles/TabContent";
 import LeadDetailDialog from "./BrandDashboardController/BrandDashboardFiles/LeadDetailDialog";
 import { userId } from "../../Utils/autherId";
 
-const API_BASE_URL = "http://localhost:5000/api/v1";
+const API_BASE_URL = "https://mrfranchisebackend.mrfranchise.in/api/v1";
 
 const BrandDashboard = ({ selectedSection, sectionContent }) => {
   const theme = useTheme();
@@ -24,7 +24,6 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
   
   const brandUUID = userId ||useSelector((state) => state.auth.brandUUID);
   const token = useSelector((state) => state.auth.AccessToken);
-  console.log("===id=== :",brandUUID)
 
   const fetchData = async () => {
     if (!brandUUID || !token) return;
@@ -53,7 +52,7 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
 
       if (brandRes.status === 'fulfilled' && brandRes.value.data?.success) {
         setBrandData(brandRes.value.data.data || {});
-        console.log("===brandData===: ",brandRes.value.data.data )
+        // console.log("===brandData===: ",brandRes.value.data.data )
       } else {
         console.warn('Brand data fetch failed');
         setBrandData({});
@@ -102,7 +101,7 @@ const BrandDashboard = ({ selectedSection, sectionContent }) => {
     return sectionContent[selectedSection];
   }
 
-  console.log("brandData :",brandData)
+  // console.log("brandData :",brandData)
 
   return (
     <Box sx={{ backgroundColor: "#f8f9fa", minHeight: "100vh", pb: 4 }}>

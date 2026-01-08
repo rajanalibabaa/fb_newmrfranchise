@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Typography,
-  Paper
-} from "@mui/material";
+
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import axios from "axios";
 
 const PostRequirement = () => {
@@ -54,7 +54,7 @@ const PostRequirement = () => {
       // console.log("Sending cleaned data:", cleanData);
 
       const response = await axios.post(
-        "http://localhost:5000/api/v1/post/createPostRequirement",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/post/createPostRequirement",
         cleanData,
         { headers: { "Content-Type": "application/json" } }
       );

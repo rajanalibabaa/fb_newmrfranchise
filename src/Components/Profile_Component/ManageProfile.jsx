@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Box, Button, TextField, Typography, Paper, Avatar
-} from "@mui/material";
+
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Avatar from "@mui/material/Avatar";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Paper from "@mui/material/Paper";
+
 import axios from "axios";
 import img from "../../assets/images/brandLogo.jpg";
 import PersonIcon from '@mui/icons-material/Person';
@@ -18,7 +24,7 @@ const id = useSelector((state) => state.user.investorUUID);
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:5000/api/v1/investor/getInvestor/${id}`,
+                    `https://mrfranchisebackend.mrfranchise.in/api/v1/investor/getInvestor/${id}`,
                     {
                         headers: {
                             "Content-Type": "application/json",

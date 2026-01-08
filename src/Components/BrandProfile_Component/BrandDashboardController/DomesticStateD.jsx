@@ -1,18 +1,18 @@
 // Updated DomesticStateDrawer.js with isEditing support
 import React from "react";
-import {
-  Box,
-  Typography,
-  Button,
-  Checkbox,
-  TextField,
-  Drawer,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Chip,
-  FormControlLabel,
-} from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import TextField from "@mui/material/TextField";
+import Drawer from "@mui/material/Drawer";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Chip from "@mui/material/Chip";
+import FormControlLabel from "@mui/material/FormControlLabel";
+
 import { ChevronDown, Search } from "lucide-react";
 
 const DomesticStateDrawer = ({

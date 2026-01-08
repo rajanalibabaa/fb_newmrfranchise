@@ -1,15 +1,22 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import {
-  Box,
-  Typography,
-  Button,
-  CircularProgress,
+
   useMediaQuery,
   useTheme,
-  IconButton
+  
 } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import IconButton from '@mui/material/IconButton'
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowBack, ArrowForward, Close } from "@mui/icons-material";
+import ArrowRight from "@mui/icons-material/ArrowRight";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import Close from "@mui/icons-material/Close";
+
+
 import { useSelector, useDispatch } from 'react-redux';
 import HomePageBrandCard from './HomePageBrandCard';
 import { openBrandDialog } from "../../Redux/Slices/OpenBrandNewPageSlice.jsx";
@@ -43,7 +50,7 @@ const SimilarBrands = ({ brandData }) => {
   // Get brands from Redux
   const { brands, loading, error } = useSelector((state) => state.brandCategory);
 
-  console.log("SimilarBrands Brands from Redux:", brands);
+  // console.log("SimilarBrands Brands from Redux:", brands);
 
   // Get current brand's subCategory and childCategory
   const currentSubCategory = brandData[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.main;
@@ -204,7 +211,7 @@ const SimilarBrands = ({ brandData }) => {
       <Box
         ref={containerRef}
         sx={{
-          py: isMobile ? 1 : 3,
+          py: isMobile ? 1 : 1,
           px: isMobile ? 0 : 2,
           maxWidth: isMobile ? "100%" : 1400,
           mx: "auto",
@@ -238,14 +245,18 @@ const SimilarBrands = ({ brandData }) => {
             alignItems: "center",
             mb: 1,
             px: isMobile ? 2 : 0,
+            //  backgroundColor:'white',
+            p: 1.5,
+            // borderRadius: 2,
           }}
         >
           <Typography
             variant={isMobile ? "body1" : "h5"}
             fontWeight="bold"
             sx={{
-              color: "black",
+              color: "#f57c00",
               mb: 1,
+             
               textAlign: "left",
               position: "relative",
               "&:after": {
@@ -299,17 +310,18 @@ const SimilarBrands = ({ brandData }) => {
             aria-label="previous"
             sx={{
               position: "absolute",
-              left: isMobile ? 2 : 8,
-              top: "55%",
+              left: isMobile ? 2 : -10,
+              top: "63.5%",
               transform: "translateY(-50%)",
               zIndex: 1,
               minWidth: 40,
               height: 40,
               borderRadius: "50%",
-              backgroundColor: "background.paper",
+              color:"black",
+              backgroundColor: "#ff9800",
               boxShadow: 2,
               "&:hover": {
-                backgroundColor: "action.hover",
+                backgroundColor: "#c28223ff",
               },
               "&:disabled": {
                 opacity: 0,
@@ -326,17 +338,18 @@ const SimilarBrands = ({ brandData }) => {
             aria-label="next"
             sx={{
               position: "absolute",
-              right: isMobile ? 4 : 8,
-              top: "55%",
+              right: isMobile ? 4 : -10,
+              top: "63.5%",
               transform: "translateY(-50%)",
               zIndex: 1,
               minWidth: 40,
               height: 40,
               borderRadius: "50%",
-              backgroundColor: "background.paper",
+              color:"black",
+              backgroundColor: "#ff9800",
               boxShadow: 2,
               "&:hover": {
-                backgroundColor: "action.hover",
+                backgroundColor: "#c28223ff",
               },
               "&:disabled": {
                 opacity: 0,
@@ -360,7 +373,7 @@ const SimilarBrands = ({ brandData }) => {
             }}
           >
             {brands?.map((brand) => (
-              console.log("Rendering brand in SimilarBrands:", brand),
+              // console.log("Rendering brand in SimilarBrands:", brand),
               <motion.div key={brand.uuid || brand.id}>
                 <HomePageBrandCard
                   brand={brand}

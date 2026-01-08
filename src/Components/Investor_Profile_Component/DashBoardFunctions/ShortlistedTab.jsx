@@ -1,6 +1,11 @@
 import React from "react";
-import { Grid, Box, Typography, LinearProgress, Pagination, CircularProgress } from "@mui/material";
-import { Bookmark } from "@mui/icons-material";
+import CircularProgress from "@mui/material/CircularProgress";
+import LinearProgress from "@mui/material/LinearProgress";
+import Pagination from "@mui/material/Pagination";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import  Bookmark  from "@mui/icons-material/Bookmark";
 import BrandCard from "../DashBoardFunctions/BrandCard";
 
 const ShortlistedTab = ({ 

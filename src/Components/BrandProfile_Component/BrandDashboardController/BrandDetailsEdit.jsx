@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  TextField,
-  Grid,
-  Typography,
-  InputAdornment,
-  Box,
-  Autocomplete,
-  Tooltip,
-} from "@mui/material";
+
+import TextField from "@mui/material/TextField";
+import CircularProgress from "@mui/material/CircularProgress";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
+import InputAdornment from "@mui/material/InputAdornment";
+import Autocomplete from "@mui/material/Autocomplete";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+
 import FlagIcon from "@mui/icons-material/Flag";
 import { fetchGlobalLocationByPostalCode } from "../../../Utils/PincodeFetch.jsx";
 import coutryCode from "../../../Utils/AllCountryCode.jsx";
@@ -133,7 +134,10 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
         case "whatsapp":
           setWhatsappCountryCode(newValue);
           if (data.whatsappNumber) {
-            const numberWithoutCode = data.whatsappNumber.replace(/^\+?\d+/, "");
+            const numberWithoutCode = data.whatsappNumber.replace(
+              /^\+?\d+/,
+              ""
+            );
             onChange("whatsappNumber", newValue.dial_code + numberWithoutCode);
           }
           break;
@@ -393,7 +397,11 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
   return (
     <Box sx={{ pr: 1, mr: { sm: 0, md: 10 }, ml: { sm: 0, md: 10 } }}>
       {/* Brand Details Section */}
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        sx={{ mb: 3, color: "#ff9800" }}
+      >
         Login Credentials
       </Typography>
 
@@ -454,7 +462,11 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
         </Grid>
       </Grid>
 
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        sx={{ mb: 3, color: "#ff9800" }}
+      >
         Brand Details
       </Typography>
       <Grid
@@ -569,7 +581,11 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
         </Grid>
       </Grid>
 
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 3, color: "#ff9800" }}>
+      <Typography
+        variant="h6"
+        fontWeight={700}
+        sx={{ mb: 3, color: "#ff9800" }}
+      >
         Head Office Location{" "}
       </Typography>
 
@@ -898,8 +914,7 @@ const BrandDetailsEdit = ({ data = {}, errors = {}, onChange, isEditing }) => {
           gridTemplateColumns: { md: "repeat(4, 1fr)", xs: "1fr" },
           gap: 2,
         }}
-      >
-      </Grid>
+      ></Grid>
     </Box>
   );
 };

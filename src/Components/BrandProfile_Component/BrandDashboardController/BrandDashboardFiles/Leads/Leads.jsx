@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
-import { Box, Typography, CircularProgress } from "@mui/material";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 import { GetApiCall } from "../../../../../Api/DefaultApi";
 import { api } from "../../../../../Api/api";
 import PackageCard from "../../../../../ui/cards/PackageCard";

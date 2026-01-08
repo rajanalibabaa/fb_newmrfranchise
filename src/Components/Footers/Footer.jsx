@@ -1,25 +1,21 @@
 import React from "react";
-import {
-  Box,
-  Container,
-  Grid,
-  Typography,
-  Link,
-  Divider,
-  IconButton,
-  Button,
-} from "@mui/material";
+
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
+import IconButton from "@mui/material/IconButton";
+import Button from "@mui/material/Button";
 import brandlogo from "../../assets/Images/brandLogo.jpg";
-import {
-  Facebook,
-  Twitter,
-  LinkedIn,
-  Instagram,
-  ArrowUpward,
-  Email,
-  Phone,
-  LocationOn,
-} from "@mui/icons-material";
+
+
+import Facebook from "@mui/icons-material/Facebook";
+import Twitter from "@mui/icons-material/Twitter";
+import LinkedIn from "@mui/icons-material/LinkedIn";
+import Instagram from "@mui/icons-material/Instagram";
+import ArrowUpward from "@mui/icons-material/ArrowUpward";
+
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -36,7 +32,7 @@ function Footer() {
   const handleSubscribe = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/v1/subcribe/getsubscribe",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/subcribe/getsubscribe",
         { email },
         {
           headers: {
@@ -82,13 +78,14 @@ function Footer() {
       }}
     >
       <Container maxWidth="xl">
-        <Grid container spacing={4} justifyContent="space-between">
+        <Grid container spacing={4} justifyContent="space-around">
           {/* Brand Column */}
           <Grid item xs={12} md={3}>
             <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
               <Box
                 component="img"
                 src={brandlogo}
+                onClick={()=> navigate("/")}
                 loading="lazy"
                 alt="MR FRANCHISE Logo"
                 sx={{
@@ -109,7 +106,7 @@ function Footer() {
                   alignSelf: { xs: "center", md: "flex-start" },
                 }}
               >
-                BUSINESS INVESTORS: BEST CHOICE
+                BUSINESS INVESTORS' BEST CHOICE
               </Typography>
               <Typography
                 variant="body2"
@@ -161,8 +158,8 @@ function Footer() {
                 { text: "Expand Your Brand", href: "/expandyourbrand" },
                 { text: "Invest in a Franchise", href: "/investfranchise" },
                 { text: "Advertise With Us", href: "/advertisewithus" },
-                { text: "Lead Distribution", href: "/franchisepromotion" },
-                { text: "Other Industries", href: "/otherindustries" },
+                // { text: "Lead Distribution", href: "/franchisepromotion" },
+                // { text: "Other Industries", href: "/otherindustries" },
                 { text: "Blogs", href: "/blogs" },
               ].map((item, index) => (
                 <Link
@@ -218,6 +215,7 @@ function Footer() {
             >
               {[
                 { text: "About Us", href: "/aboutus" },
+                { text: "Contact Us", href: "/contactus" },
                 { text: "FAQs", href: "/faq" },
                 { text: "Help Center", href: "/help" },
                 { text: "Terms & Conditions", href: "/termsandconditions" },
@@ -242,8 +240,57 @@ function Footer() {
             </Box>
           </Grid>
 
-          {/* Newsletter Column */}
-          <Grid item xs={12} md={3}>
+         
+
+          {/* Contact Details Column */}
+          {/* <Grid item xs={12} md={2}>
+            <Typography
+              variant="h6"
+              sx={{
+                color: "#ffba00",
+                fontWeight: 700,
+                mb: 2.5,
+                fontSize: "1.1rem",
+                position: "relative",
+                "&::after": {
+                  content: '""',
+                  position: "absolute",
+                  bottom: -8,
+                  left: 0,
+                  width: "50px",
+                  height: "3px",
+                  backgroundColor: "#ff6d00",
+                },
+              }}
+            >
+              Contact Details
+            </Typography>
+            
+            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+              <Phone sx={{ color: "#ffba00", mr: 1.5, fontSize: "1.2rem" }} />
+              <Link
+                href="tel:+917449213799"
+                color="#b0bec5"
+                underline="hover"
+                variant="body2"
+              >
+                +91 7449213799
+              </Link>
+            </Box>
+            
+            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
+              <LocationOn sx={{ color: "#ffba00", mr: 1.5, fontSize: "1.2rem" }} />
+              <Typography variant="body2" color="#b0bec5">
+                India
+              </Typography>
+            </Box>
+            
+          
+          </Grid> */}
+        </Grid>
+ {/* Newsletter Column */}
+          <Box display={'flex'} flexDirection={{ xs: 'column', sm: 'row' }} >
+            <Box ml={{ xs: 0, md:8 }} >
             <Typography
               variant="h6"
               sx={{
@@ -325,9 +372,9 @@ function Footer() {
                 Subscribe
               </Button>
             </Box>
-
+</Box>
             {/* Social Media */}
-            <Box sx={{ mt: 3 }}>
+            <Box sx={{ ml: { xs: 4, md: 18}, mt: { xs: 3, sm: 0, md: 5 } }}>
               <Typography variant="body2" color="#b0bec5" mb={1.5}>
                 Connect with us:
               </Typography>
@@ -357,101 +404,7 @@ function Footer() {
                 ))}
               </Box>
             </Box>
-          </Grid>
-
-          {/* Contact Details Column */}
-          <Grid item xs={12} md={2}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: "#ffba00",
-                fontWeight: 700,
-                mb: 2.5,
-                fontSize: "1.1rem",
-                position: "relative",
-                "&::after": {
-                  content: '""',
-                  position: "absolute",
-                  bottom: -8,
-                  left: 0,
-                  width: "50px",
-                  height: "3px",
-                  backgroundColor: "#ff6d00",
-                },
-              }}
-            >
-              Contact Details
-            </Typography>
-            
-            <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-              <Phone sx={{ color: "#ffba00", mr: 1.5, fontSize: "1.2rem" }} />
-              <Link
-                href="tel:+917449213799"
-                color="#b0bec5"
-                underline="hover"
-                variant="body2"
-              >
-                +91 7449213799
-              </Link>
-            </Box>
-            
-            <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-              <LocationOn sx={{ color: "#ffba00", mr: 1.5, fontSize: "1.2rem" }} />
-              <Typography variant="body2" color="#b0bec5">
-                India
-              </Typography>
-            </Box>
-            
-            <Box mb={2}>
-              <Typography variant="body2" sx={{ color: "#ffba00", mb: 1 }}>
-                Want to "ADVERTISE YOUR BRAND" on www.MrFranchise.in?
-              </Typography>
-              <Typography variant="body2" color="#b0bec5">
-                Mail to{" "}
-                <Link
-                  href="mailto:sales@mrfranchise.in"
-                  color="#ffba00"
-                  underline="hover"
-                >
-                  sales@mrfranchise.in
-                </Link>
-              </Typography>
-            </Box>
-
-            <Box mb={2}>
-              <Typography variant="body2" sx={{ color: "#ffba00", mb: 1 }}>
-                Want to "START A FOOD AND BEVERAGE BUSINESS" and need support?
-              </Typography>
-              <Typography variant="body2" color="#b0bec5">
-                Mail to{" "}
-                <Link
-                  href="mailto:investor@mrfranchise.in"
-                  color="#ffba00"
-                  underline="hover"
-                >
-                  investor@mrfranchise.in
-                </Link>
-              </Typography>
-            </Box>
-
-            <Box mb={2}>
-              <Typography variant="body2" sx={{ color: "#ffba00", mb: 1 }}>
-                Want to "CHANGE YOUR LISTING INFORMATION" on www.MrFranchise.in?
-              </Typography>
-              <Typography variant="body2" color="#b0bec5">
-                Mail to{" "}
-                <Link
-                  href="mailto:support.team@mrfranchise.in"
-                  color="#ffba00"
-                  underline="hover"
-                >
-                  support.team@mrfranchise.in
-                </Link>
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
-
+          </Box>
         {/* Bottom Bar */}
         <Box
           sx={{

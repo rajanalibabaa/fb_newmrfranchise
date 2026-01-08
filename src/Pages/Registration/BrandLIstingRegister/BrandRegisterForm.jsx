@@ -231,7 +231,7 @@ const BrandRegisterForm = () => {
     return savedData ? JSON.parse(savedData) : initialFormData;
   });
 
-  console.log("Initial Form Data:", formData);
+  // console.log("Initial Form Data:", formData);
 
   const [validationErrors, setValidationErrors] = useState({
     brandDetails: {},
@@ -263,7 +263,7 @@ const BrandRegisterForm = () => {
     localStorage.setItem(FORM_STEP_KEY, activeStep.toString());
   }, [formData, activeStep]);
 
-  console.log("Form Data:", formData);
+  // console.log("Form Data:", formData);
   const validateUploadsDetails = (data, pancardNumbers, gstNumber) => {
     const errors = {};
     // if (data.brandLogo.length === 0) {
@@ -324,7 +324,7 @@ const BrandRegisterForm = () => {
       const errors = {};
       let isValid = true;
 
-      console.log("Validating step:", errors);
+      // console.log("Validating step:", errors);
 
       switch (step) {
         case 0:
@@ -493,10 +493,10 @@ const BrandRegisterForm = () => {
           }
         });
 
-        console.log("sending form data", formDataSend);
+        // console.log("sending form data", formDataSend);
 
         const response = await axios.post(
-          "http://localhost:5000/api/v1/brandlisting/createBrandListing",
+          "https://mrfranchisebackend.mrfranchise.in/api/v1/brandlisting/createBrandListing",
           formDataSend,
           {
             headers: {
@@ -513,7 +513,7 @@ const BrandRegisterForm = () => {
             severity: "success",
           });
 
-          console.log("Form data submitted successfully:", response.data);
+          // console.log("Form data submitted successfully:", response.data);
           localStorage.removeItem(FORM_DATA_KEY);
           localStorage.removeItem(FORM_STEP_KEY);
           setFormData(initialFormData);

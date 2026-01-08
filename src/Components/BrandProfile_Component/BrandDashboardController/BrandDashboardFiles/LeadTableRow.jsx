@@ -1,6 +1,8 @@
 // components/LeadTableRow.js
 import React from "react";
-import { TableRow, TableCell, Button } from "@mui/material";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import Button from "@mui/material/Button";
 
 const LeadTableRow = ({ lead, index, isMobile, isTablet, onViewDetails }) => {
   return (

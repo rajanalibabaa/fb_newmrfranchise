@@ -238,18 +238,19 @@ useEffect(() => {
   const showThem = () => setShowControls(true);
 
   // Progress bar gradient
-  const sliderGradient = `linear-gradient(90deg, orange 0%, limegreen 100%)`;
+  const sliderGradient = '#00ff1aff';
   const theme = useTheme();
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2, duration: 0.5 }}>
-      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={4}>
+      <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={3}>
         <Box flex={isMobile ? "none" : 2} ref={videoContainerRef} position="relative">
           <Box
             sx={{
               width: "100%",
               height: isMobile ? 200 : isTablet ? 300 : 416,
               borderRadius: 2,
+              border: "2px solid #ff9800",
               overflow: "hidden",
               backgroundColor: "#f5f5f5",
               position: "relative",
@@ -274,7 +275,7 @@ useEffect(() => {
                   style={{
                     width: "100%",
                     height: "100%",
-                    objectFit: "cover",
+                    objectFit: "contain",
                     background: "#eee",
                   }}
                   preload="auto"
@@ -370,7 +371,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                       },
                       "& .MuiSlider-rail": {
                         opacity: 0.5,
-                        background: "#ffffff29"
+                        background: "#000000ff"
                       },
                       "& .MuiSlider-track": {
                         background: sliderGradient
@@ -381,7 +382,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     <IconButton
                       size="small"
                       onClick={handlePlayPause}
-                      sx={{ color: "white" }}
+                      sx={{ color: "#ff9800" }}
                       aria-label={isPlaying ? "Pause" : "Play"}
                     >
                       {isPlaying ? <Pause /> : <PlayArrow />}
@@ -389,7 +390,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     <IconButton
                       size="small"
                       onClick={handleMute}
-                      sx={{ color: "white" }}
+                      sx={{ color: "#ff9800" }}
                       aria-label={isMuted ? "Unmute" : "Mute"}
                     >
                       {isMuted ? <VolumeOff /> : <VolumeUp />}
@@ -410,14 +411,14 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                         },
                       }}
                     />
-                    <Typography variant="caption" color="white" mx={1}>
+                    <Typography variant="caption" color="black" mx={1}>
                       {formatTime(videoRef.current?.currentTime || 0)} / {formatTime(duration)}
                     </Typography>
                     <Box flex={1} />
                     <IconButton
                       size="small"
                       onClick={handlePiP}
-                      sx={{ color: "white" }}
+                      sx={{ color: "black" }}
                       aria-label={inPiP ? "Exit PiP" : "PiP"}
                     >
                       {inPiP ? <Close /> : <PictureInPictureAlt />}
@@ -425,7 +426,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     <IconButton
                       size="small"
                       onClick={handleFullscreen}
-                      sx={{ color: "white" }}
+                      sx={{ color: "black" }}
                       aria-label={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
                     >
                       {isFullscreen ? <FullscreenExit /> : <Fullscreen />}
@@ -449,12 +450,12 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
           </Box>
         </Box>
         {/* Images panel */}
-        <Box flex={1}>
+        <Box flex={1} >
           <Box
             sx={{
               display: "grid",
               gridTemplateColumns: "repeat(2, 1fr)",
-              gap: 1,
+              gap: 0.7,
             }}
           >
             {allImages.slice(0, 3).map((imageUrl, index) => (
@@ -475,7 +476,8 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    bgcolor: "#f5f5f5",
+                    bgcolor: "#ffffffff",
+                    border: "2px solid #ff9800",
                     position: "relative",
                   }}
                   onClick={() => handleImageOpen(index)}
@@ -487,7 +489,7 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                     style={{
                       width: "100%",
                       height: "100%",
-                      objectFit: "cover",
+                      objectFit: "contain",
                       position: "absolute",
                       top: 0,
                       left: 0,
@@ -509,13 +511,14 @@ opacity: (showControls || !isPlaying || videoLoading || videoError) ? 1 : 0,
                   height: getImageBoxSize(),
                   overflow: "hidden",
                   borderRadius: 2,
+                  ml: 0.2,
                   cursor: "pointer",
                   position: "relative",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  bgcolor: "rgba(0,0,0,0.05)",
-                  "&:hover": { bgcolor: "rgba(0,0,0,0.1)" },
+                  bgcolor: "rgba(255, 255, 255, 1)",
+                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.8)" },
                 }}
                 onClick={() => handleImageOpen(3)}
               >

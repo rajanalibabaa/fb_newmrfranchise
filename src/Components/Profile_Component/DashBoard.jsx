@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Avatar,
-    Tabs,
-    Tab
-} from "@mui/material";
+
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Avatar from '@mui/material/Avatar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import PersonIcon from '@mui/icons-material/Person';
 import img from "../../assets/images/brandLogo.jpg";
 

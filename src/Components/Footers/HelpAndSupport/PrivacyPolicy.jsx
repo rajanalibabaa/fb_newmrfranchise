@@ -1,7 +1,7 @@
 import React from 'react'
 import Navbar from '../../Navbar/NavBar';
 import Footer from '../Footer';
-import {Box} from '@mui/material';
+import Box from '@mui/material/Box';
 const PrivacyPolicy = () => {
   return (
      <Box>

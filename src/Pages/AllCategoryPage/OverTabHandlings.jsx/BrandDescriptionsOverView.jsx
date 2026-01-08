@@ -6,14 +6,14 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
   return (
     <Box
       sx={{
-        mb: 4,
+        mb: 2,
         p: 3,
         borderRadius: "16px",
-        background: "#fff",
+        background: "#ffffffff",
         boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
       }}
     >
-      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#7ad03a" }}>
+      <Typography variant="h6" fontWeight={700} sx={{ mb: 2, color: "#000000ff",background:'#7cd13b',padding:'10px',borderRadius:'5px' }}>
         Brand Description
       </Typography>
       <Divider sx={{ mb: 2, borderColor: "rgba(0,0,0,0.1)" }} />
@@ -29,11 +29,11 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
             width: "6px",
           },
           "&::-webkit-scrollbar-track": {
-            background: "#f1f1f1",
+            background: "#ff9800",
             borderRadius: "10px",
           },
           "&::-webkit-scrollbar-thumb": {
-            background: "#888",
+            background: "#ffffffa2",
             borderRadius: "10px",
           },
           "&::-webkit-scrollbar-thumb:hover": {
@@ -42,7 +42,7 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
         }}
       >
         <Typography 
-          variant={isMobile ? "body2" : "body1"} 
+          variant={isMobile ? "body2" : "body2"} 
           component="div" 
           sx={{ 
             color: "#212121",
@@ -70,9 +70,11 @@ const BrandDescription = ({ brandDescription, uniqueSellingPoints }) => {
             sx={{ 
               mt: 2,
               mb: 1,
-              color: "#3f51b5",
+              p:1,
+              color: "#000000ff",
               fontSize: "1.25rem",
-              fontWeight: 600
+              fontWeight: 600,
+              background:'#7cd13b'
             }}
           >
             Unique Points:

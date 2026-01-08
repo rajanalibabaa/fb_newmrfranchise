@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { Link } from "react-router-dom";
-
+import Disclimer from '../OverTabHandlings.jsx/DisclimerPage.jsx'
 const ApplyDrawer = ({
   open,
   onClose,
@@ -298,7 +298,7 @@ const ApplyDrawer = ({
           </Grid>
           <Grid item xs={12} sx={{ mt: 2 }}>
             {/* aimer: Instantly rendered */}
-      <Box
+      {/* <Box
         sx={{
           mt: 4,
           p: 3,
@@ -332,7 +332,9 @@ const ApplyDrawer = ({
             </Typography>
           </Box>
         )}
-      </Box>
+      </Box> */}
+      <Disclimer/>
+      
           </Grid>
         </form>
       </Box>

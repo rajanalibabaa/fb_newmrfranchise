@@ -1,23 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link as RouterLink } from 'react-router-dom';
 import axios from "axios";
-import {
-  Box,
-  TextField,
-  Select,
-  MenuItem,
-  Link,
-  InputLabel,
-  FormControl,
-  Button,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Grid,
-} from "@mui/material";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import { useTheme, useMediaQuery } from "@mui/material";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Grid from "@mui/material/Grid";
+import Link from "@mui/material/Link";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Navbar from "../../Navbar/NavBar";
 import Footer from "../Footer";
@@ -81,7 +78,7 @@ const Otherindustries = () => {
       // console.log("Payload:", payload);
 
       const response = await axios.post(
-        "http://localhost:5000/api/v1/otherindustries/recievingOtherIndustriesData",
+        "https://mrfranchisebackend.mrfranchise.in/api/v1/otherindustries/recievingOtherIndustriesData",
         payload,
         {
           headers: {
