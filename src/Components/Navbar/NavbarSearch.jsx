@@ -93,6 +93,7 @@ const NavbarSearch = ({ open, handleClose }) => {
     investment: "",
   });
 
+
   // Mobile detection
   useEffect(() => {
     const checkMobile = () => {
@@ -145,6 +146,8 @@ const NavbarSearch = ({ open, handleClose }) => {
   // Filter main categories based on search term
   const filteredMainCategories = useMemo(() => {
     const term = searchTerms.mainCategory.toLowerCase();
+
+    console.log("===term=== ",term)
     return mainCategories
       .filter((cat) => cat.toLowerCase().includes(term))
       .slice(0, 100);

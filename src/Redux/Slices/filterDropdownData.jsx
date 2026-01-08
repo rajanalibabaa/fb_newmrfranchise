@@ -22,6 +22,8 @@ export const fetchFilterOptions = createAsyncThunk(
 
 
       const response = await axios.post(`${API_BASE_URL}filter/getAllBrandFiltersdata?${queryParams.toString()}`);
+console.log("===response=== ",response.data.data)
+
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || error.message);
