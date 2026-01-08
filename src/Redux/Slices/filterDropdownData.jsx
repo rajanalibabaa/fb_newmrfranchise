@@ -56,6 +56,8 @@ const initialState = {
   citiesError: null,
 };
 
+console.log("===initialState=== ",initialState)
+
 const filterDropdownSlice = createSlice({
   name: 'filterDropdown',
   initialState,

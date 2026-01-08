@@ -80,8 +80,8 @@ const BrandCard = React.memo(
           onClick={handleClick}
           elevation={2}
           sx={{
-            width: isMobile ? 100 : 120,
-            height: isMobile ? 140 : 140,
+            width: isMobile ? 90 : 120,
+            height: isMobile ? 120 : 140,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -568,18 +568,16 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
   
 //industries only make this categorires show 
 
-  useEffect(() => {
-    if (industries.length > 0 && activeIndustry === null && !loading.industries) {
-      const foodIndex = industries.findIndex(ind => ind === "Food & Beverages");
-      if (foodIndex !== -1) {
-        handleIndustryHover(foodIndex, "Food & Beverages");
-        if (isMobile) {
-          setMobileTabValue(1);
-        }
-      }
+// Remove or update this useEffect since we're not using tabs anymore
+useEffect(() => {
+  if (industries.length > 0 && activeIndustry === null && !loading.industries) {
+    const foodIndex = industries.findIndex(ind => ind === "Food & Beverages");
+    if (foodIndex !== -1) {
+      handleIndustryHover(foodIndex, "Food & Beverages");
+      // Remove the setMobileTabValue(1) line since we don't have tabs
     }
-  }, [industries, activeIndustry, loading.industries, isMobile, handleIndustryHover]);
-
+  }
+}, [industries, activeIndustry, loading.industries, handleIndustryHover]);
   // Clear data when drawer closes
   useEffect(() => {
     if (!hoverCategory) {
@@ -602,120 +600,47 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
   }, [hoverCategory]);
 
   // Memoized mobile tab content
-  const getMobileTabContent = useMemo(() => {
-    const tabContents = [
-      // Industries Tab
-      <Box sx={{ p: 2 }}>
-        {loading.industries ? (
-          <CategorySkeleton />
-        ) : apiError ? (
-          <Box sx={{ textAlign: "center", py: 4 }}>
-            <ErrorIcon sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
-            <Typography variant="body2" color="error">
-              Failed to load industries
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Please try again later
-            </Typography>
-          </Box>
-        ) : industries.length > 0 ? (
-          industries.map((industry, index) => (
-            <motion.div
-              key={index}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Box
-                onClick={() => {
-                  handleIndustryHover(index, industry);
-                  setMobileTabValue(1);
-                }}
-                sx={{
-                  cursor: "pointer",
-                  py: 1.5,
-                  px: 1.5,
-                  borderRadius: 2,
-                  mb: 1,
-                  color: activeIndustry === index ? "white" : "text.primary",
-                  bgcolor:
-                    activeIndustry === index
-                      ? "primary.main"
-                      : "background.paper",
-                  fontWeight: "medium",
-                  transition: "all 0.3s ease",
-                  boxShadow: theme.shadows[1],
-                  "&:hover": {
-                    bgcolor:
-                      activeIndustry === index ? "primary.dark" : "action.hover",
-                  },
-                }}
-              >
-                <Typography variant="subtitle1">{industry}</Typography>
-              </Box>
-            </motion.div>
-          ))
-        ) : (
-          <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-            No industries available
-          </Typography>
-        )}
-      </Box>,
-      // Subcategories Tab
-      <Box sx={{ p: 2 }}>
-        <motion.div whileHover={{ x: -5 }} whileTap={{ scale: 0.98 }}>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              mb: 2,
-              cursor: "pointer",
-              p: 1,
-              borderRadius: 1,
-              "&:hover": { bgcolor: "action.hover" },
-            }}
-            onClick={() => setMobileTabValue(0)}
-          >
-            <IconButton size="small" sx={{ mr: 1 }}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-            <Typography variant="body2" color="text.secondary">
-              Back to Industries
-            </Typography>
-          </Box>
-        </motion.div>
-        
-        {loading.subcategories ? (
-          <CategorySkeleton />
-        ) : availableSubCategories.length > 0 ? (
-          availableSubCategories.map((subCategory, idx) => (
+// Remove the old getMobileTabContent useMemo and replace with this:
+
+// Single view for mobile (shows only subcategories like desktop)
+const getMobileTabContent = useMemo(() => {
+  // Don't show tabs, just show subcategories directly
+  return (
+    <Box>
+
+      {/* Subcategories list */}
+      {loading.subcategories ? (
+        <CategorySkeleton />
+      ) : availableSubCategories.length > 0 ? (
+        <Box sx={{ display: "grid", gap: 1.5 }}>
+          {availableSubCategories.map((subCategory, idx) => (
             <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
-              <motion.div whileHover={{ scale: 1.02 }}>
+              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <Box
                   onClick={() => handleSubCategoryHover(subCategory)}
                   sx={{
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
-                    py: 1.5,
-                    px: 1.5,
+                    py: 1,
+                    px: 2,
                     borderRadius: 2,
                     gap: 1.5,
-                    mb: 1,
                     bgcolor:
                       activeSubCategory === subCategory
-                        ? "primary.light"
+                        ? "orange"
                         : "background.paper",
                     color:
                       activeSubCategory === subCategory
-                        ? "primary.contrastText"
+                        ? "white"
                         : "text.primary",
                     boxShadow: theme.shadows[1],
                     transition: "all 0.3s ease",
                     "&:hover": {
                       bgcolor:
                         activeSubCategory === subCategory
-                          ? "primary.main"
-                          : "action.hover",
+                          ? "orange"
+                          : "orange",
                     },
                   }}
                 >
@@ -723,36 +648,51 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
                     fontWeight={
                       activeSubCategory === subCategory ? "bold" : "medium"
                     }
+                    sx={{ flex: 1,fontSize: isMobile ? "1rem" : "1.1rem" }}
                   >
                     {subCategory}
                   </Typography>
+                  
+                  {/* Show brand count if available
+                  {activeSubCategory === subCategory && brands.length > 0 && (
+                    <Chip
+                      label={`${brands.length} brands`}
+                      size="small"
+                      sx={{ 
+                        bgcolor: "white",
+                        color: "primary.main",
+                        fontWeight: "bold"
+                      }}
+                    />
+                  )} */}
                 </Box>
               </motion.div>
             </Grow>
-          ))
-        ) : (
-          <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-            {activeIndustry !== null ? "No subcategories available" : "Select an industry first"}
-          </Typography>
-        )}
-      </Box>,
-    ];
-
-    return tabContents[mobileTabValue] || null;
-  }, [
-    mobileTabValue,
-    activeIndustry,
-    activeSubCategory,
-    availableSubCategories,
-    handleIndustryHover,
-    handleSubCategoryHover,
-    theme.shadows,
-    loading.industries,
-    loading.subcategories,
-    industries,
-    apiError,
-  ]);
-
+          ))}
+        </Box>
+      ) : activeIndustry !== null ? (
+        <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+          No subcategories available for this industry
+        </Typography>
+      ) : (
+        <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+          Select an industry to see available subcategories
+        </Typography>
+      )}
+      
+  
+    </Box>
+  );
+}, [
+  activeIndustry,
+  activeSubCategory,
+  availableSubCategories,
+  handleSubCategoryHover,
+  theme.shadows,
+  loading.subcategories,
+  industries,
+  brands.length,
+]);
   // Content when only industry is selected (no subcategory hovered)
   const renderIndustryContent = useMemo(() => {
     return (
@@ -842,11 +782,11 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
             }}
           >
             <Typography
-              variant="h5"
-              fontWeight="bold"
               sx={{
                 background: "linear-gradient(45deg, #ff9800 30%, #ff5722 90%)",
                 WebkitBackgroundClip: "text",
+                fontWeight: "bold",
+                FontSize: isMobile ? "0.1rem" : "2rem",
                 WebkitTextFillColor: "transparent",
               }}
             >
@@ -854,7 +794,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Chip
-                label={`click to view${brands.length} brands`}
+                label={`${brands.length} brands`}
                 component="button"
                 size="small"
                 color="warning"
@@ -873,7 +813,7 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
                 : `brand-fallback-${index}`;
 
               return (
-                <Grid item xs={12} sm={6} md={3} key={uniqueKey}>
+                <Grid item xs={12} sm={6} md={3} key={uniqueKey} ml={isMobile ? 0.3 : 0}>
                   <BrandCard
                   
                     brand={brand}
@@ -1024,84 +964,45 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
     loading.industries, 
     apiError
   ]);
-
-  return (
-    <>
-      <Drawer
-        anchor="top"
-        open={hoverCategory !== null}
-        onClose={onHoverLeave}
-        PaperProps={{
-          sx: {
-            height: isMobile ? "85vh" : isTablet ? "65vh" : 500,
-            background: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(12px)",
-            boxShadow: "0 8px 32px 0 rgba(60,72,88,0.18)",
-            borderBottomLeftRadius: 24,
-            borderBottomRightRadius: 24,
-            border: "1.5px solid rgba(255,255,255,0.25)",
-            overflow: "hidden",
-          },
+return (
+  <>
+    <Drawer
+      anchor="top"
+      open={hoverCategory !== null}
+      onClose={onHoverLeave}
+      PaperProps={{
+        sx: {
+          height: isMobile ? "85vh" : isTablet ? "65vh" : 500,
+          background: "rgba(255,255,255,0.95)",
+          backdropFilter: "blur(12px)",
+          boxShadow: "0 8px 32px 0 rgba(60,72,88,0.18)",
+          borderBottomLeftRadius: 24,
+          borderBottomRightRadius: 24,
+          border: "1.5px solid rgba(255,255,255,0.25)",
+          overflow: "hidden",
+        },
+      }}
+      SlideProps={{ timeout: 300 }}
+    >
+      <Box
+        onMouseLeave={onHoverLeave}
+        sx={{
+          display: "flex",
+          flexDirection: isMobile ? "column" : "row",
+          height: "100%",
+          overflow: "hidden",
         }}
-        SlideProps={{ timeout: 300 }}
       >
-        <Box
-          onMouseLeave={onHoverLeave}
-          sx={{
-            display: "flex",
-            flexDirection: isMobile ? "column" : "row",
-            height: "100%",
-            overflow: "hidden",
-          }}
-        >
-          {/* Mobile Tabs Navigation */}
-          {isMobile && (
-            <AppBar
-              position="static"
-              color="inherit"
-              elevation={0}
-              sx={{ background: "#ff9800", color: "white" }}
-            >
-              <Tabs
-                value={mobileTabValue}
-                onChange={handleMobileTabChange}
-                variant="fullWidth"
-                indicatorColor="secondary"
-                textColor="inherit"
+        {/* Remove the mobile tabs AppBar completely */}
+        
+        {/* Desktop View - Keep as is */}
+        {!isMobile && (
+          <>
+            {/* Subcategories Column - Fixed */}
+            {activeIndustry !== null && (
+              <Box
                 sx={{
-                  "& .MuiTabs-indicator": { height: 4, backgroundColor: "white" },
-                }}
-              >
-                <Tab
-                  label="Industries"
-                  sx={{
-                    fontSize: "0.8rem",
-                    fontWeight: "bold",
-                    textTransform: "none",
-                    minHeight: 48,
-                  }}
-                />
-                <Tab
-                  label="Subcategories"
-                  disabled={activeIndustry === null}
-                  sx={{
-                    fontSize: "0.8rem",
-                    fontWeight: "bold",
-                    textTransform: "none",
-                    minHeight: 48,
-                  }}
-                />
-              </Tabs>
-            </AppBar>
-          )}
-
-          {/* Desktop View */}
-          {!isMobile && (
-            <>
-              {/* Industries Column - Fixed */}
-              {/* <Box
-                sx={{
-                  width: 300,
+                  width: 400,
                   borderRight: `1px solid ${theme.palette.divider}`,
                   overflowY: "auto",
                   px: 2,
@@ -1116,150 +1017,150 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
                   mb={2}
                   color="text.secondary"
                 >
-                  Industries
+                  Industry - {industries[activeIndustry] || "Select Industry"}
                 </Typography>
+                <Divider sx={{ mb: 2 }} />
                 
-                {loading.industries ? (
+                {loading.subcategories ? (
                   <CategorySkeleton />
-                ) : industries.length > 0 ? (
-                  industries.map((industry, index) => (
-                    <motion.div
-                      key={index}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <Box
-                        onMouseEnter={() => handleIndustryHover(index, industry)}
-                        sx={{
-                          cursor: "pointer",
-                          py: 1.5,
-                          px: 2,
-                          borderRadius: 2,
-                          mb: 1.5,
-                          color:
-                            activeIndustry === index ? "white" : "text.primary",
-                          bgcolor:
-                            activeIndustry === index
-                              ? "orange"
-                              : "background.paper",
-                          fontWeight: "medium",
-                          transition: "all 0.3s ease",
-                          boxShadow: theme.shadows[1],
-                          "&:hover": {
+                ) : availableSubCategories.length > 0 ? (
+                  availableSubCategories.map((subCategory, idx) => (
+                    <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
+                      <motion.div whileHover={{ scale: 1.02 }}>
+                        <Box
+                          onMouseEnter={() => handleSubCategoryHover(subCategory)}
+                          sx={{
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            py: 1.5,
+                            px: 2,
+                            borderRadius: 2,
+                            gap: 1.5,
+                            mb: 1.5,
                             bgcolor:
-                              activeIndustry === index ? "orange" : "action.hover",
-                          },
-                        }}
-                      >
-                        <Typography variant="subtitle1">{industry}</Typography>
-                      </Box>
-                    </motion.div>
-                  ))
-                ) : apiError ? (
-                  <Box sx={{ textAlign: "center", py: 4 }}>
-                    <ErrorIcon sx={{ fontSize: 48, color: "error.main", mb: 2 }} />
-                    <Typography variant="body2" color="error">
-                      Failed to load industries
-                    </Typography>
-                  </Box>
-                ) : (
-                  <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-                    No industries available
-                  </Typography>
-                )}
-              </Box> */}
-
-              {/* Subcategories Column - Fixed */}
-              {activeIndustry !== null && (
-                <Box
-                  sx={{
-                    width: 400,
-                    borderRight: `1px solid ${theme.palette.divider}`,
-                    overflowY: "auto",
-                    px: 2,
-                    py: 2,
-                    background:
-                      "linear-gradient(to bottom, #ffffff 0%, #f8f9fa 100%)",
-                  }}
-                >
-                  <Typography
-                    variant="h6"
-                    fontWeight="bold"
-                    mb={2}
-                    color="text.secondary"
-                  >
-                    Industry - {industries[activeIndustry] || "Select Industry"}
-                  </Typography>
-                  <Divider sx={{ mb: 2 }} />
-                  
-                  {loading.subcategories ? (
-                    <CategorySkeleton />
-                  ) : availableSubCategories.length > 0 ? (
-                    availableSubCategories.map((subCategory, idx) => (
-                      <Grow in={true} timeout={(idx + 1) * 150} key={idx}>
-                        <motion.div whileHover={{ scale: 1.02 }}>
-                          <Box
-                            onMouseEnter={() => handleSubCategoryHover(subCategory)}
-                            sx={{
-                              cursor: "pointer",
-                              display: "flex",
-                              alignItems: "center",
-                              py: 1.5,
-                              px: 2,
-                              borderRadius: 2,
-                              gap: 1.5,
-                              mb: 1.5,
+                              activeSubCategory === subCategory
+                                ? "orange"
+                                : "background.paper",
+                            color:
+                              activeSubCategory === subCategory
+                                ? "primary.contrastText"
+                                : "text.primary",
+                            boxShadow: theme.shadows[1],
+                            transition: "all 0.3s ease",
+                            "&:hover": {
                               bgcolor:
                                 activeSubCategory === subCategory
                                   ? "orange"
-                                  : "background.paper",
-                              color:
-                                activeSubCategory === subCategory
-                                  ? "primary.contrastText"
-                                  : "text.primary",
-                              boxShadow: theme.shadows[1],
-                              transition: "all 0.3s ease",
-                              "&:hover": {
-                                bgcolor:
-                                  activeSubCategory === subCategory
-                                    ? "orange"
-                                    : "action.hover",
-                              },
-                            }}
+                                  : "action.hover",
+                            },
+                          }}
+                        >
+                          <Typography
+                            fontWeight={
+                              activeSubCategory === subCategory
+                                ? "bold"
+                                : "medium"
+                            }
                           >
-                            <Typography
-                              fontWeight={
-                                activeSubCategory === subCategory
-                                  ? "bold"
-                                  : "medium"
-                              }
-                            >
-                              {subCategory}
-                            </Typography>
-                          </Box>
-                        </motion.div>
-                      </Grow>
+                            {subCategory}
+                          </Typography>
+                        </Box>
+                      </motion.div>
+                    </Grow>
+                  ))
+                ) : (
+                  <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
+                    No subcategories available
+                  </Typography>
+                )}
+              </Box>
+            )}
+          </>
+        )}
+
+        {/* Mobile Content - Single view without tabs */}
+        {isMobile && (
+          <Box sx={{ 
+            flex: 1, 
+            overflowY: "auto", 
+            bgcolor: "background.default",
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            {/* Header with close button */}
+            <Box sx={{ 
+              p: 2, 
+              borderBottom: "1px solid #eee",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              bgcolor: "background.paper"
+            }}>
+                <Typography variant="h6" fontWeight="bold" color="grey">
+                  Industry - <Box component={"span"}>{activeIndustry !== null ? industries[activeIndustry] : "Select Category"}</Box>
+              </Typography>
+              <IconButton onClick={onHoverLeave} size="small">
+                <CloseIcon />
+              </IconButton>
+            </Box>
+            
+            {/* Main content area */}
+            <Box sx={{ flex: 1, overflowY: "auto" }}>
+              {/* If no industry selected, show industries list */}
+              {activeIndustry === null ? (
+                <Box sx={{ p: 2 }}>
+                  {loading.industries ? (
+                    <CategorySkeleton />
+                  ) : industries.length > 0 ? (
+                    industries.map((industry, index) => (
+                      <motion.div
+                        key={index}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <Box
+                          onClick={() => handleIndustryHover(index, industry)}
+                          sx={{
+                            cursor: "pointer",
+                            py: 1.5,
+                            px: 1.5,
+                            borderRadius: 2,
+                            mb: 1,
+                            bgcolor: "background.paper",
+                            color: "text.primary",
+                            fontWeight: "medium",
+                            transition: "all 0.3s ease",
+                            boxShadow: theme.shadows[1],
+                            border: "1px solid #eee",
+                            "&:hover": {
+                              bgcolor: "action.hover",
+                            },
+                          }}
+                        >
+                          <Typography variant="subtitle1">{industry}</Typography>
+                        </Box>
+                      </motion.div>
                     ))
                   ) : (
                     <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-                      No subcategories available
+                      No industries available
                     </Typography>
                   )}
                 </Box>
+              ) : (
+                // Show subcategories list (single view)
+                <Box sx={{ p: 2 }}>
+                  {getMobileTabContent}
+                </Box>
               )}
-            </>
-          )}
-
-          {/* Mobile Tab Content */}
-          {isMobile && (
-            <Box
-              sx={{ flex: 1, overflowY: "auto", bgcolor: "background.default" }}
-            >
-              {getMobileTabContent}
             </Box>
-          )}
+          </Box>
+        )}
 
-          {/* Main Content Area - Shows either industry info or brands */}
+        {/* Main Content Area - Shows brands (for both mobile and desktop) */}
+        {/* This area now only shows brands, not industry/subcategory info */}
+        {(activeSubCategory || (!isMobile && activeIndustry !== null)) && (
           <Box
             sx={{
               flex: 1,
@@ -1268,31 +1169,33 @@ const SideViewContent = ({ hoverCategory, onHoverLeave, onBrandClick }) => {
               py: 2,
               bgcolor: "background.paper",
               borderTop: isMobile ? `1px solid ${theme.palette.divider}` : "none",
+              borderLeft: !isMobile ? `1px solid ${theme.palette.divider}` : "none",
               position: "relative",
             }}
           >
             {renderMainContent}
           </Box>
-        </Box>
-      </Drawer>
+        )}
+      </Box>
+    </Drawer>
 
-      {/* Snackbar for error messages */}
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
+    {/* Snackbar for error messages */}
+    <Snackbar
+      open={snackbar.open}
+      autoHideDuration={6000}
+      onClose={handleCloseSnackbar}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+    >
+      <Alert
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        severity={snackbar.severity}
+        sx={{ width: "100%" }}
       >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </>
-  );
+        {snackbar.message}
+      </Alert>
+    </Snackbar>
+  </>
+);
 };
 
 export default React.memo(SideViewContent);
