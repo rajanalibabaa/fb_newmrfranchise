@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import TextField from "@mui/material/TextField";
@@ -16,44 +13,23 @@ import FormControl from "@mui/material/FormControl";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete from "@mui/material/Autocomplete";
-
 import CloseIcon from "@mui/icons-material/Close";
 import { fetchFilterOptions } from "../../Redux/Slices/filterDropdownData";
-import {  resetFilters } from "../../Redux/Slices/FilterBrandSlice";
+import { resetFilters } from "../../Redux/Slices/FilterBrandSlice";
 import Search from "./Search";
 
-// const highlightMatch = (text, searchTerm) => {
-//   if (!searchTerm || !text) return text;
-
-//   const regex = new RegExp(`(${searchTerm})`, "gi");
-//   const parts = text.split(regex);
-
-//   return parts.map((part, index) =>
-//     part.toLowerCase() === searchTerm.toLowerCase() ? (
-//       <span
-//         key={index}
-//         style={{ fontWeight: "bold", backgroundColor: "yellow" }}
-//       >
-//         {part}
-//       </span>
-//     ) : (
-//       part
-//     )
-//   );
-// };
-
 const NavbarSearch = ({ open, handleClose }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [tab, setTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [openSuggestions, setOpenSuggestions] = useState(false);
-  const [activeSuggestion, setActiveSuggestion] = useState(0);
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Get filter options from Redux store
+  const filterState = useSelector((state) => state.filterDropdown);
+  
+  // Destructure with default empty arrays
   const {
     mainCategories = [],
     subCategories = [],
@@ -63,9 +39,22 @@ const NavbarSearch = ({ open, handleClose }) => {
     districts = [],
     cities = [],
     loading: dropdownLoading,
-  } = useSelector((state) => state.filterDropdown);
+    error: dropdownError,
+  } = filterState;
 
-  // console.log("===mainCategories=== ",subCategories)
+  // Debug logging
+  useEffect(() => {
+    console.log("=== Redux Store State ===");
+    console.log("mainCategories:", mainCategories);
+    console.log("subCategories:", subCategories);
+    console.log("childCategories:", childCategories);
+    console.log("states:", states);
+    console.log("districts:", districts);
+    console.log("cities:", cities);
+    console.log("investmentRanges:", investmentRanges);
+    console.log("dropdownLoading:", dropdownLoading);
+    console.log("dropdownError:", dropdownError);
+  }, [filterState]);
 
   // Selected filters state
   const [selectedMainCategory, setSelectedMainCategory] = useState("");
@@ -99,12 +88,16 @@ const NavbarSearch = ({ open, handleClose }) => {
 
   // Fetch initial filter options when component mounts
   useEffect(() => {
-    dispatch(fetchFilterOptions());
-  }, [dispatch]);
+    if (open) {
+      console.log("Dialog opened, fetching initial filters...");
+      dispatch(fetchFilterOptions());
+    }
+  }, [dispatch, open]);
 
   // Fetch sub-categories when main category is selected
   useEffect(() => {
     if (selectedMainCategory) {
+      console.log("Main category selected, fetching sub-categories:", selectedMainCategory);
       dispatch(fetchFilterOptions({ main: selectedMainCategory }));
       setSelectedSubCategory("");
       setSelectedChildCategory("");
@@ -114,6 +107,7 @@ const NavbarSearch = ({ open, handleClose }) => {
   // Fetch child-categories when sub-category is selected
   useEffect(() => {
     if (selectedSubCategory) {
+      console.log("Sub-category selected, fetching child-categories:", selectedSubCategory);
       dispatch(fetchFilterOptions({ sub: selectedSubCategory }));
       setSelectedChildCategory("");
     }
@@ -122,6 +116,7 @@ const NavbarSearch = ({ open, handleClose }) => {
   // Fetch districts when state is selected
   useEffect(() => {
     if (selectedState) {
+      console.log("State selected, fetching districts:", selectedState);
       dispatch(fetchFilterOptions({ state: selectedState }));
       setSelectedDistrict("");
       setSelectedCity("");
@@ -131,6 +126,7 @@ const NavbarSearch = ({ open, handleClose }) => {
   // Fetch cities when district is selected
   useEffect(() => {
     if (selectedDistrict) {
+      console.log("District selected, fetching cities:", selectedDistrict);
       dispatch(fetchFilterOptions({ district: selectedDistrict }));
       setSelectedCity("");
     }
@@ -139,34 +135,52 @@ const NavbarSearch = ({ open, handleClose }) => {
   // Filter main categories based on search term
   const filteredMainCategories = useMemo(() => {
     const term = searchTerms.mainCategory.toLowerCase();
-    return mainCategories
-      .filter((cat) => cat.toLowerCase().includes(term))
+    console.log("Filtering main categories. Term:", term, "Total:", mainCategories.length);
+    
+    // Ensure we're working with an array
+    const categories = Array.isArray(mainCategories) ? mainCategories : [];
+    
+    const filtered = categories
+      .filter((cat) => cat && cat.toString().toLowerCase().includes(term))
       .slice(0, 100);
+    
+    console.log("Filtered main categories:", filtered.length);
+    return filtered;
   }, [mainCategories, searchTerms.mainCategory]);
 
-  // Filter sub categories based on selected main category and search term
+  // Filter sub categories based on search term (NOT dependent on selectedMainCategory for initial display)
   const filteredSubCategories = useMemo(() => {
-    if (!selectedMainCategory) return [];
     const term = searchTerms.subCategory.toLowerCase();
-    return subCategories
-      .filter((sub) => sub.toLowerCase().includes(term))
+    const subs = Array.isArray(subCategories) ? subCategories : [];
+    
+    console.log("Filtering sub categories. Term:", term, "Total:", subs.length);
+    
+    const filtered = subs
+      .filter((sub) => sub && sub.toString().toLowerCase().includes(term))
       .slice(0, 100);
-  }, [selectedMainCategory, subCategories, searchTerms.subCategory]);
+    
+    console.log("Filtered sub categories:", filtered.length);
+    return filtered;
+  }, [subCategories, searchTerms.subCategory]);
 
   // Filter child categories based on selected sub category and search term
   const filteredChildCategories = useMemo(() => {
     if (!selectedSubCategory) return [];
     const term = searchTerms.childCategory.toLowerCase();
-    return childCategories
-      .filter((child) => child.toLowerCase().includes(term))
+    const children = Array.isArray(childCategories) ? childCategories : [];
+    
+    return children
+      .filter((child) => child && child.toString().toLowerCase().includes(term))
       .slice(0, 100);
   }, [selectedSubCategory, childCategories, searchTerms.childCategory]);
 
   // Filter states based on search term
   const filteredStates = useMemo(() => {
     const term = searchTerms.state.toLowerCase();
-    return states
-      .filter((state) => state.toLowerCase().includes(term))
+    const stateList = Array.isArray(states) ? states : [];
+    
+    return stateList
+      .filter((state) => state && state.toString().toLowerCase().includes(term))
       .slice(0, 100);
   }, [states, searchTerms.state]);
 
@@ -174,8 +188,10 @@ const NavbarSearch = ({ open, handleClose }) => {
   const filteredDistricts = useMemo(() => {
     if (!selectedState) return [];
     const term = searchTerms.district.toLowerCase();
-    return districts
-      .filter((district) => district.toLowerCase().includes(term))
+    const districtList = Array.isArray(districts) ? districts : [];
+    
+    return districtList
+      .filter((district) => district && district.toString().toLowerCase().includes(term))
       .slice(0, 100);
   }, [selectedState, districts, searchTerms.district]);
 
@@ -183,206 +199,47 @@ const NavbarSearch = ({ open, handleClose }) => {
   const filteredCities = useMemo(() => {
     if (!selectedDistrict) return [];
     const term = searchTerms.city.toLowerCase();
-    return cities
-      .filter((city) => city.toLowerCase().includes(term))
+    const cityList = Array.isArray(cities) ? cities : [];
+    
+    return cityList
+      .filter((city) => city && city.toString().toLowerCase().includes(term))
       .slice(0, 100);
   }, [selectedDistrict, cities, searchTerms.city]);
 
   // Filter investment ranges based on search term
   const filteredInvestmentRanges = useMemo(() => {
     const term = searchTerms.investment.toLowerCase();
-    return investmentRanges
-      .filter((range) => range.toLowerCase().includes(term))
+    const ranges = Array.isArray(investmentRanges) ? investmentRanges : [];
+    
+    return ranges
+      .filter((range) => range && range.toString().toLowerCase().includes(term))
       .slice(0, 50);
   }, [investmentRanges, searchTerms.investment]);
 
-  // Generate search suggestions
-  const searchSuggestions = useMemo(() => {
-    if (!searchTerm || searchTerm.length < 2) return [];
-
-    const term = searchTerm.toLowerCase();
-    const suggestions = [];
-
-    // Add category suggestions
-    mainCategories.forEach((category) => {
-      if (category.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Category",
-          value: category,
-          icon: "🏭",
-          searchTerm: term,
-          filterType: "maincat",
-          filterValue: category,
-        });
-      }
-    });
-
-    subCategories.forEach((sub) => {
-      if (sub.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Sub-Category",
-          value: sub,
-          icon: "🏷️",
-          searchTerm: term,
-          filterType: "subcat",
-          filterValue: sub,
-        });
-      }
-    });
-
-    childCategories.forEach((child) => {
-      if (child.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Menu-Tags",
-          value: child,
-          icon: "🏷️",
-          searchTerm: term,
-          filterType: "childcat",
-          filterValue: child,
-        });
-      }
-    });
-
-    // Add location suggestions
-    states.forEach((state) => {
-      if (state.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Location",
-          value: state,
-          icon: "📍",
-          searchTerm: term,
-          filterType: "state",
-          filterValue: state,
-        });
-      }
-    });
-
-    districts.forEach((district) => {
-      if (district.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Location",
-          value: district,
-          icon: "📍",
-          searchTerm: term,
-          filterType: "district",
-          filterValue: district,
-        });
-      }
-    });
-
-    cities.forEach((city) => {
-      if (city.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Location",
-          value: city,
-          icon: "📍",
-          searchTerm: term,
-          filterType: "city",
-          filterValue: city,
-        });
-      }
-    });
-
-    // Add investment range suggestions
-    investmentRanges.forEach((range) => {
-      if (range.toLowerCase().includes(term)) {
-        suggestions.push({
-          type: "Investment",
-          value: range,
-          icon: "💰",
-          searchTerm: term,
-          filterType: "investmentRange",
-          filterValue: range,
-        });
-      }
-    });
-
-    return suggestions.slice(0, 10); // Limit to 10 suggestions
-  }, [
-    searchTerm,
-    mainCategories,
-    subCategories,
-    childCategories,
-    states,
-    districts,
-    cities,
-    investmentRanges,
-  ]);
-
-  // Handle keyboard navigation for suggestions
-  useEffect(() => {
-    if (!openSuggestions || searchSuggestions.length === 0) return;
-
-    const handleKeyDown = (e) => {
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        setActiveSuggestion((prev) =>
-          prev < searchSuggestions.length - 1 ? prev + 1 : prev
-        );
-      } else if (e.key === "ArrowUp") {
-        e.preventDefault();
-        setActiveSuggestion((prev) => (prev > 0 ? prev - 1 : 0));
-      } else if (e.key === "Enter") {
-        e.preventDefault();
-        if (searchSuggestions[activeSuggestion]) {
-          handleSuggestionSelect(searchSuggestions[activeSuggestion]);
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [openSuggestions, searchSuggestions, activeSuggestion]);
-
-  const handleTabChange = (_, newValue) => setTab(newValue);
+  const handleTabChange = (_, newValue) => {
+    setTab(newValue);
+    // Reset relevant selections when changing tabs
+    if (newValue !== 0) {
+      setSelectedMainCategory("");
+      setSelectedSubCategory("");
+      setSelectedChildCategory("");
+    }
+    if (newValue !== 1) {
+      setSelectedState("");
+      setSelectedDistrict("");
+      setSelectedCity("");
+    }
+    if (newValue !== 2) {
+      setSelectedInvestmentRange("");
+    }
+  };
 
   const handleSearchChange = (key, value) => {
     setSearchTerms((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSuggestionSelect = (suggestion) => {
-    setSearchTerm(suggestion.value);
-    setOpenSuggestions(false);
-
-    // Set the appropriate filter based on suggestion type
-    switch (suggestion.filterType) {
-      case "maincat":
-        setSelectedMainCategory(suggestion.filterValue);
-        setTab(0);
-        break;
-      case "subcat":
-        setSelectedSubCategory(suggestion.filterValue);
-        setTab(0);
-        break;
-      case "childcat":
-        setSelectedChildCategory(suggestion.filterValue);
-        setTab(0);
-        break;
-      case "state":
-        setSelectedState(suggestion.filterValue);
-        setTab(1);
-        break;
-      case "district":
-        setSelectedDistrict(suggestion.filterValue);
-        setTab(1);
-        break;
-      case "city":
-        setSelectedCity(suggestion.filterValue);
-        setTab(1);
-        break;
-      case "investmentRange":
-        setSelectedInvestmentRange(suggestion.filterValue);
-        setTab(2);
-        break;
-      default:
-        break;
-    }
-  };
-
   const handleExplore = async () => {
     setLoading(true);
-
-    // Reset filters in Redux (for current tab if needed)
     dispatch(resetFilters());
 
     // Collect filters into query params
@@ -400,7 +257,7 @@ const NavbarSearch = ({ open, handleClose }) => {
     if (selectedInvestmentRange)
       queryParams.append("investmentRange", selectedInvestmentRange);
 
-    // ✅ open new tab with filters in URL
+    // Open new tab with filters in URL
     window.open(
       `/brandViewPage?${queryParams.toString()}`,
       "_blank",
@@ -431,29 +288,7 @@ const NavbarSearch = ({ open, handleClose }) => {
     });
   };
 
-  // Count active filters
-  const activeFiltersCount = useMemo(() => {
-    let count = 0;
-    if (searchTerm) count++;
-    if (selectedMainCategory) count++;
-    if (selectedSubCategory) count++;
-    if (selectedChildCategory) count++;
-    if (selectedState) count++;
-    if (selectedDistrict) count++;
-    if (selectedCity) count++;
-    if (selectedInvestmentRange) count++;
-    return count;
-  }, [
-    searchTerm,
-    selectedMainCategory,
-    selectedSubCategory,
-    selectedChildCategory,
-    selectedState,
-    selectedDistrict,
-    selectedCity,
-    selectedInvestmentRange,
-  ]);
-
+  // Custom Listbox component
   const CustomListbox = React.forwardRef(function CustomListbox(props, ref) {
     const { children, ...other } = props;
 
@@ -477,6 +312,37 @@ const NavbarSearch = ({ open, handleClose }) => {
       </ul>
     );
   });
+
+  // Loading state display
+  if (dropdownLoading && !mainCategories.length) {
+    return (
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+        <DialogContent sx={{ p: 3, background: "#d5e7ddac", textAlign: "center" }}>
+          <CircularProgress sx={{ mb: 2 }} />
+          <Typography>Loading filter options...</Typography>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  // Error state display
+  if (dropdownError && !mainCategories.length) {
+    return (
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+        <DialogContent sx={{ p: 3, background: "#d5e7ddac", textAlign: "center" }}>
+          <Typography color="error" sx={{ mb: 2 }}>
+            Error loading filter options: {dropdownError}
+          </Typography>
+          <Button
+            variant="contained"
+            onClick={() => dispatch(fetchFilterOptions())}
+          >
+            Retry
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
@@ -601,12 +467,13 @@ const NavbarSearch = ({ open, handleClose }) => {
         {tab === 0 && (
           <Box
             display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
             flexWrap="wrap"
             gap={2}
             justifyContent="center"
             mb={3}
           >
-            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
+            {/* <FormControl sx={{ minWidth: { xs: "100%", md: 600 }, width: { xs: "100%", md: "auto" } }}>
               <Autocomplete
                 options={filteredMainCategories}
                 value={selectedMainCategory}
@@ -619,12 +486,26 @@ const NavbarSearch = ({ open, handleClose }) => {
                 onInputChange={(_, v) => handleSearchChange("mainCategory", v)}
                 ListboxComponent={CustomListbox}
                 renderInput={(params) => (
-                  <TextField {...params} label="Industry" />
+                  <TextField 
+                    {...params} 
+                    label="Industry" 
+                    helperText={`${filteredMainCategories.length} options available`}
+                    error={!!dropdownError}
+                  />
                 )}
+                loading={dropdownLoading}
+                renderOption={(props, option) => (
+                  <li {...props} key={option}>
+                    {option}
+                  </li>
+                )}
+                getOptionLabel={(option) => option || ""}
+                isOptionEqualToValue={(option, value) => option === value}
+                size="small"
               />
-            </FormControl>
+            </FormControl> */}
 
-            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
+            <FormControl sx={{ minWidth: { xs: "100%", md: 600 }, width: { xs: "100%", md: "auto" } }}>
               <Autocomplete
                 options={filteredSubCategories}
                 value={selectedSubCategory}
@@ -639,9 +520,24 @@ const NavbarSearch = ({ open, handleClose }) => {
                   <TextField
                     {...params}
                     label="Category"
-                    disabled={!selectedMainCategory}
+                    helperText={
+                      selectedMainCategory 
+                        ? `Showing categories for "${selectedMainCategory}" (${filteredSubCategories.length} options)` 
+                        : `${filteredSubCategories.length} options available - select an industry to filter`
+                    }
+                    disabled={false} // Changed: Always enabled to show all categories initially
+                    error={!!dropdownError}
                   />
                 )}
+                loading={dropdownLoading}
+                renderOption={(props, option) => (
+                  <li {...props} key={option}>
+                    {option}
+                  </li>
+                )}
+                getOptionLabel={(option) => option || ""}
+                isOptionEqualToValue={(option, value) => option === value}
+                size="small"
               />
             </FormControl>
           </Box>
@@ -651,12 +547,13 @@ const NavbarSearch = ({ open, handleClose }) => {
         {tab === 1 && (
           <Box
             display="flex"
+            flexDirection={{ xs: "column", md: "row" }}
             flexWrap="wrap"
             gap={2}
             justifyContent="center"
             mb={3}
           >
-            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
+            <FormControl sx={{ minWidth: { xs: "100%", md: 600 }, width: { xs: "100%", md: "auto" } }}>
               <Autocomplete
                 options={filteredStates}
                 value={selectedState}
@@ -668,12 +565,26 @@ const NavbarSearch = ({ open, handleClose }) => {
                 inputValue={searchTerms.state}
                 onInputChange={(_, v) => handleSearchChange("state", v)}
                 renderInput={(params) => (
-                  <TextField {...params} label="State" />
+                  <TextField 
+                    {...params} 
+                    label="State" 
+                    helperText={`${filteredStates.length} options available`}
+                    error={!!dropdownError}
+                  />
                 )}
+                loading={dropdownLoading}
+                renderOption={(props, option) => (
+                  <li {...props} key={option}>
+                    {option}
+                  </li>
+                )}
+                getOptionLabel={(option) => option || ""}
+                isOptionEqualToValue={(option, value) => option === value}
+                size="small"
               />
             </FormControl>
 
-            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
+            <FormControl sx={{ minWidth: { xs: "100%", md: 600 }, width: { xs: "100%", md: "auto" } }}>
               <Autocomplete
                 options={filteredDistricts}
                 value={selectedDistrict}
@@ -688,8 +599,19 @@ const NavbarSearch = ({ open, handleClose }) => {
                     {...params}
                     label="District"
                     disabled={!selectedState}
+                    helperText={selectedState ? `${filteredDistricts.length} options available` : "Select a State first"}
+                    error={!!dropdownError}
                   />
                 )}
+                loading={dropdownLoading}
+                renderOption={(props, option) => (
+                  <li {...props} key={option}>
+                    {option}
+                  </li>
+                )}
+                getOptionLabel={(option) => option || ""}
+                isOptionEqualToValue={(option, value) => option === value}
+                size="small"
               />
             </FormControl>
           </Box>
@@ -698,7 +620,7 @@ const NavbarSearch = ({ open, handleClose }) => {
         {/* TAB 3 — INVESTMENT */}
         {tab === 2 && (
           <Box display="flex" justifyContent="center" mb={3}>
-            <FormControl sx={{ minWidth: { xs: 270, md: 600 } }}>
+            <FormControl sx={{ minWidth: { xs: "100%", md: 600 }, width: { xs: "100%", md: "auto" } }}>
               <Autocomplete
                 options={filteredInvestmentRanges}
                 value={selectedInvestmentRange}
@@ -706,15 +628,29 @@ const NavbarSearch = ({ open, handleClose }) => {
                 inputValue={searchTerms.investment}
                 onInputChange={(_, v) => handleSearchChange("investment", v)}
                 renderInput={(params) => (
-                  <TextField {...params} label="Investment Range" />
+                  <TextField 
+                    {...params} 
+                    label="Investment Range" 
+                    helperText={`${filteredInvestmentRanges.length} options available`}
+                    error={!!dropdownError}
+                  />
                 )}
+                loading={dropdownLoading}
+                renderOption={(props, option) => (
+                  <li {...props} key={option}>
+                    {option}
+                  </li>
+                )}
+                getOptionLabel={(option) => option || ""}
+                isOptionEqualToValue={(option, value) => option === value}
+                size="small"
               />
             </FormControl>
           </Box>
         )}
 
         {/* Action Buttons */}
-        <Box display="flex" justifyContent="center" gap={2}>
+        <Box display="flex" justifyContent="center" gap={2} mt={2}>
           <Button
             variant="contained"
             onClick={handleExplore}
@@ -722,6 +658,7 @@ const NavbarSearch = ({ open, handleClose }) => {
             sx={{
               backgroundColor: "#7ad03a",
               "&:hover": { backgroundColor: "rgb(104,159,56)" },
+              minWidth: 120,
             }}
           >
             {loading ? <CircularProgress size={24} /> : "Explore"}
@@ -732,6 +669,7 @@ const NavbarSearch = ({ open, handleClose }) => {
             color="error"
             onClick={handleClearAll}
             disabled={loading}
+            sx={{ minWidth: 120 }}
           >
             Clear All
           </Button>
