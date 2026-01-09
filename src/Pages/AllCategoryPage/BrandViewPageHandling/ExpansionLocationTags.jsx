@@ -1,5 +1,5 @@
-import React , { useMemo } from "react";
-import { Box, Typography } from "@mui/material";
+import React, { useMemo, useState } from "react";
+import { Box, Typography, Button } from "@mui/material";
 
 const ExpansionLocationTags = ({
   brand,
@@ -8,210 +8,176 @@ const ExpansionLocationTags = ({
   isSmallDesktop,
   isLargeDesktop,
 }) => {
+  const [showAll, setShowAll] = useState(false);
+  
+  const subCategory = brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories?.sub || "Business";
 
-  // Process location data more safely with null checks
-  const locations = useMemo(() => {
+  // Process only state data with null checks
+  const states = useMemo(() => {
     try {
-      return (
-        brand?.[0]?.brandexpansionlocationdatas?.expansionLocations?.domestic?.locations
-          ?.flatMap((loc) =>
-            loc?.districts?.flatMap((dist) =>
-              dist?.cities?.map((city) => ({
-                city,
-                district: dist?.district,
-                state: loc?.state,
-              })) || []
-            ) || []
-          ) || []
-      );
+      const locations = brand?.[0]?.brandexpansionlocationdatas?.expansionLocations?.domestic?.locations || [];
+      
+      // Extract unique states
+      const stateSet = new Set();
+      const uniqueStates = [];
+      
+      locations.forEach((loc) => {
+        const state = loc?.state;
+        if (state && !stateSet.has(state)) {
+          stateSet.add(state);
+          uniqueStates.push(state);
+        }
+      });
+      
+      return uniqueStates;
     } catch (error) {
       console.error("Error processing location data:", error);
-      return [];
+      return ["Delhi", "Haryana", "Himachal Pradesh", "Jammu and Kashmir", "Punjab", "Uttar Pradesh", "Rajasthan", "Maharashtra", "Karnataka", "Tamil Nadu"];
     }
   }, [brand]);
 
-  const category = useMemo(
-    () => brand?.[0]?.brandfranchisedetails?.franchiseDetails?.brandCategories || {},
-    [brand]
-  );
+  // Create formatted state tags
+  const stateTags = useMemo(() => {
+    if (!states.length) return [];
+    
+    return states.map((state, index) => ({
+      id: `${state}-${index}`,
+      label: `${subCategory} Franchise in ${state}`,
+      state: state
+    }));
+  }, [states, subCategory]);
 
-  // Create formatted chips with unique keys
-  const formattedChipsState = useMemo(
-    () =>
-      locations.map((loc, index) => ({
-        key: `${loc.state}-${index}-${Date.now()}`,
-        label: `${category.child || ""} franchise in ${loc.state}`,
-      })),
-    [locations, category]
-  );
+  // Calculate initial tags to show based on device
+  const initialTagsToShow = useMemo(() => {
+    if (isMobile) {
+      // For mobile: Show 3 lines of tags
+      // Assuming 2 tags per line on mobile = 6 tags for 3 lines
+      return 5;
+    }
+    if (isTablet) {
+      // For tablet: show 8 tags initially
+      return 5;
+    }
+    // For tablet and desktop: show 10 tags initially
+    return 10;
+  }, [isMobile]);
 
-  const formattedChipsDistrict = useMemo(
-    () =>
-      locations.map((loc, index) => ({
-        key: `${loc.district}-${index}-${Date.now()}`,
-        label: `${category.child || ""} franchise in ${loc.district}`,
-      })),
-    [locations, category]
-  );
+  const hasMoreTags = stateTags.length > initialTagsToShow;
 
-  const formattedChipsCity = useMemo(
-    () =>
-      locations.map((loc, index) => ({
-        key: `${loc.city}-${index}-${Date.now()}`,
-        label: `${category.child || ""} franchise in ${loc.city}`,
-      })),
-    [locations, category]
-  );
-
-  // Filter out duplicates
-  const uniqueStateChips = useMemo(
-    () =>
-      Array.from(
-        new Map(formattedChipsState.map((item) => [item.label, item])).values()
-      ),
-    [formattedChipsState]
-  );
-
-  const uniqueDistrictChips = useMemo(
-    () =>
-      Array.from(
-        new Map(formattedChipsDistrict.map((item) => [item.label, item])).values()
-      ),
-    [formattedChipsDistrict]
-  );
-
-  const uniqueCityChips = useMemo(
-    () =>
-      Array.from(
-        new Map(formattedChipsCity.map((item) => [item.label, item])).values()
-      ),
-    [formattedChipsCity]
-  );
+  // Determine which tags to show
+  const visibleTags = useMemo(() => {
+    return showAll ? stateTags : stateTags.slice(0, initialTagsToShow);
+  }, [stateTags, showAll, initialTagsToShow]);
 
   return (
     <Box
       sx={{
-        border: "1px solid #e0e0e0",
-        borderRadius: "8px",
         p: 2,
-        display: "grid",
-        gridTemplateColumns: isMobile
-          ? "1fr"
-          : isTablet
-          ? "repeat(2, 1fr)"
-          : "repeat(3, 1fr)",
-        gap: 2,
-        height: isMobile ? "auto" : "50px",
-        overflowY: "auto",
+        backgroundColor: "white",
+        borderRadius: 3,
       }}
     >
-      {/* State Column - Always visible */}
-      <Box>
-        {uniqueStateChips.length > 0 ? (
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-            {uniqueStateChips
-              .slice(0, isMobile ? 3 : uniqueStateChips.length)
-              .map((chip) => (
+      {/* Title - "Tags:" with bold */}
+      <Typography 
+        variant="body2" 
+        component="span"
+        sx={{ 
+          mr: 1,
+          color: "#f7a853ff",
+          fontWeight: 600,
+          fontSize: isMobile ? "0.875rem" : "0.9375rem",
+        }}
+      >
+        Tags:
+      </Typography>
+
+      {/* Tags Display */}
+      {stateTags.length > 0 ? (
+        <>
+          {/* Tags Container */}
+          <Box component="span" sx={{ display: "inline" }}>
+            {visibleTags.map((tag, index) => (
+              <React.Fragment key={tag.id}>
                 <Typography
-                  key={chip.key}
-                  variant="caption"
+                  component="span"
                   sx={{
-                    borderRadius: "4px",
-                    color: "black",
-                    whiteSpace: "nowrap",
-                    fontSize: isMobile ? "0.7rem" : "0.8rem",
+                    color: "#333",
+                    fontSize: isMobile ? "0.875rem" : "0.9375rem",
+                    fontWeight: 400,
+                    lineHeight: 1.6,
                   }}
                 >
-                  {chip.label}
+                  {tag.label}
                 </Typography>
-              ))}
+                
+                {/* Add separator | except for last item */}
+                {index < visibleTags.length - 1 && (
+                  <Typography
+                    component="span"
+                    sx={{
+                      color: "#333",
+                      mx: 1,
+                      fontSize: isMobile ? "0.875rem" : "0.9375rem",
+                      fontWeight: 400,
+                    }}
+                  >
+                    |{" "}
+                  </Typography>
+                )}
+              </React.Fragment>
+            ))}
+            
+            {/* Show More/Less Button */}
+            {hasMoreTags && (
+              <>
+                <Typography
+                  component="span"
+                  sx={{
+                    color: "#333",
+                    mx: 1,
+                    fontSize: isMobile ? "0.875rem" : "0.9375rem",
+                    fontWeight: 400,
+                  }}
+                >
+                  |{" "}
+                </Typography>
+                
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => setShowAll(!showAll)}
+                  sx={{
+                    textTransform: "none",
+                    fontSize: isMobile ? "0.875rem" : "0.9375rem",
+                    color: "#1976d2",
+                    fontWeight: 400,
+                    minWidth: "auto",
+                    p: 0,
+                    "&:hover": {
+                      backgroundColor: "transparent",
+                      textDecoration: "underline",
+                    },
+                  }}
+                >
+                  {showAll ? "Show less..." : "Show more..."}
+                </Button>
+              </>
+            )}
           </Box>
-        ) : (
-          <Typography
-            variant="body2"
-            sx={{
-              color: "text.secondary",
-              textAlign: "center",
-              mt: 2,
-            }}
-          >
-            No state locations available
-          </Typography>
-        )}
-      </Box>
-
-      {/* District Column - hidden on mobile */}
-      {!isMobile && (
-        <Box>
-          {uniqueDistrictChips.length > 0 ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {uniqueDistrictChips
-                .slice(0, isMobile ? 3 : uniqueDistrictChips.length)
-                .map((chip) => (
-                  <Typography
-                    key={chip.key}
-                    variant="caption"
-                    sx={{
-                      borderRadius: "4px",
-                      color: "white",
-                      whiteSpace: "nowrap",
-                      fontSize: isMobile ? "0.7rem" : "0.8rem",
-                    }}
-                  >
-                    {chip.label}
-                  </Typography>
-                ))}
-            </Box>
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                textAlign: "center",
-                mt: 2,
-              }}
-            >
-              No district locations available
-            </Typography>
-          )}
-        </Box>
-      )}
-
-      {/* City Column - only visible on desktop */}
-      {(isLargeDesktop || isSmallDesktop) && (
-        <Box>
-          {uniqueCityChips.length > 0 ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {uniqueCityChips
-                .slice(0, isMobile ? 3 : uniqueCityChips.length)
-                .map((chip) => (
-                  <Typography
-                    key={chip.key}
-                    variant="caption"
-                    sx={{
-                      borderRadius: "4px",
-                      color: "black",
-                      whiteSpace: "nowrap",
-                      fontSize: isMobile ? "0.7rem" : "0.8rem",
-                    }}
-                  >
-                    {chip.label}
-                  </Typography>
-                ))}
-            </Box>
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{
-                color: "text.secondary",
-                textAlign: "center",
-                mt: 2,
-              }}
-            >
-              No city locations available
-            </Typography>
-          )}
-        </Box>
+        </>
+      ) : (
+        /* Empty State */
+        <Typography
+          component="span"
+          variant="body2"
+          sx={{
+            color: "text.secondary",
+            fontStyle: "italic",
+            fontSize: isMobile ? "0.875rem" : "0.9375rem",
+          }}
+        >
+          No franchise locations available
+        </Typography>
       )}
     </Box>
   );

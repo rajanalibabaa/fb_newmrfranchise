@@ -1,16 +1,15 @@
-
 import { useEffect, useState, useMemo, lazy, Suspense } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { CircularProgress, Box } from "@mui/material";
 import axios from "axios";
 import { userId } from "../../Utils/autherId.jsx";
 import SEO from "../../Components/SEO/Seo";
-import img1 from '../../assets/Images/bg25.jpeg'
+import img1 from "../../assets/Images/bg25.jpeg";
 const BrandDetails = lazy(() => import("./BrandDetail.jsx"));
 
 function BrandDetailsPage() {
   const { brandId: routeBrandId } = useParams();
-  
+
   const location = useLocation();
   const [brandData, setBrandData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -79,12 +78,17 @@ function BrandDetailsPage() {
         );
         let brand = res.data?.data;
         // console.log("brand coming data ",brand);
-        
+
         // Guarantee always array for BrandDetails
         setBrandData(Array.isArray(brand) ? brand : [brand]);
-        sessionStorage.setItem(brandCacheKey, JSON.stringify(Array.isArray(brand) ? brand : [brand]));
+        sessionStorage.setItem(
+          brandCacheKey,
+          JSON.stringify(Array.isArray(brand) ? brand : [brand])
+        );
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to load brand details.");
+        setError(
+          err.response?.data?.message || "Failed to load brand details."
+        );
       } finally {
         setLoading(false);
       }
@@ -152,18 +156,24 @@ function BrandDetailsPage() {
       "fico",
       0,
       "investmentRange",
-    ]) || pageBrand.investmentRange || "5-50 lakhs";
+    ]) ||
+    pageBrand.investmentRange ||
+    "5-50 lakhs";
 
   const brandDescription =
     getNested(pageBrand, [
       "brandfranchisedetails",
       "franchiseDetails",
       "brandDescription",
-    ]) || pageBrand.shortDescription || `Franchise opportunity for ${brandName} in India`;
+    ]) ||
+    pageBrand.shortDescription ||
+    `Franchise opportunity for ${brandName} in India`;
 
   const roi = pageBrand.roi || "15-25";
   const roiPeriod = pageBrand.roiPeriod || "12-24 months";
-  const requirements = pageBrand.requirements || "minimum 200-500 sq ft space and business experience";
+  const requirements =
+    pageBrand.requirements ||
+    "minimum 200-500 sq ft space and business experience";
   const establishedYear = pageBrand.establishedYear
     ? `${pageBrand.establishedYear}-01-01`
     : undefined;
@@ -173,10 +183,14 @@ function BrandDetailsPage() {
       "franchiseDetails",
       "brandCategories",
       "child",
-    ]) || pageBrand.category || "Food & Beverage";
+    ]) ||
+    pageBrand.category ||
+    "Food & Beverage";
   const slug = pageBrand.slug || brandId;
   const brandUrl = `https://mrfranchise.in/brand/${slug}`;
-  const brandImage = getNested(pageBrand, ["uploads", "logo"]) || "https://mrfranchise.in/images/default-brand.jpg";
+  const brandImage =
+    getNested(pageBrand, ["uploads", "logo"]) ||
+    "https://mrfranchise.in/images/default-brand.jpg";
 
   // --- SCHEMAS (robust and error-free) ---
   const breadcrumbSchema = {
@@ -255,7 +269,9 @@ function BrandDetailsPage() {
     <>
       <SEO
         title={`Start ${brandName} Franchise in India | Cost ₹${investMentRange} | ROI ${roi}%`}
-        description={`${brandDescription}. Investment: ₹${investMentRange}, ROI: ${roi}%. ${pageBrand.keyFeatures || "Trusted brand with proven business model"}.`}
+        description={`${brandDescription}. Investment: ₹${investMentRange}, ROI: ${roi}%. ${
+          pageBrand.keyFeatures || "Trusted brand with proven business model"
+        }.`}
         keywords={`${brandName} franchise, ${brandName} franchise cost, ${brandName} ROI, ${category} franchise opportunities`}
         canonical={brandUrl}
         url={brandUrl}
@@ -275,33 +291,36 @@ function BrandDetailsPage() {
 
       <Suspense
         fallback={
-          <Box sx={{ minHeight: 220, display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <Box
+            sx={{
+              minHeight: 220,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <CircularProgress color="warning" size={40} />
           </Box>
-          
         }
       >
         <Box
-  sx={{
-    
-                    backgroundImage: `url(${img1})`,
-                   backgroundSize: "400px auto",  
-                   backgroundAttachment: "fixed",
-                   // fill entire box
-                   // backgroundPosition: "center",   // center image
-                   backgroundRepeat: "repeat",
-                   minHeight: "87vh",             // full screen height
-                   width: "100%",
-                
-  }}
->
-  <BrandDetails
-    brandData={brandData}
-    fromSession={true}
-    key={brandCacheKey}
-  />
-</Box>
-
+          sx={{
+            backgroundImage: `url(${img1})`,
+            backgroundSize: "400px auto",
+            backgroundAttachment: "fixed",
+            // fill entire box
+            // backgroundPosition: "center",   // center image
+            backgroundRepeat: "repeat",
+            minHeight: "87vh", // full screen height
+            width: "100%",
+          }}
+        >
+          <BrandDetails
+            brandData={brandData}
+            fromSession={true}
+            key={brandCacheKey}
+          />
+        </Box>
       </Suspense>
     </>
   );

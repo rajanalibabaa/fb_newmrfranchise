@@ -80,46 +80,7 @@ function LazyOverviewTab({ brand }) {
 }
 
 
-const ExpansionLocationSection = ({
-  brand,
-  isMobile,
-  isTablet,
-  isSmallDesktop,
-  isLargeDesktop,
-}) => {
-  const [visible, setVisible] = useState(false);
-  const ref = useRef();
 
-  useEffect(() => {
-    if (!ref.current) return;
-    const observer = new window.IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setVisible(true);
-      },
-      { rootMargin: "300px" }
-    );
-    observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <div ref={ref}>
-      {visible ? (
-        <Suspense fallback={<div style={{ minHeight: 100 }}>Loading tags...</div>}>
-          <ExpansionLocationTags
-            brand={brand}
-            isMobile={isMobile}
-            isTablet={isTablet}
-            isSmallDesktop={isSmallDesktop}
-            isLargeDesktop={isLargeDesktop}
-          />
-        </Suspense>
-      ) : (
-        <div style={{ minHeight: 100 }} /> // Keep layout stable
-      )}
-    </div>
-  );
-};
 
 const BrandDetails = ({ brandData }) => {
   const theme = useTheme();
@@ -291,6 +252,7 @@ const handleSubmit = useCallback(
         
         applyId: id,
       };
+
  
       // Validate required fields
       const requiredFields = [
@@ -629,30 +591,24 @@ const handleSubmit = useCallback(
       </Suspense>
 
       {/* EXPANSION LOCATIONS LAZY ON SCROLL */}
-      {/* <Box
+      <Box
         sx={{
-          width: "90%",
-          maxWidth: 1200,
+          width: isMobile ?"93%" : isTablet ? "94%" : "89%",
           mx: "auto",
           my: 4,
           px: isMobile ? 1 : isTablet ? 3 : 4,
         }}
         color={"#ff9800"}
       >
-        <Typography
-          variant="h6"
-          sx={{ mb: 2, fontSize: isMobile ? "1.25rem" : "1.5rem" }}
-        >
-          Tags
-        </Typography>
-        <ExpansionLocationSection
-          brand={selectedBrand}
-          isMobile={isMobile}
-          isTablet={isTablet}
-          isSmallDesktop={isSmallDesktop}
-          isLargeDesktop={isLargeDesktop}
-        />
-      </Box> */}
+         <ExpansionLocationTags
+            brand={selectedBrand}
+            isMobile={isMobile}
+            isTablet={isTablet}
+            isSmallDesktop={isSmallDesktop}
+            isLargeDesktop={isLargeDesktop}
+          />
+      </Box> 
+    
       <Disclaimer isMobile={isMobile} />
 
       <Suspense fallback={null}>
@@ -661,6 +617,9 @@ const handleSubmit = useCallback(
       <Suspense fallback={<div style={{height: 300, background: "#eee"}} />}>
         <Footer />
       </Suspense>
+
+
+
 
       {/* Login Dialog */}
       {showLogin && (
