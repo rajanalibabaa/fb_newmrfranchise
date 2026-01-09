@@ -10,6 +10,7 @@ const BrandDetails = lazy(() => import("./BrandDetail.jsx"));
 
 function BrandDetailsPage() {
   const { brandId: routeBrandId } = useParams();
+  
   const location = useLocation();
   const [brandData, setBrandData] = useState(null);
   const [loading, setLoading] = useState(true);
